@@ -1,0 +1,107 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 800px;
+  position: relative;
+  overflow: hidden; /* Prevents content from spilling out */
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  z-index: 1; /* Overlay */
+}
+
+.heroImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures image covers the container */
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0; /* Behind everything */
+}
+
+.headerContent {
+  position: relative;
+  z-index: 2; /* Above the overlay */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  animation-duration: 2s;
+  -webkit-animation-name: fadeIn;
+  animation-name: fadeIn;
+  width: 100%; /* Full width */
+  padding: 0 15%; /* Adjust padding instead of margin */
+}
+
+.headerContent h1 {
+  font-weight: 500;
+  font-size: 2.5rem;
+  line-height: 1.222;
+  color: #ffffff;
+  margin-top: 0;
+  margin-bottom: 1rem; /* Adjust bottom margin */
+  padding-top: 3.2rem;
+}
+
+.headerContent h3 {
+  color: rgba(255, 255, 255, 0.8); /* Adjusted for better visibility */
+  font-weight: 300;
+  font-size: 2rem;
+  line-height: 1.667;
+  margin-bottom: 1rem; /* Added bottom margin */
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.button {
+  padding: 12px 25px;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.buttonGetStarted {
+  background-color: #539165;
+}
+
+.buttonLearnMore {
+  font-size: 1.3rem;
+  background-color: transparent;
+  border: 2px solid white;
+}
+
+.button:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .headerContent h3 {
+    font-size: 1.5rem;
+  }
+  .buttonContainer {
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 25px;
+  }
+
+  .button {
+    width: 100%;
+  }
+}
