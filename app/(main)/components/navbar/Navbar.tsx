@@ -6,15 +6,17 @@ export const Navbar = () => {
   return (
     <nav className={styles.container} role="navigation">
       <Link href="/">
-      <Image
-        className={styles.logo}
-        src="/worknify_main_logo.svg"
-        alt="Worknify"
-        width={300}
-        height={60}
-      />
+        <Image
+          className={styles.logo}
+          src="/worknify_main_logo.svg"
+          alt="Worknify"
+          width={300}
+          height={60}
+        />
       </Link>
-      <Link className={styles.getStartedBtn} href="#">Get Started</Link>
+      <Link className={styles.getStartedBtn} href="/api/auth/signin">
+        Get Started
+      </Link>
     </nav>
   );
 };
