@@ -2,9 +2,12 @@ import { databaseDrizzle } from "@/db/database";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider, { GoogleProfile } from "next-auth/providers/google";
-import FacebookProvider from "next-auth/providers/facebook";
+import FacebookProvider, {
+  FacebookProfile,
+} from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GithubProvider from "next-auth/providers/github";
+import GithubProvider, { GithubProfile } from "next-auth/providers/github";
+import GitlabProvider, { GitLabProfile } from "next-auth/providers/gitlab";
 import bcrypt from "bcrypt";
 import { env } from "process";
 export const authOptions: NextAuthOptions = {
@@ -48,18 +51,41 @@ export const authOptions: NextAuthOptions = {
     FacebookProvider({
       clientId: env.FACEBOOK_CLIENT_ID!,
       clientSecret: env.FACEBOOK_CLIENT_SECRET!,
-      profile(profile) {
+      profile(profile: FacebookProfile) {
         return {
           id: profile.id,
           name: profile.name,
-          image: profile.picture,
-          emailVerified: profile.email,
+          image: profile.picture.data.url,
+          email: profile.email,
         };
       },
     }),
-
-    GithubProvider({ clientId: "xxxx", clientSecret: "xxx" }),
+    GithubProvider({
+      clientId: env.GITHUB_ID!,
+      clientSecret: env.GITHUB_SECRET!,
+      profile(profile: GithubProfile) {
+        return {
+          id: profile.id.toString(),
+          name: profile.name,
+          image: profile.avatar_url,
+          email: profile.email,
+        };
+      },
+    }),
+    GitlabProvider({
+      clientId: process.env.GITLAB_CLIENT_ID!,
+      clientSecret: process.env.GITLAB_CLIENT_SECRET!,
+      profile(profile: GitLabProfile) {
+        return {
+          id: profile.id.toString(),
+          name: profile.name,
+          image: profile.avatar_url,
+          email: profile.email,
+        };
+      },
+    }),
   ],
+
   session: {
     strategy: "jwt",
   },
