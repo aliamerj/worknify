@@ -1,8 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./Navbar.module.css";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { UserAvatar } from "../userAvatar/userAvatar";
 
-export const Navbar = () => {
+export const Navbar = async () => {
+  const user = await getServerSession(authOptions);
   return (
     <nav className={styles.container} role="navigation">
       <Link href="/">
@@ -14,9 +18,13 @@ export const Navbar = () => {
           height={60}
         />
       </Link>
-      <Link className={styles.getStartedBtn} href="/api/auth/signin">
-        Get Started
-      </Link>
+      {user ? (
+        <UserAvatar userImage={user.user?.image} />
+      ) : (
+        <Link className={styles.getStartedBtn} href="/api/auth/signin">
+          Get Started
+        </Link>
+      )}
     </nav>
   );
 };
