@@ -1,11 +1,7 @@
 .container {
-  height: var(--navbar-height);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
   background-color: #e4ebf3;
   border-radius: 10px;
-box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 .logo {
   cursor: pointer;
@@ -15,7 +11,7 @@ box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   transition: transform 0.2s;
   border-radius: 25px;
   font-weight: 500;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   padding: 10px 20px;
   border: none;
   background-color: #164863;

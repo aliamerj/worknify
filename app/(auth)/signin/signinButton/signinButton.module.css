@@ -1,0 +1,51 @@
+.button {
+  width: 20rem;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: bold;
+  margin: 10px 0;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border: none;
+}
+
+.providerIcon {
+  width: 24px;
+  height: 24px;
+  margin-right: 15px;
+}
+
+.google {
+  background-color: #ffffff;
+  color: #757575;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.facebook {
+  background-color: #4267b2;
+  color: #ffffff;
+}
+
+.gitlub {
+  background-color: orange;
+  color: #ffffff;
+}
+
+.linkedIn {
+  background-color: #2867b2;
+  color: #ffffff;
+}
+
+.github {
+  background-color: #333333;
+  color: #ffffff;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}

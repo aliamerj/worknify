@@ -1,0 +1,121 @@
+.loginPage {
+  display: flex;
+  height: 100vh;
+}
+
+.loginSection {
+  flex: 1.5;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-bottom-left-radius: 75% 45px;
+}
+
+.brandingSection {
+  flex: 1.5;
+  padding: 5em;
+  background: linear-gradient(45deg, #539165 10%, #4c3575 40%, #f6ad10 80%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border-end-start-radius: 23%;
+  text-align: center;
+}
+
+.loginPage h1 {
+  margin-bottom: 1.7rem;
+}
+.loginPage h2 {
+  margin-bottom: 1.5rem;
+}
+.loginSection h2 {
+  color: #040e32;
+}
+
+.loginPage p {
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+  max-width: 60%;
+  text-align: center;
+}
+
+.providerButton {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #4c3575;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 18px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.providerButton:hover {
+  background-color: #6a4fad;
+}
+
+.backToHome {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+}
+
+.backToHome a {
+  color: #777; /* gray color */
+  text-decoration: none; /* remove underline from link */
+  font-weight: 400; /* regular weight text */
+  font-size: 1.2rem; /* adjust as per your preference */
+  display: flex;
+  align-items: center;
+}
+
+.arrow {
+  padding-bottom: 5px;
+  margin-right: 5px; /* spacing between arrow and text */
+}
+
+.backToHome a:hover {
+  color: #555; /* slightly darker gray on hover */
+}
+
+/* Responsive Styles */
+
+/* Small devices (phones) */
+@media only screen and (max-width: 900px) {
+  .loginPage {
+    flex-direction: column;
+  }
+  .loginSection {
+    margin-top: 3rem;
+  }
+
+  .loginSection,
+  .brandingSection {
+    flex: 1; /* Evenly distribute space */
+    padding: 20px;
+    border-radius: 0;
+  }
+
+  .loginPage p {
+    max-width: 90%;
+  }
+
+  .brandingSection {
+    border-end-start-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+/* Medium devices (tablets) */
+@media only screen and (min-width: 601px) and (max-width: 992px) {
+  .loginPage p {
+    max-width: 80%;
+  }
+}

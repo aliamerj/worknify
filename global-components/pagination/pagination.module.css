@@ -1,0 +1,41 @@
+.paginationContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+}
+
+.pageInfo {
+  margin-right: 20px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.pageButton {
+  padding: 5px 10px;
+  margin: 0 5px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pageButton:hover {
+  background-color: #e9ecef;
+}
+
+.pageButton[disabled] {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.pageButton:not([disabled]):hover {
+  background-color: #dee2e6;
+}
+
+.activeButton {
+  font-weight: bold;
+  color: #007bff;
+}
+
+/* Add additional responsive design adjustments if necessary */

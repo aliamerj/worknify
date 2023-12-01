@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import {Rubik} from "next/font/google";
+import { Rubik } from "next/font/google";
 import "../globals.css";
-import { Navbar } from "./components/navbar/Navbar";
+import { Providers } from "../providers";
+import { NavBar } from "./components/navbar/Navbar";
 
 const rubik = Rubik({
   subsets: ["latin"],
@@ -19,10 +20,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="light">
       <body className={rubik.className}>
-        <Navbar/>
-        {children}
+        <Providers>
+          <NavBar />
+          {children}
+        </Providers>
       </body>
     </html>
   );

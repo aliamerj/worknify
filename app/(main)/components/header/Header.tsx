@@ -1,6 +1,8 @@
 import Image from "next/image";
 import hero from "@/public/hero.png";
 import styles from "./Header.module.css";
+import { Button } from "@nextui-org/button";
+import Link from "next/link";
 
 export const Header = () => {
   return (
@@ -17,17 +19,25 @@ export const Header = () => {
           Collaboration
         </h1>
         <h3>
-          Discover a world where efficient project management meets dynamic team
-          building – Worknify empowers you to seamlessly integrate top talent
-          into your projects, fostering collaboration and success at every step.
+          Merging sophisticated project tracking with streamlined hiring –
+          Worknify brings together all you need for team efficiency and project
+          success under one roof.
         </h3>
         <div className={styles.buttonContainer}>
-          <button className={`${styles.button} ${styles.buttonGetStarted}`}>
+          <Button
+            as={Link}
+            href="/api/auth/signin"
+            className={`${styles.button} ${styles.buttonGetStarted}`}
+          >
             Get Started
-          </button>
-          <button className={`${styles.button} ${styles.buttonLearnMore}`}>
+          </Button>
+          <Button
+            as={Link}
+            href="#"
+            className={`${styles.button} ${styles.buttonLearnMore}`}
+          >
             Learn More
-          </button>
+          </Button>
         </div>{" "}
       </div>
     </main>

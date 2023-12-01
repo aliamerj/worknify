@@ -1,30 +1,38 @@
 import Image from "next/image";
-import Link from "next/link";
 import styles from "./Navbar.module.css";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { UserAvatar } from "../userAvatar/userAvatar";
+import { Navbar, NavbarBrand, NavbarContent } from "@nextui-org/navbar";
+import Link from "next/link";
 
-export const Navbar = async () => {
-  const user = await getServerSession(authOptions);
+export const NavBar = async () => {
+  const sesstion = await getServerSession(authOptions);
   return (
-    <nav className={styles.container} role="navigation">
-      <Link href="/">
+    <Navbar className={styles.container}>
+      <NavbarBrand as={Link} href="/">
         <Image
           className={styles.logo}
           src="/worknify_main_logo.svg"
           alt="Worknify"
-          width={300}
-          height={60}
+          width={190}
+          height={50}
         />
-      </Link>
-      {user ? (
-        <UserAvatar userImage={user.user?.image} />
-      ) : (
-        <Link className={styles.getStartedBtn} href="/api/auth/signin">
-          Get Started
-        </Link>
-      )}
-    </nav>
+      </NavbarBrand>
+
+      <NavbarContent justify="end">
+        {sesstion?.user ? (
+          <UserAvatar
+            name={sesstion.user.name!}
+            email={sesstion.user.email!}
+            userImage={sesstion.user.image!}
+          />
+        ) : (
+          <Link className={styles.getStartedBtn} href="/api/auth/signin">
+            Get Started
+          </Link>
+        )}
+      </NavbarContent>
+    </Navbar>
   );
 };
