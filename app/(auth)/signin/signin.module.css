@@ -33,7 +33,9 @@
   margin-bottom: 1.5rem;
 }
 .loginSection h2 {
-  color: #040e32;
+  color: #333;
+  font-size: 2rem;
+  font-weight: bold;
 }
 
 .loginPage p {

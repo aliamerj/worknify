@@ -19,10 +19,39 @@ const config = {
       themes: {
         light: {
           colors: {
+            default: {
+              DEFAULT: "#687EFF",
+              foreground: "#333",
+            },
             primary: {
               DEFAULT: "#164863",
               foreground: "#fff",
             },
+            secondary: {
+              DEFAULT: "#427D9D",
+              foreground: "#E4EBF3",
+            },
+            success: {
+              DEFAULT: "#539165",
+              foreground: "#E4EBF3",
+            },
+            content1: {
+              DEFAULT: "#040E32",
+              foreground: "#fff",
+            },
+            content2: {
+              DEFAULT: "#9BBEC8",
+              foreground: "#333",
+            },
+            content3: {
+              DEFAULT: "#646464",
+              foreground: "#fff",
+            },
+            background: {
+              DEFAULT: "#E4EBF3",
+              foreground: "#333",
+            },
+            foreground: "#333",
           },
         },
       },
