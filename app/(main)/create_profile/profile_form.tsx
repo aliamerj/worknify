@@ -1,6 +1,6 @@
 "use client";
 import { Button, Divider, Input, Spacer, Textarea } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect } from "react";
 
 import {
   Controller,
@@ -8,30 +8,12 @@ import {
   useFieldArray,
   useForm,
 } from "react-hook-form";
-
-interface AdditionalForm {
-  title: string;
-  description: string;
-}
-
-interface FormState {
-  name: string;
-  username: string;
-  email: string;
-  jobTitle: string;
-  address: string;
-  gitHub?: string;
-  linkedin?: string;
-  phone?: string;
-  sections: AdditionalForm[];
-}
+import { FormState, useProfileData } from "./profile_context";
 
 export const ProfileForm = () => {
-  const { control, handleSubmit } = useForm<FormState>({
-    defaultValues: {
-      name: "Ali Amer",
-      email: "aliamer19ali@gmail.com",
-    },
+  const { profileData, updateProfileData } = useProfileData();
+  const { control, handleSubmit, watch } = useForm<FormState>({
+    defaultValues: profileData,
   });
   const onSubmit: SubmitHandler<FormState> = (data) => {
     console.log(data);
@@ -40,12 +22,19 @@ export const ProfileForm = () => {
     control,
     name: "sections",
   });
-
+  useEffect(() => {
+    const subscription = watch((value, _) => {
+      console.log(value);
+      // Ensure 'value' matches the structure of FormState
+      updateProfileData(value as Partial<FormState>);
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, updateProfileData]);
   return (
     <div className="flex justify-center">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="max-w-md rounded-xl bg-white p-5 drop-shadow-xl"
+        className="max-w-md rounded-xl bg-white p-5 drop-shadow-xl md:max-w-lg"
       >
         <Controller
           name="username"
