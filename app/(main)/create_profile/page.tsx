@@ -18,7 +18,7 @@ export default async function CreateProfile() {
           </h2>
           <ProfileForm />
         </div>
-        <div className="mt-4 w-full bg-red-200 px-4 py-4 md:mt-0 md:w-6/12 ">
+        <div className="mt-4 w-full px-4 py-4 md:mt-0 md:w-6/12 ">
           <ProfileDisplay />
         </div>
       </main>

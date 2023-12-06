@@ -12,6 +12,7 @@ export interface FormState {
   email: string;
   jobTitle: string;
   address: string;
+  intro: string;
   gitHub?: string;
   linkedin?: string;
   phone?: string;
@@ -54,6 +55,7 @@ export const ProfileDataProvider = ({
     gitHub: "",
     linkedin: "",
     sections: [],
+    intro: "",
   });
 
   const updateProfileData = (newData: Partial<FormState>) => {

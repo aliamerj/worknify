@@ -1,6 +1,8 @@
 "use client";
 import { Button, Divider, Input, Spacer, Textarea } from "@nextui-org/react";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
+import SimpleMDE, { SimpleMDEReactProps } from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
 
 import {
   Controller,
@@ -30,6 +32,23 @@ export const ProfileForm = () => {
     });
     return () => subscription.unsubscribe();
   }, [watch, updateProfileData]);
+
+  const editorOptions = useMemo(
+    () =>
+      ({
+        toolbar: [
+          "bold",
+          "italic",
+          "heading",
+          "|",
+          "quote",
+          "unordered-list",
+          "ordered-list",
+          "link",
+        ],
+      }) as SimpleMDEReactProps,
+    [],
+  );
   return (
     <div className="flex justify-center">
       <form
@@ -77,6 +96,13 @@ export const ProfileForm = () => {
                 {...field}
               />
             )}
+          />
+          <Controller
+            render={({ field }) => (
+              <Textarea fullWidth label="Info" {...field} />
+            )}
+            name="intro"
+            control={control}
           />
 
           <Controller
@@ -183,11 +209,11 @@ export const ProfileForm = () => {
                 control={control}
               />
               <Controller
-                render={({ field }) => (
-                  <Textarea fullWidth label="Info" {...field} />
-                )}
                 name={`sections.${index}.description`}
                 control={control}
+                render={({ field }) => (
+                  <SimpleMDE {...field} options={editorOptions} />
+                )}
               />
             </div>
           </div>
