@@ -11,15 +11,15 @@ export default async function CreateProfile() {
       name={session?.user?.name ?? ""}
       email={session?.user?.email ?? ""}
     >
-      <main className="mt-5 flex flex-col gap-2 md:flex-row md:justify-evenly md:py-5">
-        <div className="w-full md:w-5/12">
-          <h2 className="my-5 mb-4 text-center text-3xl font-bold text-foreground md:pt-9">
+      <main className="mt-5 flex flex-col gap-2 lg:flex-row lg:justify-evenly lg:py-5">
+        <div className="w-full lg:w-5/12">
+          <h2 className="mb-4 text-center text-3xl font-bold text-foreground lg:pt-9">
             Create your profile
           </h2>
           <ProfileForm />
         </div>
-        <div className="mt-4 w-full px-4 py-4 md:mt-0 md:w-6/12">
-          <ProfileDisplay />
+        <div className="mt-4 w-full px-4 py-4 lg:mt-0 lg:w-6/12">
+          <ProfileDisplay userId={session?.user.id!} />
         </div>
       </main>
     </ProfileDataProvider>

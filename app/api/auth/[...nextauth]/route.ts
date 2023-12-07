@@ -93,13 +93,27 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
 
+  callbacks: {
+    session: async ({ session, token }) => {
+      if (session?.user) {
+        session.user.id = token.sub; // token.uid or token.sub both work
+      }
+      return session;
+    },
+    jwt: async ({ user, token }) => {
+      if (user) {
+        token.sub = user.id; // token.uid or token.sub both work
+      }
+      return token;
+    },
+  },
+
   theme: {
     colorScheme: "light",
     brandColor: "#164863",
     logo: "/worknify_main_logo.svg",
     buttonText: "#fff",
   },
-
   secret: process.env.NEXTAUTH_SECRET,
 };
 
