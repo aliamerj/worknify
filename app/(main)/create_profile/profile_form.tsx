@@ -1,9 +1,7 @@
 "use client";
 import { Button, Divider, Input, Spacer, Textarea } from "@nextui-org/react";
-import React, { useEffect, useMemo } from "react";
-import SimpleMDE, { SimpleMDEReactProps } from "react-simplemde-editor";
-import "easymde/dist/easymde.min.css";
-
+import React, { useEffect } from "react";
+import "react-quill/dist/quill.snow.css";
 import {
   Controller,
   SubmitHandler,
@@ -11,6 +9,7 @@ import {
   useForm,
 } from "react-hook-form";
 import { FormState, useProfileData } from "./profile_context";
+import ReactQuill from "react-quill";
 
 export const ProfileForm = () => {
   const { profileData, updateProfileData } = useProfileData();
@@ -26,54 +25,34 @@ export const ProfileForm = () => {
   });
   useEffect(() => {
     const subscription = watch((value, _) => {
-      console.log(value);
-      // Ensure 'value' matches the structure of FormState
       updateProfileData(value as Partial<FormState>);
     });
     return () => subscription.unsubscribe();
   }, [watch, updateProfileData]);
 
-  const editorOptions = useMemo(
-    () =>
-      ({
-        toolbar: [
-          "bold",
-          "italic",
-          "heading",
-          "|",
-          "quote",
-          "unordered-list",
-          "ordered-list",
-          "link",
-        ],
-      }) as SimpleMDEReactProps,
-    [],
-  );
+  const modules = {
+    toolbar: [
+      [{ size: ["small", false, "large", "huge"] }],
+      ["bold", "italic", "underline"],
+      [{ color: [] }, { background: [] }],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link"],
+    ],
+  };
+
   return (
     <div className="flex justify-center">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="max-w-md rounded-xl bg-white p-5 drop-shadow-xl md:max-w-lg"
+        className="mx-2 rounded-xl bg-white p-5 drop-shadow-xl md:max-w-lg"
       >
-        <Controller
-          name="username"
-          control={control}
-          render={({ field }) => (
-            <Input
-              isRequired
-              type="text"
-              color="success"
-              label="Username"
-              className="mb-5 max-w-full"
-              {...field}
-            />
-          )}
-        />
         <Controller
           name="jobTitle"
           control={control}
+          rules={{ required: true, maxLength: 20 }}
           render={({ field }) => (
             <Input
+              maxLength={20}
               isRequired
               type="text"
               label="Job Title"
@@ -87,10 +66,12 @@ export const ProfileForm = () => {
           <Controller
             name="name"
             control={control}
+            rules={{ required: true, maxLength: 20 }}
             render={({ field }) => (
               <Input
                 isRequired
                 type="text"
+                maxLength={20}
                 label="Full Name"
                 className="mb-5 max-w-full"
                 {...field}
@@ -98,8 +79,14 @@ export const ProfileForm = () => {
             )}
           />
           <Controller
+            rules={{ maxLength: 120 }}
             render={({ field }) => (
-              <Textarea fullWidth label="Info" {...field} />
+              <Textarea
+                maxLength={120}
+                fullWidth
+                label="Background"
+                {...field}
+              />
             )}
             name="intro"
             control={control}
@@ -108,9 +95,11 @@ export const ProfileForm = () => {
           <Controller
             name="phone"
             control={control}
+            rules={{ required: true, pattern: /^[0-9]+$/, maxLength: 15 }}
             render={({ field }) => (
               <Input
                 isRequired
+                maxLength={15}
                 type="text"
                 label="Phone Number"
                 className="mb-5 max-w-full"
@@ -123,11 +112,13 @@ export const ProfileForm = () => {
           <Controller
             name="address"
             control={control}
+            rules={{ required: true, maxLength: 30 }}
             render={({ field }) => (
               <Input
                 isRequired
+                maxLength={30}
                 type="text"
-                label="Address"
+                label="Country, City"
                 className="mb-5 max-w-full"
                 {...field}
               />
@@ -137,6 +128,7 @@ export const ProfileForm = () => {
           <Controller
             name="email"
             control={control}
+            rules={{ required: true, pattern: /^\S+@\S+\.\S+$/ }}
             render={({ field }) => (
               <Input
                 isRequired
@@ -203,7 +195,14 @@ export const ProfileForm = () => {
             <div className="flex flex-col gap-3">
               <Controller
                 render={({ field }) => (
-                  <Input isClearable fullWidth label="Title" {...field} />
+                  <Input
+                    fullWidth
+                    label="Title"
+                    variant="bordered"
+                    maxLength={30}
+                    radius="none"
+                    {...field}
+                  />
                 )}
                 name={`sections.${index}.title`}
                 control={control}
@@ -212,7 +211,7 @@ export const ProfileForm = () => {
                 name={`sections.${index}.description`}
                 control={control}
                 render={({ field }) => (
-                  <SimpleMDE {...field} options={editorOptions} />
+                  <ReactQuill theme="snow" modules={modules} {...field} />
                 )}
               />
             </div>

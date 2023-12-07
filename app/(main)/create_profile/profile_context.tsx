@@ -8,7 +8,6 @@ interface AdditionalForm {
 
 export interface FormState {
   name: string;
-  username: string;
   email: string;
   jobTitle: string;
   address: string;
@@ -46,7 +45,6 @@ export const ProfileDataProvider = ({
   email: string;
 }) => {
   const [profileData, setProfileData] = useState<FormState>({
-    username: "",
     jobTitle: "",
     name: name,
     phone: "",
