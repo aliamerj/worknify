@@ -28,6 +28,7 @@
     "react-quill": "^2.0.0",
     "react-simplemde-editor": "^5.2.0",
     "uuid": "^9.0.1",
+    "validator": "^13.11.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -38,6 +39,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/uuid": "^9.0.7",
+    "@types/validator": "^13.11.7",
     "autoprefixer": "^10.4.16",
     "drizzle-kit": "^0.20.6",
     "eslint": "^8",

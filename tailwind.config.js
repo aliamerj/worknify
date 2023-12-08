@@ -15,7 +15,7 @@ const config = {
   },
   darkMode: "class",
   plugins: [
-require('@tailwindcss/typography'),
+    require("@tailwindcss/typography"),
     nextui({
       themes: {
         light: {
@@ -47,6 +47,10 @@ require('@tailwindcss/typography'),
             content3: {
               DEFAULT: "#646464",
               foreground: "#fff",
+            },
+            content4: {
+              DEFAULT: "#d9d7d7",
+              foreground: "#000",
             },
             background: {
               DEFAULT: "#E4EBF3",

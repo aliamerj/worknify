@@ -8,56 +8,7 @@ export const ProfileDisplay = ({ userId }: { userId: string }) => {
   const createMarkup = (htmlContent: string) => {
     return { __html: DOMPurify.sanitize(htmlContent) };
   };
-  //const { profileData } = useProfileData();
-  console.log({ userId });
-  const profileData = {
-    name: "Jordan Smith",
-    jobTitle: "Senior Full Stack Developer",
-    email: "jordan.smith@example.com",
-    phone: "+1234567890",
-    address: "1234, Elm Street, Springfield, USA",
-    gitHub: "jordan-smith",
-    linkedin: "jordan-smith",
-    intro:
-      "Senior Full Stack Developer with over 10 years of experience in developing scalable web applications and working with cross-functional teams. Proficient in modern web technologies, agile methodologies, and leading project teams. Committed to writing clean, optimized, and maintainable code.",
-    sections: [
-      {
-        title: "Professional Experience",
-        description:
-          "<p>Senior Software Developer at Tech Innovations, Jan 2020 - Present</p><ul><li>Lead the development of a high-traffic e-commerce platform, resulting in a 20% increase in sales</li><li>Implemented advanced features using React, Redux, and Node.js</li><li>Mentored junior developers and conducted code reviews to ensure best practices</li></ul><p>Software Developer at Tech Solutions, Jan 2010 - Dec 2019</p><ul><li>Developed and maintained multiple enterprise-level web applications</li><li>Collaborated with UI/UX designers to implement user-centric solutions</li><li>Optimized applications for maximum speed and scalability</li></ul>",
-      },
-      {
-        title: "Education",
-        description:
-          "<p>Master of Science in Computer Science, University of Tech, 2008 - 2010</p><p>Bachelor of Science in Computer Science, University of Springfield, 2004 - 2008</p>",
-      },
-      {
-        title: "Skills",
-        description:
-          "<ul><li>Programming Languages: JavaScript (ES6+), Python, Java, C#</li><li>Frameworks & Libraries: React, Angular, Node.js, .NET</li><li>Databases: MySQL, PostgreSQL, MongoDB</li><li>DevOps & Tools: Docker, Jenkins, AWS, Azure</li><li>Methodologies: Agile, Scrum, TDD</li></ul>",
-      },
-      {
-        title: "Certifications",
-        description:
-          "<p>Full Stack Web Development, Code Academy, 2021</p><p>Azure Solutions Architect, Microsoft, 2019</p>",
-      },
-      {
-        title: "Projects",
-        description:
-          "<p>Project Manager, Online Learning Platform, Tech Innovations, 2021 - Present</p><p>Key Developer, Mobile Banking App, Tech Solutions, 2016 - 2020</p>",
-      },
-      {
-        title: "Languages",
-        description:
-          "<p>English (Native), Spanish (Professional Proficiency), German (Conversational)</p>",
-      },
-      {
-        title: "Interests",
-        description:
-          "<p>Coding Challenges, Open Source Contribution, Blogging about Tech Trends, Mountain Biking, Photography</p>",
-      },
-    ],
-  };
+  const { profileData } = useProfileData();
 
   const githubLink = `https//github.com/${profileData.gitHub}`;
   const linkedin = `https//linkedin.com/in/${profileData.linkedin}`;

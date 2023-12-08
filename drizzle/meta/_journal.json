@@ -5,29 +5,15 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1701254766104,
-      "tag": "0000_rich_black_bolt",
+      "when": 1702063017244,
+      "tag": "0000_dark_shinko_yamashiro",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "5",
-      "when": 1701258213087,
-      "tag": "0001_hard_cardiac",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1701266995568,
-      "tag": "0002_odd_jazinda",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1701267118308,
-      "tag": "0003_dark_the_professor",
+      "when": 1702063198112,
+      "tag": "0001_slim_magik",
       "breakpoints": true
     }
   ]
