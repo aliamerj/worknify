@@ -1,6 +1,7 @@
 "use client";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Divider, Input, Spacer, Textarea } from "@nextui-org/react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import {
   Controller,
@@ -8,16 +9,33 @@ import {
   useFieldArray,
   useForm,
 } from "react-hook-form";
-import { FormState, useProfileData } from "./profile_context";
+import { useProfileData, ProfileData } from "./profile_context";
 import ReactQuill from "react-quill";
+import { profileSchemaValidation } from "@/utils/validations/profileValidation";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export const ProfileForm = () => {
-  const { profileData, updateProfileData } = useProfileData();
-  const { control, handleSubmit, watch } = useForm<FormState>({
+  const router = useRouter();
+  const { profileData, updateProfileData, setIsLoading, formRef } =
+    useProfileData();
+  const { control, handleSubmit, watch } = useForm<ProfileData>({
     defaultValues: profileData,
+    resolver: zodResolver(profileSchemaValidation),
   });
-  const onSubmit: SubmitHandler<FormState> = (data) => {
-    console.log(data);
+
+  const [error, setError] = useState("");
+
+  const onSubmit: SubmitHandler<ProfileData> = async (data) => {
+    try {
+      setIsLoading(true);
+      await axios.post("/api/profile", data);
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      setIsLoading(false);
+      setError("An unexpected error occurred.");
+    }
   };
   const { fields, append, remove } = useFieldArray({
     control,
@@ -25,7 +43,7 @@ export const ProfileForm = () => {
   });
   useEffect(() => {
     const subscription = watch((value, _) => {
-      updateProfileData(value as Partial<FormState>);
+      updateProfileData(value as Partial<ProfileData>);
     });
     return () => subscription.unsubscribe();
   }, [watch, updateProfileData]);
@@ -46,13 +64,22 @@ export const ProfileForm = () => {
         onSubmit={handleSubmit(onSubmit)}
         className="mx-2 w-full rounded-xl bg-white p-5 drop-shadow-xl lg:max-w-lg"
       >
+        {error && (
+          <div
+            role="alert"
+            className="font-regular relative mb-4 block w-full rounded-lg bg-red-500 p-4 text-base leading-5 text-white opacity-100"
+          >
+            {error}
+          </div>
+        )}
         <Controller
           name="jobTitle"
           control={control}
-          rules={{ required: true, maxLength: 20 }}
-          render={({ field }) => (
+          render={({ field, fieldState: { error } }) => (
             <Input
-              maxLength={20}
+              maxLength={30}
+              isInvalid={!!error}
+              errorMessage={error?.message}
               isRequired
               type="text"
               label="Job Title"
@@ -64,14 +91,15 @@ export const ProfileForm = () => {
 
         <div className="mb-6 flex flex-wrap gap-4">
           <Controller
-            name="name"
+            name="fullName"
             control={control}
-            rules={{ required: true, maxLength: 20 }}
-            render={({ field }) => (
+            render={({ field, fieldState: { error } }) => (
               <Input
                 isRequired
+                isInvalid={!!error}
+                errorMessage={error?.message}
                 type="text"
-                maxLength={20}
+                maxLength={30}
                 label="Full Name"
                 className="mb-5 max-w-full"
                 {...field}
@@ -79,25 +107,27 @@ export const ProfileForm = () => {
             )}
           />
           <Controller
-            rules={{ maxLength: 120 }}
-            render={({ field }) => (
+            name="background"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
               <Textarea
-                maxLength={120}
+                isInvalid={!!error}
+                errorMessage={error?.message}
+                maxLength={300}
                 fullWidth
                 label="Background"
                 {...field}
               />
             )}
-            name="intro"
-            control={control}
           />
 
           <Controller
-            name="phone"
+            name="phoneNumber"
             control={control}
-            rules={{ required: true, pattern: /^[0-9]+$/, maxLength: 15 }}
-            render={({ field }) => (
+            render={({ field, fieldState: { error } }) => (
               <Input
+                isInvalid={!!error}
+                errorMessage={error?.message}
                 isRequired
                 maxLength={15}
                 type="text"
@@ -112,9 +142,10 @@ export const ProfileForm = () => {
           <Controller
             name="address"
             control={control}
-            rules={{ required: true, maxLength: 30 }}
-            render={({ field }) => (
+            render={({ field, fieldState: { error } }) => (
               <Input
+                isInvalid={!!error}
+                errorMessage={error?.message}
                 isRequired
                 maxLength={30}
                 type="text"
@@ -128,9 +159,10 @@ export const ProfileForm = () => {
           <Controller
             name="email"
             control={control}
-            rules={{ required: true, pattern: /^\S+@\S+\.\S+$/ }}
-            render={({ field }) => (
+            render={({ field, fieldState: { error } }) => (
               <Input
+                isInvalid={!!error}
+                errorMessage={error?.message}
                 isRequired
                 type="email"
                 label="Email"
@@ -143,11 +175,13 @@ export const ProfileForm = () => {
 
         <div className="mb-6 flex flex-wrap gap-4">
           <Controller
-            name="gitHub"
+            name="github"
             control={control}
-            render={({ field }) => (
+            render={({ field, fieldState: { error } }) => (
               <Input
-                type="url"
+                isInvalid={!!error}
+                errorMessage={error?.message}
+                type="text"
                 label="GitHub"
                 className="max-w-full"
                 startContent={
@@ -165,9 +199,11 @@ export const ProfileForm = () => {
           <Controller
             name="linkedin"
             control={control}
-            render={({ field }) => (
+            render={({ field, fieldState: { error } }) => (
               <Input
-                type="url"
+                isInvalid={!!error}
+                errorMessage={error?.message}
+                type="text"
                 label="Linkedin"
                 className="max-w-full"
                 startContent={
@@ -194,24 +230,29 @@ export const ProfileForm = () => {
             </button>
             <div className="flex flex-col gap-3">
               <Controller
-                render={({ field }) => (
+                name={`sections.${index}.title`}
+                control={control}
+                render={({ field, fieldState: { error } }) => (
                   <Input
                     fullWidth
+                    isInvalid={!!error}
+                    errorMessage={error?.message}
                     label="Title"
                     variant="bordered"
-                    maxLength={30}
+                    maxLength={50}
                     radius="none"
                     {...field}
                   />
                 )}
-                name={`sections.${index}.title`}
-                control={control}
               />
               <Controller
                 name={`sections.${index}.description`}
                 control={control}
-                render={({ field }) => (
-                  <ReactQuill theme="snow" modules={modules} {...field} />
+                render={({ field, fieldState: { error } }) => (
+                  <>
+                    {error && <p className="text-red-500">{error.message}</p>}
+                    <ReactQuill theme="snow" modules={modules} {...field} />
+                  </>
                 )}
               />
             </div>
@@ -227,6 +268,7 @@ export const ProfileForm = () => {
             <h1 className="text-3xl">+</h1>
           </Button>
         </div>
+        <button ref={formRef} type="submit" style={{ display: "none" }} />
       </form>
     </div>
   );

@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^0.3.9",
+    "@hookform/resolvers": "^3.3.2",
     "@nextui-org/react": "^2.2.9",
+    "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
     "dompurify": "^3.0.6",
     "drizzle-orm": "^0.29.0",

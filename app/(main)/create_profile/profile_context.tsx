@@ -1,26 +1,24 @@
 "use client";
-import React, { createContext, useContext, useState } from "react";
+import { profileSchemaValidation } from "@/utils/validations/profileValidation";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { z } from "zod";
 
-interface AdditionalForm {
-  title: string;
-  description: string;
-}
-
-export interface FormState {
-  name: string;
-  email: string;
-  jobTitle: string;
-  address: string;
-  intro: string;
-  gitHub?: string;
-  linkedin?: string;
-  phone?: string;
-  sections: AdditionalForm[];
-}
+export type ProfileData = z.infer<typeof profileSchemaValidation>;
 
 interface ProfileContextValue {
-  profileData: FormState;
-  updateProfileData: (newData: Partial<FormState>) => void;
+  profileData: ProfileData;
+  updateProfileData: (newData: Partial<ProfileData>) => void;
+  isLoading: boolean;
+  setIsLoading: (state: boolean) => void;
+  triggerSubmit: () => void;
+  formRef: React.Ref<HTMLButtonElement>;
 }
 
 const ProfileDataContext = createContext<ProfileContextValue | undefined>(
@@ -44,24 +42,52 @@ export const ProfileDataProvider = ({
   name: string;
   email: string;
 }) => {
-  const [profileData, setProfileData] = useState<FormState>({
-    jobTitle: "",
-    name: name,
-    phone: "",
-    address: "",
-    email: email,
-    gitHub: "",
-    linkedin: "",
-    sections: [],
-    intro: "",
-  });
+  const [isLoading, setLoading] = useState(false);
+  const formRef = useRef<HTMLButtonElement>(null);
+  const savedData = localStorage?.getItem("formData");
+  const initialProfileData = savedData
+    ? JSON.parse(savedData)
+    : {
+        jobTitle: "",
+        fullName: name,
+        phoneNumber: "",
+        address: "",
+        email: email,
+        github: "",
+        linkedin: "",
+        sections: [],
+        background: "",
+      };
 
-  const updateProfileData = (newData: Partial<FormState>) => {
+  const [profileData, setProfileData] =
+    useState<ProfileData>(initialProfileData);
+
+  const updateProfileData = (newData: Partial<ProfileData>) => {
     setProfileData((prevData) => ({ ...prevData, ...newData }));
   };
 
+  const setIsLoading = (state: boolean) => {
+    setLoading(state);
+  };
+  const triggerSubmit = useCallback(() => {
+    formRef.current?.click();
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("formData", JSON.stringify(profileData));
+  }, [profileData]);
+
   return (
-    <ProfileDataContext.Provider value={{ profileData, updateProfileData }}>
+    <ProfileDataContext.Provider
+      value={{
+        profileData,
+        updateProfileData,
+        isLoading,
+        setIsLoading,
+        triggerSubmit,
+        formRef,
+      }}
+    >
       {children}
     </ProfileDataContext.Provider>
   );

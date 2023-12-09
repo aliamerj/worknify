@@ -3,8 +3,7 @@ import { ProfileDataProvider } from "./profile_context";
 import { ProfileDisplay } from "./profile_display";
 import { ProfileForm } from "./profile_form";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import Link from "next/link";
-import { Button } from "@nextui-org/react";
+import { MainButtons } from "./main_buttons";
 
 export default async function CreateProfile() {
   const session = await getServerSession(authOptions);
@@ -24,24 +23,7 @@ export default async function CreateProfile() {
           <ProfileDisplay userId={session?.user.id!} />
         </div>
       </main>
-      <div className="fixed inset-x-0 bottom-0 mb-4 flex justify-center">
-        <div className="mx-auto flex gap-4 rounded-md bg-content4 px-5 py-4">
-          {/* Button 1 */}
-          <button className="rounded-md bg-primary px-6 py-2 text-white hover:bg-blue-600">
-            Save Data
-          </button>
-
-          {/* Button 2 */}
-          <Button
-            as={Link}
-            href="/"
-            variant="flat"
-            className="rounded-md border-content1 bg-white px-6 py-2 text-content1"
-          >
-            Later
-          </Button>
-        </div>
-      </div>
+      <MainButtons />
     </ProfileDataProvider>
   );
 }
