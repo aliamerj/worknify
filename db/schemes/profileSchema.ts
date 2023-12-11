@@ -1,6 +1,6 @@
 import { integer, pgTable, serial, text } from "drizzle-orm/pg-core";
 
-export const profile = pgTable("profile", {
+export const profile = pgTable("resume", {
   id: serial("id").primaryKey(),
   fullName: text("full_name").notNull(),
   jobTitle: text("job_title").notNull(),

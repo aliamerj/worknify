@@ -25,7 +25,7 @@ const ProfileDataContext = createContext<ProfileContextValue | undefined>(
   undefined,
 );
 
-export const useProfileData = () => {
+export const useProfile = () => {
   const context = useContext(ProfileDataContext);
   if (context === undefined) {
     throw new Error("useProfileData must be used within a ProfileDataProvider");
