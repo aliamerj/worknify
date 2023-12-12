@@ -3,15 +3,22 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import {
+  useForm,
+  SubmitHandler,
+  Controller,
+  useFieldArray,
+} from "react-hook-form";
 import { Stepper } from "./stepper";
 import { useProfile } from "../profile_context";
 import {
   ProfileSchema,
   profileSchemaValidation,
 } from "@/utils/validations/profileValidation";
-import { Input, Textarea } from "@nextui-org/react";
+import { Button, Textarea } from "@nextui-org/react";
 import { FirstStep } from "./steps/first_step";
+import ExperienceField from "../../components/input_Field/experience/experienceField";
+import TagPicker from "../../components/input_Field/tag_picker/TagPicker";
 
 const steps = [
   {
@@ -44,13 +51,7 @@ export function ProfileForm() {
   const [currentStep, setCurrentStep] = useState(0);
   const diff = currentStep - previousStep;
 
-  const {
-    handleSubmit,
-    control,
-
-    reset,
-    trigger,
-  } = useForm({
+  const { handleSubmit, control, reset, trigger } = useForm({
     defaultValues: profileData,
     resolver: zodResolver(profileSchemaValidation),
   });
@@ -77,6 +78,15 @@ export function ProfileForm() {
       setCurrentStep((step) => step + 1);
     }
   };
+
+  const {
+    fields: experiences,
+    append,
+    remove,
+  } = useFieldArray({
+    control,
+    name: "experiences",
+  });
 
   const prev = () => {
     if (currentStep > 0) {
@@ -122,73 +132,46 @@ export function ProfileForm() {
                 />{" "}
               </div>
 
-              <div className="col-span-full">
-                <label
-                  htmlFor="street"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Street address
-                </label>
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    id="street"
-                    autoComplete="street-address"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="city"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  City
-                </label>
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    id="city"
-                    autoComplete="address-level2"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-
               <div className="sm:col-span-2">
-                <label
-                  htmlFor="state"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  State / Province
-                </label>
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    id="state"
-                    autoComplete="address-level1"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+                <Controller
+                  name="skills"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <TagPicker {...error} {...field} />
+                  )}
+                />{" "}
+              </div>
+              <div className="sm:col-span-2">
+                {experiences.map((field, index) => (
+                  <ExperienceField
+                    key={field.id}
+                    control={control}
+                    remove={remove}
+                    index={index}
                   />
-                </div>
+                ))}
+                <Button
+                  color="primary"
+                  variant="shadow"
+                  type="button"
+                  onClick={() =>
+                    append({
+                      role: "",
+                      company: "",
+                      timePeriod: {
+                        startDate: new Date(),
+                        endDate: new Date(),
+                      },
+                    })
+                  }
+                >
+                  Add Experience
+                </Button>
               </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="zip"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  ZIP / Postal code
-                </label>
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    id="zip"
-                    autoComplete="postal-code"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
+              <div className="sm:col-span-2"></div>
+
+              <div className="sm:col-span-2"></div>
             </div>
           </motion.div>
         )}

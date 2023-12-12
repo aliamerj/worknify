@@ -7,12 +7,14 @@ const TimePeriod = z
       required_error: "Start date is required",
       invalid_type_error: "Start date must be a valid date",
     }),
-    endDate: z.date({
-      required_error: "End date is required",
-      invalid_type_error: "End date must be a valid date",
-    }),
+    endDate: z
+      .date({
+        required_error: "End date is required",
+        invalid_type_error: "End date must be a valid date",
+      })
+      .optional(),
   })
-  .refine((data) => data.endDate > data.startDate, {
+  .refine((data) => data.endDate && data.endDate > data.startDate, {
     message: "End date must be after the start date",
     path: ["endDate"],
   });
@@ -30,7 +32,7 @@ const sectionSchema = z.object({
     .max(500, "Description must be under 500 characters"),
 });
 
-const experienceSchema = z.object({
+export const experienceSchema = z.object({
   role: z
     .string()
     .trim()

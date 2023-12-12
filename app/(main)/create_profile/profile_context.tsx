@@ -44,6 +44,7 @@ export const ProfileDataProvider = ({
 }) => {
   const [isLoading, setLoading] = useState(false);
   const formRef = useRef<HTMLButtonElement>(null);
+
   const savedData = localStorage?.getItem("formData");
   const initialProfileData = savedData
     ? JSON.parse(savedData)
