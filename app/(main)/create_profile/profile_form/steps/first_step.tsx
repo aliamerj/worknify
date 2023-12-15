@@ -22,8 +22,9 @@ export const FirstStep = ({ diff, control }: FirstStepProps) => {
       <p className="mt-1 text-sm leading-6 text-gray-600">
         Provide your personal details.
       </p>
-      <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-        <div className="sm:col-span-3">
+      <section className="mt-10 flex flex-col items-center">
+        <div className="mx-auto w-full max-w-2xl">
+          {" "}
           <Controller
             name="jobTitle"
             control={control}
@@ -36,13 +37,14 @@ export const FirstStep = ({ diff, control }: FirstStepProps) => {
                 maxLength={30}
                 label="Current Position"
                 placeholder="Senior Web Engineer"
-                className="mb-3 max-w-full text-gray-500"
+                className="mb-3 max-w-lg text-gray-500"
                 {...field}
               />
             )}
           />
         </div>
-        <div className="sm:col-span-3">
+
+        <div className="mx-auto w-full max-w-2xl">
           <Controller
             name="fullName"
             control={control}
@@ -55,72 +57,73 @@ export const FirstStep = ({ diff, control }: FirstStepProps) => {
                 maxLength={30}
                 label="Full Name"
                 placeholder="Elliot Alderson"
-                className="mb-3 max-w-full text-gray-500"
+                className="mb-3 max-w-lg text-gray-500"
                 {...field}
               />
             )}
           />
         </div>
-      </div>
 
-      <div className="sm:col-span-3">
-        <Controller
-          name="email"
-          control={control}
-          render={({ field, fieldState: { error } }) => (
-            <Input
-              isRequired
-              isInvalid={!!error}
-              errorMessage={error?.message}
-              type="text"
-              maxLength={30}
-              label="Email"
-              placeholder="example@gmail.com"
-              className="mb-3 max-w-full text-gray-500"
-              {...field}
-            />
-          )}
-        />
-      </div>
+        <div className="mx-auto w-full max-w-2xl">
+          <Controller
+            name="email"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <Input
+                isRequired
+                isInvalid={!!error}
+                errorMessage={error?.message}
+                type="text"
+                maxLength={30}
+                label="Email"
+                placeholder="example@gmail.com"
+                className="mb-3 max-w-lg text-gray-500"
+                {...field}
+              />
+            )}
+          />
+        </div>
 
-      <div className="sm:col-span-4">
-        <Controller
-          name="phoneNumber"
-          control={control}
-          render={({ field, fieldState: { error } }) => (
-            <Input
-              isRequired
-              isInvalid={!!error}
-              errorMessage={error?.message}
-              type="text"
-              maxLength={30}
-              label="Phone Number"
-              placeholder="+1234xxxxx"
-              className="mb-3 max-w-full text-gray-500"
-              {...field}
-            />
-          )}
-        />
-      </div>
-      <div className="sm:col-span-4">
-        <Controller
-          name="address"
-          control={control}
-          render={({ field, fieldState: { error } }) => (
-            <Input
-              isRequired
-              isInvalid={!!error}
-              errorMessage={error?.message}
-              type="text"
-              maxLength={30}
-              label="City, Country"
-              placeholder="Elm Street, Springfield, USA"
-              className="mb-3 max-w-full text-gray-500"
-              {...field}
-            />
-          )}
-        />
-      </div>
+        <div className="mx-auto w-full max-w-2xl">
+          <Controller
+            name="phoneNumber"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <Input
+                isRequired
+                isInvalid={!!error}
+                errorMessage={error?.message}
+                type="text"
+                maxLength={30}
+                label="Phone Number"
+                placeholder="+1234xxxxx"
+                className="mb-3 max-w-lg text-gray-500"
+                {...field}
+              />
+            )}
+          />
+        </div>
+
+        <div className="mx-auto w-full max-w-2xl">
+          <Controller
+            name="address"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <Input
+                isRequired
+                isInvalid={!!error}
+                errorMessage={error?.message}
+                type="text"
+                maxLength={30}
+                label="City, Country"
+                placeholder="Elm Street, Springfield, USA"
+                className="mb-3 max-w-lg text-gray-500"
+                {...field}
+              />
+            )}
+          />
+        </div>
+      </section>
     </motion.div>
   );
 };

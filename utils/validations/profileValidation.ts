@@ -46,14 +46,6 @@ export const experienceSchema = z.object({
   timePeriod: TimePeriod,
 });
 
-const skillSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(1, "Skill title cannot be empty")
-    .max(30, "Skill title must be under 30 characters"),
-});
-
 const educationSchema = z.object({
   degree: z
     .string()
@@ -98,7 +90,7 @@ export const profileSchemaValidation = z.object({
     .min(50, "Background must be at least 50 characters")
     .max(300, "Background must be under 300 characters")
     .trim(),
-  skills: z.array(skillSchema),
+  skills: z.string().min(1, "You should select one skill at lesst"),
   experiences: z.array(experienceSchema),
   github: z.string().optional().nullable(),
   linkedin: z.string().optional().nullable(),

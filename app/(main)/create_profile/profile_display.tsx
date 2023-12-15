@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useProfileData } from "./profile_context";
+import { useProfile } from "./profile_context";
 import DOMPurify from "dompurify";
 
 export const ProfileDisplay = ({ userId }: { userId: string }) => {
@@ -8,7 +8,7 @@ export const ProfileDisplay = ({ userId }: { userId: string }) => {
   const createMarkup = (htmlContent: string) => {
     return { __html: DOMPurify.sanitize(htmlContent) };
   };
-  const { profileData } = useProfileData();
+  const { profileData } = useProfile();
 
   const githubLink = `https//github.com/${profileData.github}`;
   const linkedin = `https//linkedin.com/in/${profileData.linkedin}`;
@@ -48,7 +48,7 @@ export const ProfileDisplay = ({ userId }: { userId: string }) => {
         <p className="mb-2 md:mb-0">{profileData.phoneNumber}</p>
         <p className="mb-2 md:mb-0">{profileData.address}</p>
       </div>
-      <p className="mx-2 overflow-clip pb-4 pt-2 text-center font-sans text-xs sm:text-medium ">
+      <p className="mx-3 overflow-clip pb-4 pt-2 text-center font-sans text-xs sm:text-medium ">
         {profileData.background}
       </p>
       {profileData.sections?.map((section, index) => (

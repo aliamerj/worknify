@@ -59,8 +59,6 @@ const ExperienceField = ({ control, remove, index }: IExperienceField) => {
             />
           )}
         />
-
-        {/* DatePickers for start and end dates */}
         <Controller
           control={control}
           name={`experiences.${index}.timePeriod.startDate`}

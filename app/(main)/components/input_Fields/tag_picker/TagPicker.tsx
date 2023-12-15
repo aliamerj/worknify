@@ -6,11 +6,11 @@ interface Option {
   id: number;
   name: string;
 }
-
-const TagPicker = (
-  field: ControllerRenderProps<ProfileSchema>,
-  error: FieldError | undefined,
-) => {
+interface ITagPicker {
+  field: ControllerRenderProps<ProfileSchema>;
+  error?: FieldError;
+}
+const TagPicker = ({ field, error }: ITagPicker) => {
   const [search, setSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
@@ -50,10 +50,14 @@ const TagPicker = (
       setShowDropdown(false);
     }
   }, [search]);
+  useEffect(() => {
+    const mySkills = selectedOptions.map((opt) => opt.name).toString();
+    field.onChange(mySkills);
+    console.log(selectedOptions);
+  }, [selectedOptions]);
 
   return (
     <div className="relative mx-auto max-w-sm text-sm">
-      {!!error && <p className="m-10 pl-5 text-red-500">{error.message}</p>}
       <div
         style={{
           borderStartStartRadius: "10px",
@@ -61,7 +65,9 @@ const TagPicker = (
           borderEndEndRadius: showDropdown ? "0px" : "10px",
           borderEndStartRadius: showDropdown ? "0px" : "10px",
         }}
-        className="flex flex-wrap gap-1 rounded-t-2xl bg-divider p-2"
+        className={`flex flex-wrap gap-1 rounded-t-2xl bg-divider p-2 ${
+          !!error ? "bg-red-200" : ""
+        } `}
       >
         {selectedOptions.map((opt) => (
           <div key={opt.id} className="flex items-center rounded-md bg-white">
@@ -76,14 +82,16 @@ const TagPicker = (
         ))}
 
         <input
-          {...field}
           type="text"
           value={search}
           onChange={(e) => handleSearch(e.target.value)}
-          className="flex-1  border-0 bg-divider px-0 py-1 outline-none"
+          className={`flex-1  border-0 bg-divider px-0 py-1 outline-none ${
+            !!error ? "bg-red-200 placeholder:text-red-500" : ""
+          }`}
           placeholder="Select skills"
         />
       </div>
+      {!!error && <p className="m-1 pl-1 text-red-500">{error.message}</p>}
       {showDropdown && (
         <div className="absolute left-0 top-3/4 z-30 w-full rounded-b-xl bg-divider font-medium">
           {loading ? (

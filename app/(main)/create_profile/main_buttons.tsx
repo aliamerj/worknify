@@ -1,10 +1,10 @@
 "use client";
 import { Button } from "@nextui-org/react";
-import { useProfileData } from "./profile_context";
+import { useProfile } from "./profile_context";
 import Link from "next/link";
 
 export const MainButtons = () => {
-  const { isLoading, triggerSubmit } = useProfileData();
+  const { isLoading, triggerSubmit } = useProfile();
   return (
     <div className="fixed inset-x-0 bottom-0 mb-4 flex justify-center">
       <div className="mx-auto flex gap-4 rounded-md bg-content4 px-5 py-4">

@@ -3,6 +3,7 @@ import { ProfileDataProvider } from "./profile_context";
 
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { ProfileForm } from "./profile_form/profile_form";
+
 export default async function CreateProfile() {
   const session = await getServerSession(authOptions);
   return (
