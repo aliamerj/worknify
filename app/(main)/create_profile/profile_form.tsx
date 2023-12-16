@@ -14,6 +14,7 @@ import ReactQuill from "react-quill";
 import { profileSchemaValidation } from "@/utils/validations/profileValidation";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { SkillsPicker } from "../components/input_Fields/skills_input";
 
 export const ProfileForm = () => {
   const router = useRouter();
@@ -37,7 +38,27 @@ export const ProfileForm = () => {
       setError("An unexpected error occurred.");
     }
   };
-  const { fields, append, remove } = useFieldArray({
+  const {
+    fields: experiences,
+    append: appendExperiences,
+    remove: removeExperiences,
+  } = useFieldArray({
+    control,
+    name: "experiences",
+  });
+  const {
+    fields: educations,
+    append: appendEducations,
+    remove: removeEducations,
+  } = useFieldArray({
+    control,
+    name: "educations",
+  });
+  const {
+    fields: sections,
+    append: appendSections,
+    remove: removeSections,
+  } = useFieldArray({
     control,
     name: "sections",
   });
@@ -195,7 +216,6 @@ export const ProfileForm = () => {
               />
             )}
           />
-
           <Controller
             name="linkedin"
             control={control}
@@ -217,14 +237,21 @@ export const ProfileForm = () => {
               />
             )}
           />
+          <Controller
+            name="skills"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <SkillsPicker field={{ ...field }} error={error} />
+            )}
+          />{" "}
         </div>
         <Divider className="my-5" />
         <h1 className="text-2xl font-bold text-foreground">- Sections :</h1>
-        {fields.map((section, index) => (
+        {sections.map((section, index) => (
           <div key={section.id} className="relative mt-4 rounded border p-4">
             <button
               className="absolute right-0 top-0 -translate-y-1/2 translate-x-1/2 transform rounded-full bg-white p-1 pl-2 pr-2 text-sm text-gray-700 shadow-sm hover:bg-danger hover:text-white"
-              onClick={() => remove(index)}
+              onClick={() => removeSections(index)}
             >
               X
             </button>
@@ -262,8 +289,8 @@ export const ProfileForm = () => {
         <div className="flex justify-center">
           <Button
             color="success"
-            onClick={() => append({ title: "", description: "" })}
-            disabled={fields.length >= 10}
+            onClick={() => appendSections({ title: "", description: "" })}
+            disabled={sections.length >= 10}
           >
             <h1 className="text-3xl">+</h1>
           </Button>
