@@ -111,3 +111,17 @@ a {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.ql-editor {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.calendar {
+  background-color: white !important;
+  opacity: 1 !important;
+  z-index: 100 !important;
+}
+label {
+  z-index: 0 !important;
+}

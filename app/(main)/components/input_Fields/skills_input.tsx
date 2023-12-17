@@ -57,7 +57,7 @@ export const SkillsPicker = ({ field, error }: ISkillsPicker) => {
   }, [selectedOptions]);
 
   return (
-    <div className="relative mx-auto max-w-sm text-sm">
+    <div className="relative w-full max-w-full text-sm">
       <div
         style={{
           borderStartStartRadius: "10px",
@@ -85,7 +85,7 @@ export const SkillsPicker = ({ field, error }: ISkillsPicker) => {
           type="text"
           value={search}
           onChange={(e) => handleSearch(e.target.value)}
-          className={`flex-1  border-0 bg-divider px-0 py-1 outline-none ${
+          className={`flex-1  border-0 bg-transparent px-0 py-1 outline-none ${
             !!error ? "bg-red-200 placeholder:text-red-500" : ""
           }`}
           placeholder="Select skills"
@@ -102,7 +102,7 @@ export const SkillsPicker = ({ field, error }: ISkillsPicker) => {
                 <div
                   key={opt.id}
                   onClick={() => selectOption(opt)}
-                  className="hover:bg-light-blue-500 cursor-pointer rounded-md bg-blue-200 p-2"
+                  className="hover:bg-light-blue-500 cursor-pointer rounded-md bg-white p-2"
                 >
                   {opt.name}
                 </div>

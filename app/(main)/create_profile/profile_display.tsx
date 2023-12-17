@@ -51,6 +51,115 @@ export const ProfileDisplay = ({ userId }: { userId: string }) => {
       <p className="mx-2 overflow-clip pb-4 pt-2 text-center font-sans text-xs sm:text-medium ">
         {profileData.background}
       </p>
+      {profileData.experiences.length > 0 && (
+        <>
+          <h1 className="pl-1 text-base font-bold sm:text-2xl md:text-lg xl:text-3xl">
+            WORK EXPERIENCE
+          </h1>
+          <hr className="border-black" />
+        </>
+      )}
+      <div>
+        {profileData.experiences.map((exp, index) => (
+          <div className="p-2" key={index}>
+            <h1 className="text-base font-bold sm:text-2xl md:text-lg xl:text-3xl">
+              {" "}
+              {exp.company}{" "}
+              {exp.role ? (
+                <span className="font-bold">
+                  {" "}
+                  -{" "}
+                  <span className="overflow-clip font-serif font-normal">
+                    {exp.role}
+                  </span>
+                </span>
+              ) : (
+                ""
+              )}
+            </h1>
+            <h3 className="font-sans text-small text-gray-500">
+              {exp.timePeriod.startDate.toLocaleString("default", {
+                month: "long",
+                year: "numeric",
+              })}{" "}
+              -
+              {exp.timePeriod.endDate
+                ? exp.timePeriod.endDate.toLocaleString("default", {
+                    month: "long",
+                    year: "numeric",
+                  })
+                : " Current"}
+            </h3>
+            <div className="prose">
+              <div
+                className="ql-editor m-0 mb-[10px] p-0"
+                dangerouslySetInnerHTML={createMarkup(exp.description ?? "")}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      {profileData.educations.length > 0 && (
+        <>
+          <h1 className="pl-1 text-base font-bold sm:text-2xl md:text-lg xl:text-3xl">
+            EDUCATION
+          </h1>
+          <hr className="border-black" />
+        </>
+      )}
+      <div>
+        {profileData.educations.map((ed, index) => (
+          <div className="p-2" key={index}>
+            <h1 className="text-base font-bold sm:text-2xl md:text-lg xl:text-3xl">
+              {" "}
+              {ed.university}{" "}
+              {ed.degree ? (
+                <span className="font-bold">
+                  {" "}
+                  -{" "}
+                  <span className="overflow-clip font-serif font-normal">
+                    {ed.degree}
+                  </span>
+                </span>
+              ) : (
+                ""
+              )}
+            </h1>
+            <h3 className="font-sans text-small text-gray-500">
+              {ed.timePeriod.startDate.toLocaleString("default", {
+                month: "long",
+                year: "numeric",
+              })}{" "}
+              -
+              {ed.timePeriod.endDate
+                ? ed.timePeriod.endDate.toLocaleString("default", {
+                    month: "long",
+                    year: "numeric",
+                  })
+                : " Current"}
+            </h3>
+          </div>
+        ))}
+      </div>
+      {profileData.skills.length > 0 && (
+        <>
+          <h1 className="pl-1 text-base font-bold sm:text-2xl md:text-lg xl:text-3xl">
+            SKILLS
+          </h1>
+          <hr className="border-black" />
+        </>
+      )}
+      <div className="flex flex-wrap justify-evenly gap-4 p-2">
+        {profileData.skills.length > 0 &&
+          profileData.skills.split(",").map((skill, index) => (
+            <div
+              key={index}
+              className="my-1 flex-initial rounded bg-gray-200 p-2 text-center shadow"
+            >
+              {skill.trim()}
+            </div>
+          ))}
+      </div>
       {profileData.sections?.map((section, index) => (
         <div key={index} className="px-2 pb-3 md:pb-5">
           <h1 className="pl-1 text-base font-bold sm:text-2xl md:text-lg xl:text-3xl">
@@ -59,7 +168,7 @@ export const ProfileDisplay = ({ userId }: { userId: string }) => {
           <hr className="border-black" />
           <div className="prose">
             <div
-              className="ql-editor mb-[10px] px-3 text-xs sm:text-medium xl:text-medium"
+              className="ql-editor  mb-[10px] px-3 text-xs sm:text-medium xl:text-medium"
               dangerouslySetInnerHTML={createMarkup(section.description)}
             />
           </div>

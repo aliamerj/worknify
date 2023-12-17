@@ -43,6 +43,12 @@ export const experienceSchema = z.object({
     .trim()
     .min(1, "Company name cannot be empty")
     .max(50, "Company name must be under 50 characters"),
+  description: z
+    .string()
+    .trim()
+    .min(5, "Description must be at least 5 characters")
+    .max(500, "Description must be under 500 characters")
+    .optional(),
   timePeriod: TimePeriod,
 });
 

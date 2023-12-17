@@ -15,6 +15,9 @@ import { profileSchemaValidation } from "@/utils/validations/profileValidation";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { SkillsPicker } from "../components/input_Fields/skills_input";
+import ExperienceField from "../components/input_Fields/experience_field";
+import { EducationField } from "../components/input_Fields/education_field";
+import { SectionField } from "../components/input_Fields/section_field";
 
 export const ProfileForm = () => {
   const router = useRouter();
@@ -68,16 +71,6 @@ export const ProfileForm = () => {
     });
     return () => subscription.unsubscribe();
   }, [watch, updateProfileData]);
-
-  const modules = {
-    toolbar: [
-      [{ size: ["small", false, "large", "huge"] }],
-      ["bold", "italic", "underline"],
-      [{ color: [] }, { background: [] }],
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["link"],
-    ],
-  };
 
   return (
     <div className="flex justify-center">
@@ -244,55 +237,74 @@ export const ProfileForm = () => {
               <SkillsPicker field={{ ...field }} error={error} />
             )}
           />{" "}
-        </div>
-        <Divider className="my-5" />
-        <h1 className="text-2xl font-bold text-foreground">- Sections :</h1>
-        {sections.map((section, index) => (
-          <div key={section.id} className="relative mt-4 rounded border p-4">
-            <button
-              className="absolute right-0 top-0 -translate-y-1/2 translate-x-1/2 transform rounded-full bg-white p-1 pl-2 pr-2 text-sm text-gray-700 shadow-sm hover:bg-danger hover:text-white"
-              onClick={() => removeSections(index)}
-            >
-              X
-            </button>
-            <div className="flex flex-col gap-3">
-              <Controller
-                name={`sections.${index}.title`}
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <Input
-                    fullWidth
-                    isInvalid={!!error}
-                    errorMessage={error?.message}
-                    label="Title"
-                    variant="bordered"
-                    maxLength={50}
-                    radius="none"
-                    {...field}
-                  />
-                )}
-              />
-              <Controller
-                name={`sections.${index}.description`}
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <>
-                    {error && <p className="text-red-500">{error.message}</p>}
-                    <ReactQuill theme="snow" modules={modules} {...field} />
-                  </>
-                )}
-              />
-            </div>
-          </div>
-        ))}
-        <Spacer y={3} />
-        <div className="flex justify-center">
+          {experiences.map((field, index) => (
+            <ExperienceField
+              key={field.id}
+              control={control}
+              remove={removeExperiences}
+              index={index}
+            />
+          ))}
+          <Button
+            color="primary"
+            variant="shadow"
+            type="button"
+            onClick={() =>
+              appendExperiences({
+                role: "",
+                company: "",
+                timePeriod: {
+                  startDate: new Date(),
+                },
+              })
+            }
+          >
+            Add Experience
+          </Button>
+          {educations.map((field, index) => (
+            <EducationField
+              key={field.id}
+              control={control}
+              remove={removeEducations}
+              index={index}
+            />
+          ))}
           <Button
             color="success"
-            onClick={() => appendSections({ title: "", description: "" })}
-            disabled={sections.length >= 10}
+            variant="shadow"
+            type="button"
+            onClick={() =>
+              appendEducations({
+                degree: "",
+                university: "",
+                timePeriod: {
+                  startDate: new Date(),
+                },
+              })
+            }
           >
-            <h1 className="text-3xl">+</h1>
+            Add Education
+          </Button>
+          {sections.map((field, index) => (
+            <SectionField
+              key={field.id}
+              control={control}
+              remove={removeSections}
+              index={index}
+            />
+          ))}
+          <Button
+            color="secondary"
+            variant="shadow"
+            type="button"
+            onClick={() =>
+              appendSections({
+                title: "",
+                description: "",
+              })
+            }
+          >
+            Add New Section
           </Button>
         </div>
         <button ref={formRef} type="submit" style={{ display: "none" }} />

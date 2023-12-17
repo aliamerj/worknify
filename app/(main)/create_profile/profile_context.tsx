@@ -10,6 +10,25 @@ import React, {
 } from "react";
 import { z } from "zod";
 
+type SerializedProfileData = Omit<ProfileData, "experiences" | "educations"> & {
+  experiences: Array<
+    Omit<ProfileData["experiences"][number], "timePeriod"> & {
+      timePeriod: {
+        startDate: string;
+        endDate?: string;
+      };
+    }
+  >;
+  education: Array<
+    Omit<ProfileData["educations"][number], "timePeriod"> & {
+      timePeriod: {
+        startDate: string;
+        endDate?: string;
+      };
+    }
+  >;
+};
+
 export type ProfileData = z.infer<typeof profileSchemaValidation>;
 
 interface ProfileContextValue {
@@ -44,23 +63,30 @@ export const ProfileDataProvider = ({
 }) => {
   const [isLoading, setLoading] = useState(false);
   const formRef = useRef<HTMLButtonElement>(null);
-  const savedData = localStorage?.getItem("formData");
-  const initialProfileData = savedData
-    ? JSON.parse(savedData)
-    : {
-        jobTitle: "",
-        fullName: name,
-        phoneNumber: "",
-        address: "",
-        email: email,
-        github: "",
-        linkedin: "",
-        sections: [],
-        background: "",
-      };
+
+  var defaultProfileData: ProfileData = {
+    jobTitle: "",
+    fullName: name,
+    phoneNumber: "",
+    email: email,
+    address: "",
+    github: "",
+    linkedin: "",
+    background: "",
+    sections: [],
+    skills: "",
+    experiences: [],
+    educations: [],
+  };
+  if (typeof window !== "undefined") {
+    const savedData = localStorage?.getItem("formData");
+    defaultProfileData = savedData
+      ? deserializeProfileData(savedData)
+      : defaultProfileData;
+  }
 
   const [profileData, setProfileData] =
-    useState<ProfileData>(initialProfileData);
+    useState<ProfileData>(defaultProfileData);
 
   const updateProfileData = (newData: Partial<ProfileData>) => {
     setProfileData((prevData) => ({ ...prevData, ...newData }));
@@ -74,7 +100,7 @@ export const ProfileDataProvider = ({
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("formData", JSON.stringify(profileData));
+    localStorage.setItem("formData", serializeProfileData(profileData));
   }, [profileData]);
 
   return (
@@ -91,4 +117,51 @@ export const ProfileDataProvider = ({
       {children}
     </ProfileDataContext.Provider>
   );
+};
+
+const serializeProfileData = (data: ProfileData): string => {
+  const serializedData: SerializedProfileData = {
+    ...data,
+    experiences: data.experiences.map((exp) => ({
+      ...exp,
+      timePeriod: {
+        startDate: exp.timePeriod.startDate.toISOString(),
+        endDate: exp.timePeriod.endDate?.toISOString(),
+      },
+    })),
+    education: data.educations.map((edu) => ({
+      ...edu,
+      timePeriod: {
+        startDate: edu.timePeriod.startDate.toISOString(),
+        endDate: edu.timePeriod.endDate?.toISOString(),
+      },
+    })),
+  };
+  return JSON.stringify(serializedData);
+};
+
+const deserializeProfileData = (dataString: string): ProfileData => {
+  const serializedData: SerializedProfileData = JSON.parse(dataString);
+  const deserializedData: ProfileData = {
+    ...serializedData,
+    experiences: serializedData.experiences.map((exp) => ({
+      ...exp,
+      timePeriod: {
+        startDate: new Date(exp.timePeriod.startDate),
+        endDate: exp.timePeriod.endDate
+          ? new Date(exp.timePeriod.endDate)
+          : undefined,
+      },
+    })),
+    educations: serializedData.education.map((edu) => ({
+      ...edu,
+      timePeriod: {
+        startDate: new Date(edu.timePeriod.startDate),
+        endDate: edu.timePeriod.endDate
+          ? new Date(edu.timePeriod.endDate)
+          : undefined,
+      },
+    })),
+  };
+  return deserializedData;
 };
