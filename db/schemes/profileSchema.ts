@@ -6,6 +6,7 @@ import {
   text,
   varchar,
 } from "drizzle-orm/pg-core";
+import { users } from "./userSchema";
 
 export const profile = pgTable("profile", {
   id: serial("id").primaryKey(),
@@ -18,6 +19,10 @@ export const profile = pgTable("profile", {
   github: varchar("github", { length: 100 }),
   linkedin: varchar("linkedin", { length: 100 }),
   skills: text("skills"),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" })
+    .unique(),
 });
 
 export const section = pgTable("section", {
@@ -25,18 +30,19 @@ export const section = pgTable("section", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   profileId: integer("profile_id")
-    .references(() => profile.id)
+    .references(() => profile.id, { onDelete: "cascade" })
     .notNull(),
 });
 
 export const experience = pgTable("experience", {
   id: serial("id").primaryKey(),
+  company: varchar("company", { length: 60 }).notNull(),
   role: varchar("role", { length: 60 }).notNull(),
   startDate: date("start_date").notNull(),
   endData: date("end_date"),
   description: text("description"),
   profileId: integer("profile_id")
-    .references(() => profile.id)
+    .references(() => profile.id, { onDelete: "cascade" })
     .notNull(),
 });
 export const education = pgTable("education", {
@@ -47,7 +53,7 @@ export const education = pgTable("education", {
   endData: date("end_date"),
   description: text("description"),
   profileId: integer("profile_id")
-    .references(() => profile.id)
+    .references(() => profile.id, { onDelete: "cascade" })
     .notNull(),
 });
 

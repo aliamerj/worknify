@@ -6,7 +6,6 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "@auth/core/adapters";
-import { profile } from "./profileSchema";
 
 export const users = pgTable("user", {
   id: text("id").notNull().primaryKey(),
@@ -16,9 +15,6 @@ export const users = pgTable("user", {
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
   hashedPassword: text("hashedPassword"),
-  profileId: integer("profile_id").references(() => profile.id, {
-    onDelete: "cascade",
-  }),
 });
 
 export const accounts = pgTable(

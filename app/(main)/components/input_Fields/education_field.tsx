@@ -68,7 +68,7 @@ export const EducationField = ({ control, remove, index }: IEducationField) => {
                 showIcon
                 placeholderText="Start Date"
                 maxDate={new Date()}
-                onChange={(date) => field.onChange(date?.toString())}
+                onChange={(date) => field.onChange(date?.toISOString())}
                 selected={new Date(field.value)}
                 calendarClassName="calendar"
                 className="z-30  w-full rounded-lg border bg-divider p-2 outline-none"
@@ -88,7 +88,7 @@ export const EducationField = ({ control, remove, index }: IEducationField) => {
                   showIcon
                   placeholderText="End Date"
                   maxDate={new Date()}
-                  onChange={(date) => field.onChange(date?.toString())}
+                  onChange={(date) => field.onChange(date?.toISOString())}
                   selected={field.value ? new Date(field.value) : null}
                   className="z-30 w-full rounded-lg border bg-divider p-2 outline-none disabled:bg-gray-300 disabled:line-through"
                 />

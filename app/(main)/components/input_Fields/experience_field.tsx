@@ -101,7 +101,7 @@ const ExperienceField = ({ control, remove, index }: IExperienceField) => {
                   showIcon
                   placeholderText="End Date"
                   maxDate={new Date()}
-                  onChange={(date) => field.onChange(date)}
+                  onChange={(date) => field.onChange(date?.toISOString())}
                   selected={field.value ? new Date(field.value) : null}
                   className="z-30 w-full rounded-lg border bg-divider p-2 outline-none disabled:bg-gray-300 disabled:line-through"
                 />

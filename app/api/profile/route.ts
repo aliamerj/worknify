@@ -13,8 +13,6 @@ import { profileSchemaValidation } from "@/utils/validations/profileValidation";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { users } from "@/db/schemes/userSchema";
-import { eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -54,6 +52,7 @@ export async function POST(request: NextRequest) {
     github,
     linkedin,
     skills,
+    userId: session.user.id,
   };
 
   try {
@@ -80,26 +79,27 @@ export async function POST(request: NextRequest) {
       educations.length != 0 &&
         (await trx.insert(education).values(newEducations));
       // insert experiences
-      const newExPeriences: ExperienceInsertion[] = experiences.map((ed) => ({
-        ...ed,
-        startDate: ed.timePeriod.startDate,
-        endData: ed.timePeriod.endDate,
-        profileId,
-      }));
+      const newExPeriences: ExperienceInsertion[] = experiences.map(
+        (experience) => ({
+          ...experience,
+          startDate: experience.timePeriod.startDate,
+          endData: experience.timePeriod.endDate,
+          profileId,
+          company: experience.company,
+        }),
+      );
       experiences.length != 0 &&
         (await trx.insert(experience).values(newExPeriences));
-
-      await trx
-        .update(users)
-        .set({ profileId })
-        .where(eq(users.id, session.user.id!));
       return newProfile;
     });
     return NextResponse.json(
       { state: true, body: "profile created successfully" },
       { status: 201 },
     );
-  } catch (error) {
-    return NextResponse.json({ state: false, body: error }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json(
+      { state: false, message: error.message },
+      { status: 500 },
+    );
   }
 }

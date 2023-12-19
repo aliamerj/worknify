@@ -30,16 +30,15 @@ export const ProfileForm = () => {
   const [error, setError] = useState("");
 
   const onSubmit: SubmitHandler<ProfileData> = async (data) => {
-    console.log(data);
     try {
       setIsLoading(true);
       await axios.post("/api/profile", data);
       router.push("/");
       router.refresh();
       setIsLoading(false);
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false);
-      setError("An unexpected error occurred.");
+      setError(error.message);
     }
   };
   const {
@@ -67,8 +66,6 @@ export const ProfileForm = () => {
     name: "sections",
   });
   useEffect(() => {
-    console.log(profileData.experiences);
-    console.log(profileData.sections);
     const subscription = watch((value, _) => {
       updateProfileData(value as Partial<ProfileData>);
     });
@@ -240,77 +237,82 @@ export const ProfileForm = () => {
               <SkillsPicker field={{ ...field }} error={error} />
             )}
           />{" "}
-          {experiences.map((field, index) => (
-            <ExperienceField
-              key={field.id}
-              control={control}
-              remove={removeExperiences}
-              index={index}
-            />
-          ))}
-          <Button
-            color="primary"
-            variant="shadow"
-            type="button"
-            onClick={() =>
-              appendExperiences({
-                role: "",
-                company: "",
-                timePeriod: {
-                  startDate: new Date(),
-                  endDate: null,
-                },
-              })
-            }
-          >
-            Add Experience
-          </Button>
-          {educations.map((field, index) => (
-            <EducationField
-              key={field.id}
-              control={control}
-              remove={removeEducations}
-              index={index}
-            />
-          ))}
-          <Button
-            color="success"
-            variant="shadow"
-            type="button"
-            onClick={() =>
-              appendEducations({
-                degree: "",
-                school: "",
-                timePeriod: {
-                  startDate: new Date(),
-                  endDate: null,
-                },
-              })
-            }
-          >
-            Add Education
-          </Button>
-          {sections.map((field, index) => (
-            <SectionField
-              key={field.id}
-              control={control}
-              remove={removeSections}
-              index={index}
-            />
-          ))}
-          <Button
-            color="secondary"
-            variant="shadow"
-            type="button"
-            onClick={() =>
-              appendSections({
-                title: "",
-                description: "",
-              })
-            }
-          >
-            Add New Section
-          </Button>
+          <div className="flex w-full flex-col gap-3">
+            {experiences.map((field, index) => (
+              <ExperienceField
+                key={field.id}
+                control={control}
+                remove={removeExperiences}
+                index={index}
+              />
+            ))}
+            <Button
+              color="primary"
+              variant="shadow"
+              type="button"
+              size="md"
+              onClick={() =>
+                appendExperiences({
+                  role: "",
+                  company: "",
+                  timePeriod: {
+                    startDate: new Date().toISOString(),
+                    endDate: null,
+                  },
+                })
+              }
+            >
+              Add Experience
+            </Button>
+            {educations.map((field, index) => (
+              <EducationField
+                key={field.id}
+                control={control}
+                remove={removeEducations}
+                index={index}
+              />
+            ))}
+            <Button
+              color="success"
+              variant="shadow"
+              type="button"
+              size="md"
+              onClick={() =>
+                appendEducations({
+                  degree: "",
+                  school: "",
+                  timePeriod: {
+                    startDate: new Date().toISOString(),
+                    endDate: null,
+                  },
+                })
+              }
+            >
+              Add Education
+            </Button>
+            {sections.map((field, index) => (
+              <SectionField
+                key={field.id}
+                control={control}
+                remove={removeSections}
+                index={index}
+              />
+            ))}
+            <Button
+              color="secondary"
+              variant="shadow"
+              type="button"
+              size="md"
+              onClick={() =>
+                appendSections({
+                  title: "",
+                  description: "",
+                })
+              }
+            >
+              Add New Section
+            </Button>
+          </div>
         </div>
         <button ref={formRef} type="submit" style={{ display: "none" }} />
       </form>
