@@ -51,6 +51,7 @@ export const SectionField = ({ control, remove, index }: ISectionField) => {
           render={({ field, fieldState: { error } }) => (
             <>
               {error && <p className="text-red-500">{error.message}</p>}
+
               <ReactQuill theme="snow" modules={modules} {...field} />
             </>
           )}

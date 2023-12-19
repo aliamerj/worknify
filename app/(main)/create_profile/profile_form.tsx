@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Divider, Input, Spacer, Textarea } from "@nextui-org/react";
+import { Button, Input, Textarea } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import {
@@ -10,7 +10,6 @@ import {
   useForm,
 } from "react-hook-form";
 import { useProfileData, ProfileData } from "./profile_context";
-import ReactQuill from "react-quill";
 import { profileSchemaValidation } from "@/utils/validations/profileValidation";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -31,11 +30,13 @@ export const ProfileForm = () => {
   const [error, setError] = useState("");
 
   const onSubmit: SubmitHandler<ProfileData> = async (data) => {
+    console.log(data);
     try {
       setIsLoading(true);
       await axios.post("/api/profile", data);
       router.push("/");
       router.refresh();
+      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       setError("An unexpected error occurred.");
@@ -66,6 +67,8 @@ export const ProfileForm = () => {
     name: "sections",
   });
   useEffect(() => {
+    console.log(profileData.experiences);
+    console.log(profileData.sections);
     const subscription = watch((value, _) => {
       updateProfileData(value as Partial<ProfileData>);
     });
@@ -255,6 +258,7 @@ export const ProfileForm = () => {
                 company: "",
                 timePeriod: {
                   startDate: new Date(),
+                  endDate: null,
                 },
               })
             }
@@ -276,9 +280,10 @@ export const ProfileForm = () => {
             onClick={() =>
               appendEducations({
                 degree: "",
-                university: "",
+                school: "",
                 timePeriod: {
                   startDate: new Date(),
+                  endDate: null,
                 },
               })
             }

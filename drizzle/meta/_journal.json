@@ -15,6 +15,34 @@
       "when": 1702063198112,
       "tag": "0001_slim_magik",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1702991707543,
+      "tag": "0002_nosy_ser_duncan",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1702996096564,
+      "tag": "0003_motionless_meggan",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1702996889960,
+      "tag": "0004_quick_starfox",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1702996960913,
+      "tag": "0005_conscious_typhoid_mary",
+      "breakpoints": true
     }
   ]
 }

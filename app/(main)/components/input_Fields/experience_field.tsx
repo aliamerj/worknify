@@ -41,13 +41,12 @@ const ExperienceField = ({ control, remove, index }: IExperienceField) => {
           render={({ field, fieldState: { error } }) => (
             <Input
               isRequired
+              isInvalid={!!error}
+              errorMessage={error?.message}
               type="text"
               placeholder="Canonical"
               className="mb-3 max-w-full text-gray-500"
-              {...field}
               fullWidth
-              isInvalid={!!error}
-              errorMessage={error?.message}
               label="Company"
               maxLength={50}
               {...field}
@@ -75,42 +74,48 @@ const ExperienceField = ({ control, remove, index }: IExperienceField) => {
         <Controller
           control={control}
           name={`experiences.${index}.timePeriod.startDate`}
-          render={({ field }) => (
-            <DatePicker
-              showIcon
-              placeholderText="Start Date"
-              maxDate={new Date()}
-              onChange={(date) => field.onChange(date)}
-              selected={field.value}
-              calendarClassName="calendar"
-              className="z-30  w-full rounded-lg border bg-divider p-2 outline-none"
-            />
+          render={({ field, fieldState: { error } }) => (
+            <>
+              {error && <p className="text-red-500">{error.message}</p>}
+              <DatePicker
+                showIcon
+                placeholderText="Start Date"
+                maxDate={new Date()}
+                onChange={(date) => field.onChange(date?.toISOString())}
+                selected={new Date(field.value)}
+                calendarClassName="calendar"
+                className="z-30  w-full rounded-lg border bg-divider p-2 outline-none"
+              />
+            </>
           )}
         />
         <Controller
           control={control}
           name={`experiences.${index}.timePeriod.endDate`}
-          render={({ field }) => (
-            <div className="flex justify-between gap-2">
-              <DatePicker
-                disabled={isCurrent}
-                showIcon
-                placeholderText="End Date"
-                maxDate={new Date()}
-                onChange={(date) => field.onChange(date)}
-                selected={field.value}
-                className="z-30 w-full rounded-lg border bg-divider p-2 outline-none disabled:bg-gray-300 disabled:line-through"
-              />
-              <Checkbox
-                radius="sm"
-                onValueChange={(is) => {
-                  setIsCurrent(is);
-                  field.onChange(null);
-                }}
-              >
-                Present
-              </Checkbox>
-            </div>
+          render={({ field, fieldState: { error } }) => (
+            <>
+              {error && <p className="text-red-500">{error.message}</p>}
+              <div className="flex justify-between gap-2">
+                <DatePicker
+                  disabled={isCurrent}
+                  showIcon
+                  placeholderText="End Date"
+                  maxDate={new Date()}
+                  onChange={(date) => field.onChange(date)}
+                  selected={field.value ? new Date(field.value) : null}
+                  className="z-30 w-full rounded-lg border bg-divider p-2 outline-none disabled:bg-gray-300 disabled:line-through"
+                />
+                <Checkbox
+                  radius="sm"
+                  onValueChange={(is) => {
+                    setIsCurrent(is);
+                    field.onChange(null);
+                  }}
+                >
+                  Present
+                </Checkbox>
+              </div>
+            </>
           )}
         />
         <Controller

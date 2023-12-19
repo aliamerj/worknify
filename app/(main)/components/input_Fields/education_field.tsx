@@ -23,7 +23,7 @@ export const EducationField = ({ control, remove, index }: IEducationField) => {
       </button>
       <div className="flex flex-col gap-2">
         <Controller
-          name={`educations.${index}.university`}
+          name={`educations.${index}.school`}
           control={control}
           render={({ field, fieldState: { error } }) => (
             <Input
@@ -46,13 +46,12 @@ export const EducationField = ({ control, remove, index }: IEducationField) => {
           render={({ field, fieldState: { error } }) => (
             <Input
               isRequired
+              isInvalid={!!error}
+              errorMessage={error?.message}
               type="text"
               placeholder="Computer Science"
               className="mb-3 max-w-full text-gray-500"
-              {...field}
               fullWidth
-              isInvalid={!!error}
-              errorMessage={error?.message}
               label="Degree"
               maxLength={50}
               {...field}
@@ -62,42 +61,48 @@ export const EducationField = ({ control, remove, index }: IEducationField) => {
         <Controller
           control={control}
           name={`educations.${index}.timePeriod.startDate`}
-          render={({ field }) => (
-            <DatePicker
-              showIcon
-              placeholderText="Start Date"
-              maxDate={new Date()}
-              onChange={(date) => field.onChange(date)}
-              selected={field.value}
-              calendarClassName="calendar"
-              className="z-30  w-full rounded-lg border bg-divider p-2 outline-none"
-            />
+          render={({ field, fieldState: { error } }) => (
+            <>
+              {error && <p className="text-red-500">{error.message}</p>}
+              <DatePicker
+                showIcon
+                placeholderText="Start Date"
+                maxDate={new Date()}
+                onChange={(date) => field.onChange(date?.toString())}
+                selected={new Date(field.value)}
+                calendarClassName="calendar"
+                className="z-30  w-full rounded-lg border bg-divider p-2 outline-none"
+              />
+            </>
           )}
         />
         <Controller
           control={control}
           name={`educations.${index}.timePeriod.endDate`}
-          render={({ field }) => (
-            <div className="flex justify-between gap-2">
-              <DatePicker
-                disabled={isCurrent}
-                showIcon
-                placeholderText="End Date"
-                maxDate={new Date()}
-                onChange={(date) => field.onChange(date)}
-                selected={field.value}
-                className="z-30 w-full rounded-lg border bg-divider p-2 outline-none disabled:bg-gray-300 disabled:line-through"
-              />
-              <Checkbox
-                radius="sm"
-                onValueChange={(is) => {
-                  setIsCurrent(is);
-                  field.onChange(null);
-                }}
-              >
-                Present
-              </Checkbox>
-            </div>
+          render={({ field, fieldState: { error } }) => (
+            <>
+              {error && <p className="text-red-500">{error.message}</p>}
+              <div className="flex justify-between gap-2">
+                <DatePicker
+                  disabled={isCurrent}
+                  showIcon
+                  placeholderText="End Date"
+                  maxDate={new Date()}
+                  onChange={(date) => field.onChange(date?.toString())}
+                  selected={field.value ? new Date(field.value) : null}
+                  className="z-30 w-full rounded-lg border bg-divider p-2 outline-none disabled:bg-gray-300 disabled:line-through"
+                />
+                <Checkbox
+                  radius="sm"
+                  onValueChange={(is) => {
+                    setIsCurrent(is);
+                    field.onChange(null);
+                  }}
+                >
+                  Present
+                </Checkbox>
+              </div>
+            </>
           )}
         />
       </div>

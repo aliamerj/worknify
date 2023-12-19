@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { ControllerRenderProps, FieldError } from "react-hook-form";
 import skillsJSON from "@/utils_files/skills.json";
 interface Option {
-  id: number;
   name: string;
 }
 interface ISkillsPicker {
@@ -11,9 +10,15 @@ interface ISkillsPicker {
   error?: FieldError;
 }
 export const SkillsPicker = ({ field, error }: ISkillsPicker) => {
+  const savedSkills =
+    field.value?.toString().length != 0
+      ? field.value?.toString().split(",")
+      : null;
   const [search, setSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(
+    savedSkills ?? [],
+  );
   const [options, setOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +29,7 @@ export const SkillsPicker = ({ field, error }: ISkillsPicker) => {
       .filter((opt) =>
         opt.name.toLowerCase().includes(searchTerm.toLowerCase()),
       )
-      .filter((opt) => !selectedOptions.includes(opt))
+      .filter((opt) => !selectedOptions.includes(opt.name))
       .slice(0, 3);
 
     setOptions(filteredOptions);
@@ -32,15 +37,15 @@ export const SkillsPicker = ({ field, error }: ISkillsPicker) => {
   };
 
   const selectOption = (option: Option) => {
-    if (!selectedOptions.find((opt) => opt.id === option.id)) {
-      setSelectedOptions([...selectedOptions, option]);
+    if (!selectedOptions.find((opt) => opt === option.name)) {
+      setSelectedOptions([...selectedOptions, option.name]);
     }
     setShowDropdown(false);
     setSearch("");
   };
 
-  const removeOption = (id: number) => {
-    setSelectedOptions(selectedOptions.filter((opt) => opt.id !== id));
+  const removeOption = (skill: string) => {
+    setSelectedOptions(selectedOptions.filter((opt) => opt !== skill));
   };
 
   useEffect(() => {
@@ -51,9 +56,8 @@ export const SkillsPicker = ({ field, error }: ISkillsPicker) => {
     }
   }, [search]);
   useEffect(() => {
-    const mySkills = selectedOptions.map((opt) => opt.name).toString();
+    const mySkills = selectedOptions.map((opt) => opt).toString();
     field.onChange(mySkills);
-    console.log(selectedOptions);
   }, [selectedOptions]);
 
   return (
@@ -69,11 +73,11 @@ export const SkillsPicker = ({ field, error }: ISkillsPicker) => {
           !!error ? "bg-red-200" : ""
         } `}
       >
-        {selectedOptions.map((opt) => (
-          <div key={opt.id} className="flex items-center rounded-md bg-white">
-            <div className="p-2">{opt.name}</div>
+        {selectedOptions.map((opt, index) => (
+          <div key={index} className="flex items-center rounded-md bg-white">
+            <div className="p-2">{opt}</div>
             <div
-              onClick={() => removeOption(opt.id)}
+              onClick={() => removeOption(opt)}
               className="cursor-pointer p-2"
             >
               &times;
@@ -98,9 +102,9 @@ export const SkillsPicker = ({ field, error }: ISkillsPicker) => {
             <div className="p-2 text-center text-gray-500">Loading...</div>
           ) : (
             <div className="space-y-0.5 rounded-lg p-2">
-              {options.map((opt) => (
+              {options.map((opt, index) => (
                 <div
-                  key={opt.id}
+                  key={index}
                   onClick={() => selectOption(opt)}
                   className="hover:bg-light-blue-500 cursor-pointer rounded-md bg-white p-2"
                 >

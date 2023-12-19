@@ -3,21 +3,23 @@ import validator from "validator";
 
 const TimePeriod = z
   .object({
-    startDate: z.date({
+    startDate: z.string({
       required_error: "Start date is required",
-      invalid_type_error: "Start date must be a valid date",
     }),
     endDate: z
-      .date({
+      .string({
         required_error: "End date is required",
-        invalid_type_error: "End date must be a valid date",
       })
-      .optional(),
+      .nullable(),
   })
-  .refine((data) => data.endDate && data.endDate > data.startDate, {
-    message: "End date must be after the start date",
-    path: ["endDate"],
-  });
+  .refine(
+    (data) =>
+      !(data.endDate && new Date(data.endDate) < new Date(data.startDate)),
+    {
+      message: "End date must be after the start date",
+      path: ["endDate"],
+    },
+  );
 
 const sectionSchema = z.object({
   title: z
@@ -29,7 +31,7 @@ const sectionSchema = z.object({
     .string()
     .trim()
     .min(5, "Description must be at least 5 characters")
-    .max(500, "Description must be under 500 characters"),
+    .max(700, "Description must be under 700 characters"),
 });
 
 export const experienceSchema = z.object({
@@ -47,7 +49,7 @@ export const experienceSchema = z.object({
     .string()
     .trim()
     .min(5, "Description must be at least 5 characters")
-    .max(500, "Description must be under 500 characters")
+    .max(700, "Description must be under 700 characters")
     .optional(),
   timePeriod: TimePeriod,
 });
@@ -57,9 +59,9 @@ const educationSchema = z.object({
     .string()
     .trim()
     .min(1, "Degree cannot be empty")
-    .max(30, "Degree must be under 30 characters"),
+    .max(50, "Degree must be under 30 characters"),
   timePeriod: TimePeriod,
-  university: z
+  school: z
     .string()
     .trim()
     .min(1, "University name cannot be empty")
@@ -71,12 +73,12 @@ export const profileSchemaValidation = z.object({
   jobTitle: z
     .string()
     .min(5, "Job title must be at least 5 characters")
-    .max(30, "Job title must be under 30 characters")
+    .max(50, "Job title must be under 30 characters")
     .trim(),
   fullName: z
     .string()
     .min(5, "Full name must be at least 5 characters")
-    .max(30, "Full name must be under 30 characters")
+    .max(50, "Full name must be under 30 characters")
     .trim(),
   address: z
     .string()
@@ -98,9 +100,9 @@ export const profileSchemaValidation = z.object({
     .trim(),
   skills: z.string().min(1, "You should select one skill at lesst"),
   experiences: z.array(experienceSchema),
-  github: z.string().optional(),
-  linkedin: z.string().optional(),
-  sections: z.array(sectionSchema).optional(),
+  github: z.string().max(200).optional(),
+  linkedin: z.string().max(200).optional(),
+  sections: z.array(sectionSchema),
   educations: z.array(educationSchema),
 });
 export type ProfileSchema = z.infer<typeof profileSchemaValidation>;
