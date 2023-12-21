@@ -1,4 +1,5 @@
 "use client";
+import { ProfileSelection } from "@/db/schemes/profileSchema";
 import { profileSchemaValidation } from "@/utils/validations/profileValidation";
 import React, {
   createContext,
@@ -37,25 +38,27 @@ export const ProfileDataProvider = ({
   children,
   name,
   email,
+  profile,
 }: {
   children: React.ReactNode;
   name: string;
   email: string;
+  profile?: ProfileSelection | null;
 }) => {
   const [isLoading, setLoading] = useState(false);
   const formRef = useRef<HTMLButtonElement>(null);
 
   var defaultProfileData: ProfileData = {
-    jobTitle: "",
+    jobTitle: profile?.jobTitle ?? "",
     fullName: name,
-    phoneNumber: "",
+    phoneNumber: profile?.phoneNumber ?? "",
     email: email,
-    address: "",
-    github: "",
-    linkedin: "",
-    background: "",
+    address: profile?.address ?? "",
+    github: profile?.github ?? "",
+    linkedin: profile?.linkedin ?? "",
+    background: profile?.background ?? "",
     sections: [],
-    skills: "",
+    skills: profile?.skills ?? "",
     experiences: [],
     educations: [],
   };

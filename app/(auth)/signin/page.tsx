@@ -1,19 +1,14 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
 import styles from "./signin.module.css";
 import Link from "next/link";
 import Image from "next/image";
 import { SigninButtons } from "./signinButton/signinButton";
+import { AppRouter } from "@/utils/router/app_router";
+
 export default async function SignInPage() {
-  const session = await getServerSession(authOptions);
-  if (session) {
-    redirect("/create_profile");
-  }
   return (
     <div className={styles.loginPage}>
       <div className={styles.backToHome}>
-        <Link href="/">
+        <Link href={AppRouter.home}>
           <span className={styles.arrow}>&larr;</span> Back to home page
         </Link>
       </div>

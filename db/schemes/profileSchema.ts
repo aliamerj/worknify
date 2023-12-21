@@ -61,3 +61,9 @@ export type ProfileInsertion = typeof profile.$inferInsert;
 export type SectionInsertion = typeof section.$inferInsert;
 export type EducationInsertion = typeof education.$inferInsert;
 export type ExperienceInsertion = typeof experience.$inferInsert;
+
+//selection
+export type ProfileSelection = typeof profile.$inferSelect;
+export type SectionSelection = typeof section.$inferSelect;
+export type EducationSelection = typeof education.$inferSelect;
+export type ExperienceSelection = typeof experience.$inferSelect;

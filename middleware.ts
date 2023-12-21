@@ -1,8 +1,4 @@
-export { default } from "next-auth/middleware";
+import { authMiddleware } from "./middleware/auth_middleware";
+import { middlewares } from "./middleware/middlewares";
 
-export const config = {
-  // *: zero or more
-  // +: one or more
-  // ?: zero or one
-  matcher: ["/create_profile"],
-};
+export default middlewares([authMiddleware]);

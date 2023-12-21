@@ -3,7 +3,7 @@ import { Button } from "@nextui-org/react";
 import { useProfileData } from "./profile_context";
 import Link from "next/link";
 
-export const MainButtons = () => {
+export const CreateButtons = () => {
   const { isLoading, triggerSubmit } = useProfileData();
   return (
     <div className="fixed inset-x-0 bottom-0 mb-4 flex justify-center">

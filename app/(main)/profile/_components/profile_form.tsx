@@ -13,10 +13,10 @@ import { useProfileData, ProfileData } from "./profile_context";
 import { profileSchemaValidation } from "@/utils/validations/profileValidation";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { SkillsPicker } from "../components/input_Fields/skills_input";
-import ExperienceField from "../components/input_Fields/experience_field";
-import { EducationField } from "../components/input_Fields/education_field";
-import { SectionField } from "../components/input_Fields/section_field";
+import { SkillsPicker } from "./input_Fields/skills_input";
+import ExperienceField from "./input_Fields/experience_field";
+import { EducationField } from "./input_Fields/education_field";
+import { SectionField } from "./input_Fields/section_field";
 
 export const ProfileForm = () => {
   const router = useRouter();

@@ -2,9 +2,11 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import * as users from "./schemes/userSchema";
+import * as allProfile from "./schemes/profileSchema";
 
 const schema = {
   ...users,
+  ...allProfile,
 };
 const connection = process.env.DATABASE_URL as string;
 

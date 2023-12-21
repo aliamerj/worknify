@@ -3,6 +3,7 @@ import hero from "@/public/hero.png";
 import styles from "./Header.module.css";
 import { Button } from "@nextui-org/button";
 import Link from "next/link";
+import { ApiRouter } from "@/utils/router/app_router";
 
 export const Header = () => {
   return (
@@ -26,7 +27,7 @@ export const Header = () => {
         <div className={styles.buttonContainer}>
           <Button
             as={Link}
-            href="/api/auth/signin"
+            href={ApiRouter.signin}
             className={`${styles.button} ${styles.buttonGetStarted}`}
           >
             Get Started
