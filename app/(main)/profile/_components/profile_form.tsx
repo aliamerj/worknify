@@ -9,8 +9,11 @@ import {
   useFieldArray,
   useForm,
 } from "react-hook-form";
-import { useProfileData, ProfileData } from "./profile_context";
-import { profileSchemaValidation } from "@/utils/validations/profileValidation";
+import { useProfileData } from "./profile_context";
+import {
+  ProfileSchema,
+  profileSchemaValidation,
+} from "@/utils/validations/profileValidation";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { SkillsPicker } from "./input_Fields/skills_input";
@@ -22,20 +25,24 @@ export const ProfileForm = () => {
   const router = useRouter();
   const { profileData, updateProfileData, setIsLoading, formRef } =
     useProfileData();
-  const { control, handleSubmit, watch } = useForm<ProfileData>({
+  const { control, handleSubmit, watch } = useForm<ProfileSchema>({
     defaultValues: profileData,
     resolver: zodResolver(profileSchemaValidation),
   });
 
   const [error, setError] = useState("");
 
-  const onSubmit: SubmitHandler<ProfileData> = async (data) => {
+  const onSubmit: SubmitHandler<ProfileSchema> = async (data) => {
     try {
-      setIsLoading(true);
-      await axios.post("/api/profile", data);
-      router.push("/");
-      router.refresh();
-      setIsLoading(false);
+      if (!profileData.edit) {
+        setIsLoading(true);
+        await axios.post("/api/profile", data);
+        router.push("/");
+        router.refresh();
+        setIsLoading(false);
+        return;
+      }
+      //todo: implement the edit
     } catch (error: any) {
       setIsLoading(false);
       setError(error.message);
@@ -67,7 +74,7 @@ export const ProfileForm = () => {
   });
   useEffect(() => {
     const subscription = watch((value, _) => {
-      updateProfileData(value as Partial<ProfileData>);
+      updateProfileData(value as Partial<ProfileSchema>);
     });
     return () => subscription.unsubscribe();
   }, [watch, updateProfileData]);

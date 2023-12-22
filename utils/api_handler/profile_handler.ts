@@ -6,26 +6,29 @@ import {
   SectionSelection,
 } from "@/db/schemes/profileSchema";
 
-type AllProfileData = {
+export type AllProfileData = {
   profile: ProfileSelection;
-  experience: ExperienceSelection;
-  education: EducationSelection;
-  section: SectionSelection;
+  experiences: ExperienceSelection[];
+  educations: EducationSelection[];
+  sections: SectionSelection[];
 };
 
-export default async function getProfile(userId: string) {
-  const profileData = await databaseDrizzle.query.profile.findFirst({
+export default async function getProfileData(
+  userId: string,
+): Promise<AllProfileData | null> {
+  const profile = await databaseDrizzle.query.profile.findFirst({
     where: (p, o) => o.eq(p.userId, userId),
   });
-  if (!profileData) return null;
+  if (!profile) return null;
 
-  const experienceData = await databaseDrizzle.query.experience.findMany({
-    where: (e, o) => o.eq(e.profileId, profileData.id),
+  const experiences = await databaseDrizzle.query.experience.findMany({
+    where: (e, o) => o.eq(e.profileId, profile.id),
   });
-  const educationData = await databaseDrizzle.query.education.findFirst({
-    where: (e, o) => o.eq(e.profileId, profileData.id),
+  const educations = await databaseDrizzle.query.education.findMany({
+    where: (e, o) => o.eq(e.profileId, profile.id),
   });
-  const sectionData = await databaseDrizzle.query.section.findMany({
-    where: (s, o) => o.eq(s.profileId, profileData.id),
+  const sections = await databaseDrizzle.query.section.findMany({
+    where: (s, o) => o.eq(s.profileId, profile.id),
   });
+  return { profile, experiences, educations, sections };
 }

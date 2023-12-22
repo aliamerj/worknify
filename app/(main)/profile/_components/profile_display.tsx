@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useProfileData } from "./profile_context";
 import DOMPurify from "dompurify";
 
-export const ProfileDisplay = ({ userId }: { userId: string }) => {
+export const ProfileDisplay = () => {
   // Sanitize the HTML content
   const createMarkup = (htmlContent: string) => {
     return { __html: DOMPurify.sanitize(htmlContent) };
@@ -12,7 +12,7 @@ export const ProfileDisplay = ({ userId }: { userId: string }) => {
 
   const githubLink = `https//github.com/${profileData.github}`;
   const linkedin = `https//linkedin.com/in/${profileData.linkedin}`;
-  const workify = `/user/${userId}`;
+  const workify = `/user/${profileData.userId}`;
 
   return (
     <div className="mx-auto max-w-4xl bg-white py-3 shadow-lg">

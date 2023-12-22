@@ -106,3 +106,6 @@ export const profileSchemaValidation = z.object({
   educations: z.array(educationSchema),
 });
 export type ProfileSchema = z.infer<typeof profileSchemaValidation>;
+export type ExperienceSchema = z.infer<typeof experienceSchema>;
+export type EducationSchema = z.infer<typeof educationSchema>;
+export type SectionSchema = z.infer<typeof sectionSchema>;
