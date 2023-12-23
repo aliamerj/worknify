@@ -9,10 +9,14 @@ import {
   profile,
   section,
 } from "@/db/schemes/profileSchema";
-import { profileSchemaValidation } from "@/utils/validations/profileValidation";
+import {
+  editProfileSchemaValidation,
+  profileSchemaValidation,
+} from "@/utils/validations/profileValidation";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
+import { eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -95,6 +99,99 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { state: true, body: "profile created successfully" },
       { status: 201 },
+    );
+  } catch (error: any) {
+    return NextResponse.json(
+      { state: false, message: error.message },
+      { status: 500 },
+    );
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({}, { status: 401 });
+  const body = await req.json();
+  const validation = editProfileSchemaValidation.safeParse(body);
+
+  if (!validation.success)
+    return NextResponse.json(validation.error.format(), {
+      status: 400,
+    });
+  const {
+    sections,
+    educations,
+    experiences,
+    jobTitle,
+    fullName,
+    background,
+    phoneNumber,
+    address,
+    email,
+    github,
+    linkedin,
+    skills,
+    profileId,
+  } = validation.data;
+
+  try {
+    await databaseDrizzle
+      .update(profile)
+      .set({
+        fullName,
+        jobTitle,
+        background,
+        address,
+        email,
+        github,
+        linkedin,
+        skills,
+        phoneNumber,
+      })
+      .where(eq(profile.userId, session.user.id!));
+    if (sections) {
+      for (const { title, description } of sections) {
+        await databaseDrizzle
+          .update(section)
+          .set({
+            title,
+            description,
+          })
+          .where(eq(section.profileId, profileId));
+      }
+    }
+
+    if (educations) {
+      for (const { school, degree, timePeriod } of educations) {
+        await databaseDrizzle
+          .update(education)
+          .set({
+            school,
+            degree,
+            startDate: timePeriod.startDate,
+            endData: timePeriod.endDate,
+          })
+          .where(eq(education.profileId, profileId));
+      }
+    }
+    if (experiences) {
+      for (const { company, role, timePeriod, description } of experiences) {
+        await databaseDrizzle
+          .update(experience)
+          .set({
+            company,
+            role,
+            description,
+            startDate: timePeriod.startDate,
+            endData: timePeriod.endDate,
+          })
+          .where(eq(experience.profileId, profileId));
+      }
+    }
+
+    return NextResponse.json(
+      { state: true, message: "Profile Updated successfully" },
+      { status: 200 },
     );
   } catch (error: any) {
     return NextResponse.json(

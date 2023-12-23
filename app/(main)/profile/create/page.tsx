@@ -1,4 +1,3 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { ProfileForm } from "../_components/profile_form";
 import { ProfileDisplay } from "../_components/profile_display";
 import { CreateButtons } from "../_components/create_buttons";

@@ -3,7 +3,7 @@ import { Button } from "@nextui-org/react";
 import { useProfileData } from "./profile_context";
 import Link from "next/link";
 
-export const EditButtons = () => {
+export const UpdateButtons = () => {
   const { isLoading, triggerSubmit, resetForm } = useProfileData();
   return (
     <div className="fixed inset-x-0 bottom-0 mb-4 flex justify-center">
@@ -16,7 +16,7 @@ export const EditButtons = () => {
           size="lg"
           onClick={triggerSubmit}
         >
-          Edit
+          Update
         </Button>
         {/* Button 2 */}
         <Button

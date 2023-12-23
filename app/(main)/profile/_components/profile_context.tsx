@@ -1,4 +1,5 @@
 "use client";
+import _ from "lodash";
 import { AllProfileData } from "@/utils/api_handler/profile_handler";
 import { AppRouter } from "@/utils/router/app_router";
 import {
@@ -17,7 +18,9 @@ import React, {
 } from "react";
 
 type ProfileData = ProfileSchema & { edit: boolean; userId: string };
-
+type OptionalProfileData = {
+  [P in keyof ProfileData]?: ProfileData[P];
+};
 interface ProfileContextValue {
   profileData: ProfileData;
   updateProfileData: (newData: Partial<ProfileSchema>) => void;
@@ -26,6 +29,8 @@ interface ProfileContextValue {
   triggerSubmit: () => void;
   formRef: React.Ref<HTMLButtonElement>;
   resetForm: () => void;
+  profileId?: number;
+  findDifferences: () => OptionalProfileData;
 }
 
 const ProfileDataContext = createContext<ProfileContextValue | undefined>(
@@ -91,6 +96,30 @@ export const ProfileDataProvider = ({
     setProfileData(getSavedForm);
     router.replace(AppRouter.createProfile);
   };
+  function findDifferences(): OptionalProfileData {
+    const source = serializeProfile(allProfileData, name, email, userId);
+    const differences: any = {};
+
+    Object.keys(source).forEach((key) => {
+      const typedKey = key as keyof ProfileData;
+      if (typedKey === "experiences" || typedKey === "educations") {
+        if (
+          !_.isEqual(
+            JSON.stringify(source[typedKey]),
+            JSON.stringify(profileData[typedKey]),
+          )
+        ) {
+          differences[typedKey] = source[typedKey];
+        }
+      } else if (!_.isEqual(source[typedKey], profileData[typedKey])) {
+        differences[typedKey] = source[typedKey];
+      }
+    });
+
+    return differences;
+  }
+
+  const profileId = allProfileData?.profile.id;
 
   return (
     <ProfileDataContext.Provider
@@ -102,6 +131,8 @@ export const ProfileDataProvider = ({
         triggerSubmit,
         formRef,
         resetForm,
+        profileId,
+        findDifferences,
       }}
     >
       {children}

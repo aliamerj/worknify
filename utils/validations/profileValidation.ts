@@ -69,7 +69,6 @@ const educationSchema = z.object({
 });
 
 export const profileSchemaValidation = z.object({
-  // step 1
   jobTitle: z
     .string()
     .min(5, "Job title must be at least 5 characters")
@@ -92,7 +91,6 @@ export const profileSchemaValidation = z.object({
   phoneNumber: z
     .string()
     .refine(validator.isMobilePhone, "Invalid phone number"),
-  // step 2
   background: z
     .string()
     .min(50, "Background must be at least 50 characters")
@@ -105,6 +103,26 @@ export const profileSchemaValidation = z.object({
   sections: z.array(sectionSchema),
   educations: z.array(educationSchema),
 });
+
+export const editProfileSchemaValidation = z.object({
+  profileId: z.number(),
+  jobTitle: z.string().min(5).max(50).trim().optional(),
+  fullName: z.string().min(5).max(50).trim().optional(),
+  address: z.string().min(5).max(50).trim().optional(),
+  email: z.string().email().min(5).optional(),
+  phoneNumber: z
+    .string()
+    .refine(validator.isMobilePhone, "Invalid phone number")
+    .optional(),
+  background: z.string().min(50).max(300).trim().optional(),
+  skills: z.string().min(1).optional(),
+  experiences: z.array(experienceSchema).optional(),
+  github: z.string().max(200).optional(),
+  linkedin: z.string().max(200).optional(),
+  sections: z.array(sectionSchema).optional(),
+  educations: z.array(educationSchema).optional(),
+});
+
 export type ProfileSchema = z.infer<typeof profileSchemaValidation>;
 export type ExperienceSchema = z.infer<typeof experienceSchema>;
 export type EducationSchema = z.infer<typeof educationSchema>;

@@ -23,29 +23,49 @@ import { SectionField } from "./input_Fields/section_field";
 
 export const ProfileForm = () => {
   const router = useRouter();
-  const { profileData, updateProfileData, setIsLoading, formRef } =
-    useProfileData();
+  const {
+    profileData,
+    updateProfileData,
+    setIsLoading,
+    formRef,
+    profileId,
+    findDifferences,
+  } = useProfileData();
   const { control, handleSubmit, watch } = useForm<ProfileSchema>({
     defaultValues: profileData,
     resolver: zodResolver(profileSchemaValidation),
   });
+  type Message = {
+    isError: boolean;
+    message: string;
+  };
 
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState<Message>();
 
   const onSubmit: SubmitHandler<ProfileSchema> = async (data) => {
     try {
+      setIsLoading(true);
       if (!profileData.edit) {
-        setIsLoading(true);
         await axios.post("/api/profile", data);
         router.push("/");
         router.refresh();
-        setIsLoading(false);
-        return;
+      } else {
+        const differences = findDifferences();
+        if (Object.keys(differences).length !== 0) {
+          const res = await axios.patch("/api/profile", {
+            ...differences,
+            profileId,
+          });
+          if (res.status === 200) {
+            setMessage({ isError: false, message: res.data.message });
+          }
+        }
       }
-      //todo: implement the edit
+      setIsLoading(false);
+      return;
     } catch (error: any) {
       setIsLoading(false);
-      setError(error.message);
+      setMessage({ isError: true, message: error.message });
     }
   };
   const {
@@ -85,12 +105,14 @@ export const ProfileForm = () => {
         onSubmit={handleSubmit(onSubmit)}
         className="mx-2 w-full rounded-xl bg-white p-5 drop-shadow-xl lg:max-w-lg"
       >
-        {error && (
+        {message && (
           <div
             role="alert"
-            className="font-regular relative mb-4 block w-full rounded-lg bg-red-500 p-4 text-base leading-5 text-white opacity-100"
+            className={`font-regular relative mb-4 block w-full rounded-lg ${
+              message.isError ? "bg-red-500" : "bg-green-500"
+            } p-4 text-base leading-5 text-white opacity-100`}
           >
-            {error}
+            {message.message}
           </div>
         )}
         <Controller
