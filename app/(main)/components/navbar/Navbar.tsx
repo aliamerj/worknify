@@ -26,6 +26,7 @@ export const NavBar = async () => {
             name={sesstion.user.name!}
             email={sesstion.user.email!}
             userImage={sesstion.user.image!}
+            userId={sesstion.user.id!}
           />
         ) : (
           <Link className={styles.getStartedBtn} href="/api/auth/signin">

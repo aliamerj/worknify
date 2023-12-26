@@ -10,6 +10,5 @@ export default function EditProfileGate({
 }) {
   const { profileData } = useProfileData();
   !profileData.edit && redirect(AppRouter.createProfile);
-
   return <main>{children}</main>;
 }
