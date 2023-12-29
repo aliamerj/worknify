@@ -82,7 +82,7 @@ class ErrorBoundary extends React.Component<
               padding: "10px 20px",
               fontSize: "1rem",
               color: "#fff",
-              backgroundColor: "#8a2be2",
+              backgroundColor: "#164863",
               border: "none",
               borderRadius: "5px",
               cursor: "pointer",
@@ -90,10 +90,10 @@ class ErrorBoundary extends React.Component<
               boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
             }}
             onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor = "#6920b0")
+              (e.currentTarget.style.backgroundColor = "#184863")
             }
             onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor = "#8a2be2")
+              (e.currentTarget.style.backgroundColor = "#164863")
             }
             onMouseDown={(e) =>
               (e.currentTarget.style.transform = "scale(0.95)")

@@ -1,9 +1,14 @@
 import { databaseDrizzle } from "@/db/database";
 import { notFound } from "next/navigation";
-import React from "react";
+import React, { Suspense } from "react";
 import { Header } from "../_components/header/header";
+import { ProfileSummary } from "../_components/profile_summary/profile_summary";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { Experience } from "../_components/experience/experience";
+import ShimmerLoading from "@/global-components/ShimmerLoading";
+import ErrorBoundary from "@/global-components/ErrorBoundary";
+import { Spinner } from "@nextui-org/react";
 
 interface Props {
   params: { id: string };
@@ -32,8 +37,21 @@ async function ViewProfile({ params }: Props) {
         fullName={profile.fullName}
         username={params.id}
         background={profile.background}
-        image={image ?? undefined}
+        image={image ?? null}
+        linkedin={profile.linkedin}
+        github={profile.github}
+        jobTitle={profile.jobTitle}
       />
+      <ErrorBoundary>
+        <Suspense fallback={<ShimmerLoading count={4} />}>
+          <ProfileSummary />
+        </Suspense>
+      </ErrorBoundary>
+      <ErrorBoundary>
+        <Suspense fallback={<ShimmerLoading count={4} />}>
+          <Experience profileId={profile.id} />
+        </Suspense>
+      </ErrorBoundary>
     </>
   );
 }
