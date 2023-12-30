@@ -22,6 +22,7 @@ const TimePeriod = z
   );
 
 const sectionSchema = z.object({
+  id: z.number().optional(),
   title: z
     .string()
     .trim()
@@ -35,6 +36,7 @@ const sectionSchema = z.object({
 });
 
 export const experienceSchema = z.object({
+  id: z.number().optional(),
   role: z
     .string()
     .trim()
@@ -55,6 +57,7 @@ export const experienceSchema = z.object({
 });
 
 const educationSchema = z.object({
+  id: z.number().optional(),
   degree: z
     .string()
     .trim()

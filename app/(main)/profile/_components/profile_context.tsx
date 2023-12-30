@@ -16,6 +16,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { convertTimeToString } from "@/utils/helper_function";
 
 type ProfileData = ProfileSchema & { edit: boolean; userId: string };
 type OptionalProfileData = {
@@ -92,27 +93,39 @@ export const ProfileDataProvider = ({
   }, [profileData]);
 
   const resetForm = () => {
+    console.log(allProfileData);
     const getSavedForm = serializeProfile(allProfileData, name, email, userId);
     setProfileData(getSavedForm);
     router.replace(AppRouter.createProfile);
   };
+
   function findDifferences(): OptionalProfileData {
     const source = serializeProfile(allProfileData, name, email, userId);
     const differences: any = {};
 
     Object.keys(source).forEach((key) => {
       const typedKey = key as keyof ProfileData;
-      if (typedKey === "experiences" || typedKey === "educations") {
-        if (
-          !_.isEqual(
-            JSON.stringify(source[typedKey]),
-            JSON.stringify(profileData[typedKey]),
-          )
-        ) {
-          differences[typedKey] = source[typedKey];
+      if (!_.isEqual(source[typedKey], profileData[typedKey])) {
+        if (typedKey === "experiences" || typedKey === "educations") {
+          const sourceInfo = source[typedKey];
+          const profileInfo = profileData[typedKey];
+          if (sourceInfo.length === profileInfo.length) {
+            const differencesArray = profileInfo.filter((item, index) => {
+              const startDate = convertTimeToString(item.timePeriod.startDate);
+              const endDate = convertTimeToString(item.timePeriod.endDate);
+              return (
+                !_.isEqual(startDate, sourceInfo[index].timePeriod.startDate) ||
+                !_.isEqual(endDate, sourceInfo[index].timePeriod.endDate)
+              );
+            });
+
+            if (differencesArray.length > 0) {
+              differences[typedKey] = differencesArray;
+            }
+          }
+        } else {
+          differences[typedKey] = _.cloneDeep(profileData[typedKey]);
         }
-      } else if (!_.isEqual(source[typedKey], profileData[typedKey])) {
-        differences[typedKey] = source[typedKey];
       }
     });
 
@@ -150,12 +163,18 @@ const serializeProfile = (
     const { profile, sections, experiences, educations } = allProfileData;
     const experiencesData: ExperienceSchema[] = experiences.map((exp) => ({
       ...exp,
-      timePeriod: { startDate: exp.startDate, endDate: exp.endData },
+      timePeriod: {
+        startDate: convertTimeToString(exp.startDate)!,
+        endDate: convertTimeToString(exp.endDate),
+      },
       description: exp.description ?? "",
     }));
     const educationsData: EducationSchema[] = educations.map((edu) => ({
       ...edu,
-      timePeriod: { startDate: edu.startDate, endDate: edu.endData },
+      timePeriod: {
+        startDate: convertTimeToString(edu.startDate)!,
+        endDate: convertTimeToString(edu.endDate),
+      },
     }));
 
     return {

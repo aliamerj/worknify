@@ -16,7 +16,7 @@ import {
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -135,47 +135,67 @@ export async function PATCH(req: NextRequest) {
   } = validation.data;
 
   try {
-    await databaseDrizzle
-      .update(profile)
-      .set({
-        fullName,
-        jobTitle,
-        background,
-        address,
-        email,
-        github,
-        linkedin,
-        skills,
-        phoneNumber,
-      })
-      .where(eq(profile.userId, session.user.id!));
+    if (
+      fullName &&
+      jobTitle &&
+      background &&
+      address &&
+      email &&
+      github &&
+      linkedin &&
+      skills &&
+      phoneNumber
+    ) {
+      await databaseDrizzle
+        .update(profile)
+        .set({
+          fullName,
+          jobTitle,
+          background,
+          address,
+          email,
+          github,
+          linkedin,
+          skills,
+          phoneNumber,
+        })
+        .where(eq(profile.userId, session.user.id!));
+    }
     if (sections) {
-      for (const { title, description } of sections) {
+      for (const { title, description, id } of sections) {
         await databaseDrizzle
           .update(section)
           .set({
             title,
             description,
           })
-          .where(eq(section.profileId, profileId));
+          .where(and(eq(section.profileId, profileId), eq(section.id, id!)));
       }
     }
 
     if (educations) {
-      for (const { school, degree, timePeriod } of educations) {
+      for (const { school, degree, timePeriod, id } of educations) {
         await databaseDrizzle
           .update(education)
           .set({
             school,
             degree,
             startDate: timePeriod.startDate,
-            endData: timePeriod.endDate,
+            endDate: timePeriod.endDate,
           })
-          .where(eq(education.profileId, profileId));
+          .where(
+            and(eq(education.profileId, profileId), eq(education.id, id!)),
+          );
       }
     }
     if (experiences) {
-      for (const { company, role, timePeriod, description } of experiences) {
+      for (const {
+        company,
+        role,
+        timePeriod,
+        description,
+        id,
+      } of experiences) {
         await databaseDrizzle
           .update(experience)
           .set({
@@ -183,9 +203,11 @@ export async function PATCH(req: NextRequest) {
             role,
             description,
             startDate: timePeriod.startDate,
-            endData: timePeriod.endDate,
+            endDate: timePeriod.endDate,
           })
-          .where(eq(experience.profileId, profileId));
+          .where(
+            and(eq(experience.profileId, profileId), eq(experience.id, id!)),
+          );
       }
     }
 

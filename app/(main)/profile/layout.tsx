@@ -12,7 +12,6 @@ export default async function ProfileLayout({
   const allProfiledata = session
     ? await getProfileData(session?.user.id!)
     : null;
-
   return (
     <ProfileDataProvider
       userId={session?.user.id ?? ""}

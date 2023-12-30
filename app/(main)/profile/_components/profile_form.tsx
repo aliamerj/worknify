@@ -52,6 +52,7 @@ export const ProfileForm = () => {
       } else {
         const differences = findDifferences();
         if (Object.keys(differences).length !== 0) {
+          console.log({ submit: { ...differences, profileId } });
           const res = await axios.patch("/api/profile", {
             ...differences,
             profileId,

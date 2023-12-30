@@ -33,8 +33,8 @@ export const Experience = async ({ profileId }: { profileId: number }) => {
                 <p>{data.role}</p>
                 <time className="mt-2 text-sm uppercase tracking-widest text-zinc-500">
                   {formatDate(data.startDate)} -{" "}
-                  {data.endData ? (
-                    formatDate(data.endData)
+                  {data.endDate ? (
+                    formatDate(data.endDate)
                   ) : (
                     <span className="dark:text-primary-color text-tertiary-color">
                       Present

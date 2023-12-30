@@ -8,7 +8,6 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Experience } from "../_components/experience/experience";
 import ShimmerLoading from "@/global-components/ShimmerLoading";
 import ErrorBoundary from "@/global-components/ErrorBoundary";
-import { Spinner } from "@nextui-org/react";
 
 interface Props {
   params: { id: string };

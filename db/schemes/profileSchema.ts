@@ -39,7 +39,7 @@ export const experience = pgTable("experience", {
   company: varchar("company", { length: 60 }).notNull(),
   role: varchar("role", { length: 60 }).notNull(),
   startDate: date("start_date").notNull(),
-  endData: date("end_date"),
+  endDate: date("end_date"),
   description: text("description"),
   profileId: integer("profile_id")
     .references(() => profile.id, { onDelete: "cascade" })
@@ -50,7 +50,7 @@ export const education = pgTable("education", {
   school: varchar("school", { length: 60 }).notNull(),
   degree: varchar("degree", { length: 60 }).notNull(),
   startDate: date("start_date").notNull(),
-  endData: date("end_date"),
+  endDate: date("end_date"),
   description: text("description"),
   profileId: integer("profile_id")
     .references(() => profile.id, { onDelete: "cascade" })
