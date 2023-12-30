@@ -45,7 +45,6 @@ export const useProfileData = () => {
   }
   return context;
 };
-
 export const ProfileDataProvider = ({
   children,
   name,
@@ -93,7 +92,6 @@ export const ProfileDataProvider = ({
   }, [profileData]);
 
   const resetForm = () => {
-    console.log(allProfileData);
     const getSavedForm = serializeProfile(allProfileData, name, email, userId);
     setProfileData(getSavedForm);
     router.replace(AppRouter.createProfile);

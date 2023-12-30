@@ -8,6 +8,22 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Experience } from "../_components/experience/experience";
 import ShimmerLoading from "@/global-components/ShimmerLoading";
 import ErrorBoundary from "@/global-components/ErrorBoundary";
+import dynamic from "next/dynamic";
+import { Spinner } from "@nextui-org/react";
+import { Education } from "../_components/education/education";
+import Sections from "../_components/section/section";
+
+const Skills = dynamic(
+  () => import("@/app/(main)/profile/view/_components/skills/skills"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="m-5 flex w-full items-center justify-center p-5">
+        <Spinner size="lg" />
+      </div>
+    ),
+  },
+);
 
 interface Props {
   params: { id: string };
@@ -49,6 +65,17 @@ async function ViewProfile({ params }: Props) {
       <ErrorBoundary>
         <Suspense fallback={<ShimmerLoading count={4} />}>
           <Experience profileId={profile.id} />
+        </Suspense>
+      </ErrorBoundary>
+      {profile.skills && <Skills skills={profile.skills} />}
+      <ErrorBoundary>
+        <Suspense fallback={<ShimmerLoading count={4} />}>
+          <Education profileId={profile.id} />
+        </Suspense>
+      </ErrorBoundary>
+      <ErrorBoundary>
+        <Suspense fallback={<ShimmerLoading count={4} />}>
+          <Sections profileId={profile.id} />
         </Suspense>
       </ErrorBoundary>
     </>

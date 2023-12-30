@@ -3,6 +3,7 @@ export const AppRouter = {
   signup: "/api/auth/signin",
   createProfile: "/profile/create",
   editProfile: "/profile/update",
+  viewProfile: "/profile/view/",
 };
 export const ApiRouter = {
   signin: "/api/auth/signin",

@@ -1,4 +1,5 @@
 "use client";
+import { AppRouter } from "@/utils/router/app_router";
 import {
   Avatar,
   Badge,
@@ -37,7 +38,11 @@ export const UserAvatar = ({ userImage, name, email, userId }: IUserAvatar) => {
             <p className="font-semibold">Signed in as</p>
             <p className="font-semibold">{email}</p>
           </DropdownItem>
-          <DropdownItem key="profile" as={Link} href={`/resume/${userId}`}>
+          <DropdownItem
+            key="profile"
+            as={Link}
+            href={AppRouter.viewProfile + userId}
+          >
             Profile
           </DropdownItem>
           <DropdownItem key="notifications">
