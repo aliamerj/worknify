@@ -8,4 +8,5 @@ export const AppRouter = {
 export const ApiRouter = {
   signin: "/api/auth/signin",
   signOut: "/api/auth/signout",
+  star: "/api/star/",
 };

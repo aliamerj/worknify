@@ -1,8 +1,9 @@
 import { FaTasks } from "react-icons/fa";
 import { MdOutlineStar } from "react-icons/md";
 import { GrProjects } from "react-icons/gr";
+import { StarSelection } from "@/db/schemes/profileSchema";
 
-export const ProfileSummary = () => {
+export const ProfileSummary = ({ stars }: { stars: StarSelection[] }) => {
   return (
     <div className="bg-primary py-2 text-white">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -13,7 +14,9 @@ export const ProfileSummary = () => {
               Stars
             </span>
           </div>
-          <h1 className="text-lg font-bold sm:text-xl md:text-2xl">0</h1>
+          <h1 className="text-lg font-bold sm:text-xl md:text-2xl">
+            {stars.length}
+          </h1>
         </div>
         <div className="flex flex-col items-center justify-center">
           <div className="flex items-center justify-center gap-2">

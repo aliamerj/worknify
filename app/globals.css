@@ -125,3 +125,15 @@ a {
 label {
   z-index: 0 !important;
 }
+@keyframes floatError {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  10%,
+  90% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}

@@ -10,8 +10,8 @@ export const ProfileDisplay = () => {
   };
   const { profileData } = useProfileData();
 
-  const githubLink = `https//github.com/${profileData.github}`;
-  const linkedin = `https//linkedin.com/in/${profileData.linkedin}`;
+  const githubLink = `https://github.com/${profileData.github}`;
+  const linkedin = `https:://linkedin.com/in/${profileData.linkedin}`;
   const workify = `/user/${profileData.userId}`;
 
   return (

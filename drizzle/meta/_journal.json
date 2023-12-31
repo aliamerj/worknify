@@ -57,6 +57,13 @@
       "when": 1703025412226,
       "tag": "0007_hard_hairball",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1704010113355,
+      "tag": "0008_acoustic_mimic",
+      "breakpoints": true
     }
   ]
 }

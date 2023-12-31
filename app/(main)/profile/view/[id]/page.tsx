@@ -1,20 +1,21 @@
 import { databaseDrizzle } from "@/db/database";
 import { notFound } from "next/navigation";
 import React, { Suspense } from "react";
-import { Header } from "../_components/header/header";
-import { ProfileSummary } from "../_components/profile_summary/profile_summary";
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { Experience } from "../_components/experience/experience";
+
 import ShimmerLoading from "@/global-components/ShimmerLoading";
 import ErrorBoundary from "@/global-components/ErrorBoundary";
 import dynamic from "next/dynamic";
 import { Spinner } from "@nextui-org/react";
-import { Education } from "../_components/education/education";
-import Sections from "../_components/section/section";
-
+import { ProfileSummary } from "../../_components/_view_sections/profile_summary/profile_summary";
+import { Experience } from "../../_components/_view_sections/experience/experience";
+import { Education } from "../../_components/_view_sections/education/education";
+import Sections from "../../_components/_view_sections/section/section";
+import { Header } from "../../_components/_view_sections/header/header";
 const Skills = dynamic(
-  () => import("@/app/(main)/profile/view/_components/skills/skills"),
+  () => import("@/app/(main)/profile/_components/_view_sections/skills/skills"),
   {
     ssr: false,
     loading: () => (
@@ -46,6 +47,11 @@ async function ViewProfile({ params }: Props) {
   });
 
   if (!profile) notFound();
+
+  const star = await databaseDrizzle.query.star.findMany({
+    where: (s, o) => o.eq(s.profileId, profile?.id),
+  });
+  const isStared = star.findIndex((star) => (star.userId = params.id)) !== -1;
   return (
     <>
       <Header
@@ -56,10 +62,12 @@ async function ViewProfile({ params }: Props) {
         linkedin={profile.linkedin}
         github={profile.github}
         jobTitle={profile.jobTitle}
+        isStared={isStared}
+        profileId={profile.id}
       />
       <ErrorBoundary>
         <Suspense fallback={<ShimmerLoading count={4} />}>
-          <ProfileSummary />
+          <ProfileSummary stars={star} />
         </Suspense>
       </ErrorBoundary>
       <ErrorBoundary>

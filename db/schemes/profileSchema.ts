@@ -34,6 +34,15 @@ export const section = pgTable("section", {
     .notNull(),
 });
 
+export const star = pgTable("star", {
+  profileId: integer("profile_id")
+    .references(() => profile.id, { onDelete: "cascade" })
+    .notNull(),
+  userId: text("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+});
+
 export const experience = pgTable("experience", {
   id: serial("id").primaryKey(),
   company: varchar("company", { length: 60 }).notNull(),
@@ -67,3 +76,4 @@ export type ProfileSelection = typeof profile.$inferSelect;
 export type SectionSelection = typeof section.$inferSelect;
 export type EducationSelection = typeof education.$inferSelect;
 export type ExperienceSelection = typeof experience.$inferSelect;
+export type StarSelection = typeof star.$inferSelect;
