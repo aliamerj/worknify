@@ -64,6 +64,7 @@ async function ViewProfile({ params }: Props) {
         jobTitle={profile.jobTitle}
         isStared={isStared}
         profileId={profile.id}
+        emailUser={profile.email}
       />
       <ErrorBoundary>
         <Suspense fallback={<ShimmerLoading count={4} />}>

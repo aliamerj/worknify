@@ -1,17 +1,22 @@
 "use client";
 import { StarIcon } from "@/global-components/icon/star_icon";
 import { ApiRouter } from "@/utils/router/app_router";
-import { Button } from "@nextui-org/react";
+import { Button, useDisclosure } from "@nextui-org/react";
 import axios from "axios";
 import { useState } from "react";
 import { GoAlertFill } from "react-icons/go";
+import { EmailModal } from "../email_modal/email_modal";
 
 export const ButtonHeader = ({
   isStared,
   profileId,
+  emailUser,
+  fullName,
 }: {
   isStared: boolean;
   profileId: number;
+  emailUser: string;
+  fullName: string;
 }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -29,15 +34,24 @@ export const ButtonHeader = ({
       setTimeout(() => setError(null), 3000);
     }
   };
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <div className="relative flex items-center gap-4">
       <Button
+        onPress={onOpen}
         radius="full"
         size="lg"
         className="bg-gradient-to-tr from-primary to-secondary text-white shadow-lg"
       >
         Contact
       </Button>
+      <EmailModal
+        isOpen={isOpen}
+        onClose={onClose}
+        emailUser={emailUser}
+        fullName={fullName}
+      />
       <Button
         isLoading={loading}
         size="md"

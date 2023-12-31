@@ -14,6 +14,7 @@ interface IHeader {
   jobTitle: string;
   isStared: boolean;
   profileId: number;
+  emailUser: string;
 }
 
 export const Header = ({
@@ -26,6 +27,7 @@ export const Header = ({
   jobTitle,
   isStared,
   profileId,
+  emailUser,
 }: IHeader) => {
   return (
     <div
@@ -38,7 +40,12 @@ export const Header = ({
           <p className="my-4 text-center text-lg md:w-96 md:text-start md:text-xl">
             {background}
           </p>
-          <ButtonHeader isStared={isStared} profileId={profileId} />
+          <ButtonHeader
+            isStared={isStared}
+            profileId={profileId}
+            fullName={fullName}
+            emailUser={emailUser}
+          />
         </section>
         <section className="mb-3 flex h-40 w-40 flex-col items-center justify-center gap-5 rounded-full md:h-64 md:w-64">
           <Image
