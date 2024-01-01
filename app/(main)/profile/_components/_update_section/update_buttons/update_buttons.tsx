@@ -1,7 +1,8 @@
 "use client";
 import { Button } from "@nextui-org/react";
-import { useProfileData } from "./profile_context";
+
 import Link from "next/link";
+import { useProfileData } from "../../context/profile_context";
 
 export const UpdateButtons = () => {
   const { isLoading, triggerSubmit, resetForm } = useProfileData();

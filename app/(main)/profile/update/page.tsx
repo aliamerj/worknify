@@ -1,6 +1,6 @@
-import { UpdateButtons } from "../_components/update_buttons";
-import { ProfileDisplay } from "../_components/profile_display";
-import { ProfileForm } from "../_components/profile_form";
+import { ProfileDisplay } from "../_components/_create_section/_displayer/profile_display";
+import { ProfileForm } from "../_components/_create_section/_form/profile_form";
+import { UpdateButtons } from "../_components/_update_section/update_buttons/update_buttons";
 import EditProfileGate from "./edit_profile_gate";
 
 export default function Page() {

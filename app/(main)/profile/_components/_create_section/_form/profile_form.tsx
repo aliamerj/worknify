@@ -9,17 +9,17 @@ import {
   useFieldArray,
   useForm,
 } from "react-hook-form";
-import { useProfileData } from "./profile_context";
 import {
   ProfileSchema,
   profileSchemaValidation,
 } from "@/utils/validations/profileValidation";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { SkillsPicker } from "./input_Fields/skills_input";
-import ExperienceField from "./input_Fields/experience_field";
-import { EducationField } from "./input_Fields/education_field";
-import { SectionField } from "./input_Fields/section_field";
+import { useProfileData } from "../../context/profile_context";
+import { SkillsPicker } from "../input_Fields/skills_input";
+import ExperienceField from "../input_Fields/experience_field";
+import { EducationField } from "../input_Fields/education_field";
+import { SectionField } from "../input_Fields/section_field";
 
 export const ProfileForm = () => {
   const router = useRouter();

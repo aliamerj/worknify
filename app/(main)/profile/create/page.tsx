@@ -1,6 +1,6 @@
-import { ProfileForm } from "../_components/profile_form";
-import { ProfileDisplay } from "../_components/profile_display";
-import { CreateButtons } from "../_components/create_buttons";
+import { ProfileDisplay } from "../_components/_create_section/_displayer/profile_display";
+import { ProfileForm } from "../_components/_create_section/_form/profile_form";
+import { CreateButtons } from "../_components/_create_section/create_buttons/create_buttons";
 import CreateProfileGate from "./create_profile_gate";
 
 export default async function CreateProfile() {

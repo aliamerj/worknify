@@ -1,7 +1,7 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import getProfileData from "@/utils/api_handler/profile_handler";
 import { getServerSession } from "next-auth";
-import { ProfileDataProvider } from "./_components/profile_context";
+import { ProfileDataProvider } from "./_components/context/profile_context";
 import { headers } from "next/headers";
 import { AppRouter } from "@/utils/router/app_router";
 export default async function ProfileLayout({

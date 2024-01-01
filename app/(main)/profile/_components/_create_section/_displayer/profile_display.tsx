@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
-import { useProfileData } from "./profile_context";
+
 import DOMPurify from "dompurify";
+import { useProfileData } from "../../context/profile_context";
 
 export const ProfileDisplay = () => {
   // Sanitize the HTML content
