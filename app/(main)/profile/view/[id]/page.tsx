@@ -9,11 +9,11 @@ import ShimmerLoading from "@/global-components/ShimmerLoading";
 import ErrorBoundary from "@/global-components/ErrorBoundary";
 import dynamic from "next/dynamic";
 import { Spinner } from "@nextui-org/react";
-import { Header } from "@/app/(main)/components/header/Header";
 import { ProfileSummary } from "../../_components/_view_section/profile_summary/profile_summary";
 import { Experience } from "../../_components/_view_section/experience/experience";
 import { Education } from "../../_components/_view_section/education/education";
 import Sections from "../../_components/_view_section/section/section";
+import { Header } from "../../_components/_view_section/header/header";
 
 const Skills = dynamic(
   () => import("@/app/(main)/profile/_components/_view_section/skills/skills"),
