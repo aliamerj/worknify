@@ -112,11 +112,6 @@ a {
   text-overflow: ellipsis;
 }
 
-.ql-editor {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
 .calendar {
   background-color: white !important;
   opacity: 1 !important;
