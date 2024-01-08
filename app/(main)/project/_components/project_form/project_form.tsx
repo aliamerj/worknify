@@ -54,26 +54,27 @@ export const ProjectForm = () => {
             {message.message}
           </div>
         )}
+        <div className="pb-5">
+          <Controller
+            name="type"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <Tabs
+                variant="bordered"
+                aria-label="Tabs variants"
+                {...field}
+                aria-errormessage={error?.message}
+              >
+                <Tab key="photos" title="Public" />
+                <Tab key="music" title="Permission" />
+                <Tab key="videos" title="Private" />
+              </Tabs>
+            )}
+          />
+        </div>
 
-        <Controller
-          name="type"
-          control={control}
-          render={({ field, fieldState: { error } }) => (
-            <Tabs
-              variant="bordered"
-              aria-label="Tabs variants"
-              {...field}
-              aria-errormessage={error?.message}
-            >
-              <Tab key="photos" title="Public" />
-              <Tab key="music" title="Permission" />
-              <Tab key="videos" title="Private" />
-            </Tabs>
-          )}
-        />
-
-        <div className="flex  items-center justify-between gap-4">
-          <div className="flex-1">
+        <div className="flex items-center">
+          <div className="">
             <Controller
               name="name"
               control={control}
@@ -93,7 +94,7 @@ export const ProjectForm = () => {
               )}
             />
           </div>
-          <div className="flex flex-col items-center justify-center">
+          <div className="ml-10">
             <div className="relative">
               {image ? (
                 <div className="mb-4 h-24 w-24 overflow-hidden rounded border-2 border-gray-300">
@@ -166,6 +167,13 @@ export const ProjectForm = () => {
                 variant="underlined"
                 label="Project Link"
                 className="max-w-full"
+                startContent={
+                  <div className="pointer-events-none flex items-center">
+                    <span className="text-sm text-default-400">
+                      https://github.com/
+                    </span>
+                  </div>
+                }
                 {...field}
               />
             )}
