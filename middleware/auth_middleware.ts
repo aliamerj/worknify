@@ -4,7 +4,7 @@ import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { MiddlewareFactory } from "./middleware.type";
 import { ApiRouter, AppRouter } from "@/utils/router/app_router";
 
-const configPath = ["/profile/create", "/profile/edit"];
+const configPath = ["/profile/create", "/profile/edit", "/project/create"];
 
 export const authMiddleware: MiddlewareFactory = (next) => {
   return async (request: NextRequest, _next: NextFetchEvent) => {

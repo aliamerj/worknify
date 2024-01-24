@@ -3,18 +3,26 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input, Tab, Tabs } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { Key, useState } from "react";
 import "react-quill/dist/quill.snow.css";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import {
+  Controller,
+  ControllerRenderProps,
+  SubmitHandler,
+  useForm,
+} from "react-hook-form";
+import { RiImageAddFill } from "react-icons/ri";
 
 import {
   ProjectSchema,
   projectSchema,
 } from "@/utils/validations/projectValidation";
 import ReactQuill from "react-quill";
+import Image from "next/image";
 
-export const ProjectForm = () => {
+export const ProjectForm = ({ userEmail }: { userEmail: string }) => {
   const { control, handleSubmit } = useForm<ProjectSchema>({
+    defaultValues: { ownerEmail: userEmail, type: "public" },
     resolver: zodResolver(projectSchema),
   });
   type Message = {
@@ -24,18 +32,32 @@ export const ProjectForm = () => {
 
   const [message, setMessage] = useState<Message>();
   const [image, setImage] = useState<string | null>(null);
-
-  const handleImageChange = (e: any) => {
-    const file = e.target.files[0];
-    if (file && file.type.substr(0, 5) === "image") {
+  const [selectedType, setSelectedType] = useState("public");
+  const handleImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    field: ControllerRenderProps,
+  ) => {
+    event.preventDefault();
+    if (!event.target.files) return;
+    const file = event.target.files[0];
+    console.log(file.type.substring(0, 5));
+    if (file && file.type.substring(0, 5) === "image") {
       setImage(URL.createObjectURL(file));
+      field.onChange(file);
     } else {
       setImage(null);
     }
   };
 
+  const handleSelectType = (key: Key, field: ControllerRenderProps) => {
+    if (typeof key !== "string") return setSelectedType("public");
+    field.onChange(key);
+    setSelectedType(key);
+  };
+
   const onSubmit: SubmitHandler<ProjectSchema> = async (data) => {
     console.log(data);
+    setMessage({ message: "good", isError: false });
   };
 
   return (
@@ -62,82 +84,81 @@ export const ProjectForm = () => {
               <Tabs
                 variant="bordered"
                 aria-label="Tabs variants"
-                {...field}
+                selectedKey={selectedType}
+                onSelectionChange={(key) => handleSelectType(key, { ...field })}
                 aria-errormessage={error?.message}
               >
-                <Tab key="photos" title="Public" />
-                <Tab key="music" title="Permission" />
-                <Tab key="videos" title="Private" />
+                <Tab key="public" title="Public" />
+                <Tab key="permission" title="Permission" />
+                <Tab key="private" title="Private" />
               </Tabs>
             )}
           />
         </div>
 
-        <div className="flex items-center">
-          <div className="">
-            <Controller
-              name="name"
-              control={control}
-              render={({ field, fieldState: { error } }) => (
-                <Input
-                  size="lg"
-                  maxLength={50}
-                  isInvalid={!!error}
-                  errorMessage={error?.message}
-                  variant="underlined"
-                  isRequired
-                  type="text"
-                  label="Project Name"
-                  className="w-full"
-                  {...field}
-                />
-              )}
-            />
-          </div>
-          <div className="ml-10">
+        <div className="flex">
+          <Controller
+            name="name"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <Input
+                size="lg"
+                maxLength={50}
+                isInvalid={!!error}
+                errorMessage={error?.message}
+                variant="underlined"
+                isRequired
+                type="text"
+                label="Project Name"
+                className="w-full"
+                {...field}
+              />
+            )}
+          />
+          <div className="ml-10 mt-5 md:mt-0">
             <div className="relative">
               {image ? (
-                <div className="mb-4 h-24 w-24 overflow-hidden rounded border-2 border-gray-300">
-                  <img
+                <div className="mb-4 h-32 w-32 overflow-hidden rounded-lg border-2 border-gray-300 shadow-md">
+                  <Image
                     src={image}
-                    alt="Uploaded"
+                    width={32}
+                    height={32}
+                    alt="Project Logo"
                     className="h-full w-full object-cover"
                   />
                 </div>
               ) : (
-                <div className="mb-4 flex h-24 w-24 items-center justify-center rounded border-2 border-dashed border-gray-300 bg-gray-50">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-12 w-12 text-gray-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 7l6 6m8-8l5 5M5 13l4 4m6-6l4 4"
-                    />
-                  </svg>
-                </div>
+                <label className="mb-4 flex h-32 w-32 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 transition duration-300 hover:border-blue-500 hover:bg-blue-50">
+                  <RiImageAddFill className="text-4xl text-gray-400 hover:text-blue-500" />
+                </label>
               )}
+
               <Controller
                 name="logo"
                 control={control}
                 render={({ field, fieldState: { error } }) => (
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="cursor-pointer text-sm text-gray-700"
-                  />
+                  <>
+                    {error && (
+                      <p className="text-center text-xs italic text-red-500">
+                        {error.message}
+                      </p>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageChange(e, { ...field })}
+                      className="absolute inset-0 h-full w-full opacity-0 hover:cursor-pointer"
+                    />
+                  </>
                 )}
               />
             </div>
-          </div>
-        </div>
 
+            <h5 className="text-center font-semibold text-gray-700">
+              Project Logo
+            </h5>
+          </div>{" "}
+        </div>
         <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
           <Controller
             name="projectGoal"
@@ -161,6 +182,7 @@ export const ProjectForm = () => {
             control={control}
             render={({ field, fieldState: { error } }) => (
               <Input
+                isRequired
                 isInvalid={!!error}
                 errorMessage={error?.message}
                 type="text"
@@ -216,9 +238,10 @@ export const ProjectForm = () => {
                   <div className="relative rounded-lg shadow-sm">
                     <DatePicker
                       showIcon
+                      required
                       placeholderText="Start Date"
                       selected={field.value ? new Date(field.value) : null}
-                      onChange={(date) => field.onChange(date)}
+                      onChange={(date) => field.onChange(date?.toISOString())}
                       className="block w-full rounded-lg border-gray-300 py-2 pl-4 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
                     />
                   </div>
@@ -242,7 +265,8 @@ export const ProjectForm = () => {
                       showIcon
                       placeholderText="End Date"
                       selected={field.value ? new Date(field.value) : null}
-                      onChange={(date) => field.onChange(date)}
+                      required
+                      onChange={(date) => field.onChange(date?.toISOString())}
                       className="block w-full rounded-lg border-gray-300 py-2 pl-4 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
                     />
                   </div>

@@ -10,8 +10,9 @@ import GithubProvider, { GithubProfile } from "next-auth/providers/github";
 import GitlabProvider, { GitLabProfile } from "next-auth/providers/gitlab";
 import bcrypt from "bcrypt";
 import { env } from "process";
+import { Adapter } from "next-auth/adapters";
 export const authOptions: NextAuthOptions = {
-  adapter: DrizzleAdapter(databaseDrizzle),
+  adapter: DrizzleAdapter(databaseDrizzle) as Omit<Adapter, "id">,
   providers: [
     CredentialsProvider({
       name: "Sign in With...",
@@ -95,14 +96,14 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     session: async ({ session, token }) => {
-      if (session?.user) {
-        session.user.id = token.sub; // token.uid or token.sub both work
+      if (session) {
+        session.user.id = token.sub;
       }
-      return session;
+        return session;
     },
     jwt: async ({ user, token }) => {
       if (user) {
-        token.sub = user.id; // token.uid or token.sub both work
+        token.sub = user.id;
       }
       return token;
     },

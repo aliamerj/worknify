@@ -1,10 +1,11 @@
+import { getServerSession } from "next-auth";
 import { ProjectForm } from "../_components/project_form/project_form";
-import CreateProjectGate from "./create_project_gate";
 
-const CreateProject = () => {
+const CreateProject = async () => {
+  const sesstion = await getServerSession();
   return (
     <>
-      <ProjectForm />
+      <ProjectForm userEmail={sesstion!.user.email!} />
     </>
   );
 };

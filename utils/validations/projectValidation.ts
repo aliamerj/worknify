@@ -21,20 +21,16 @@ const TimePeriod = z
   );
 export const projectSchema = z.object({
   id: z.number().optional(),
-  type: z.enum(["Private", "Public", "permission"]),
-  devs: z.array(z.string()),
-  owner: z
-    .string()
-    .trim()
-    .min(3, "Role must be at least 3 characters")
-    .max(50, "Role must be under 50 characters"),
-  link: z.string().min(5).max(100),
+  type: z.enum(["private", "public", "permission"]),
+  devs: z.array(z.string()).default([]),
+  ownerEmail: z.string().trim().min(1, "Owner should be assign").email(),
+  link: z.string().min(1).max(100),
   name: z
     .string()
     .trim()
     .min(1, "Project name cannot be empty")
     .max(50, "Project name must be under 50 characters"),
-  logo: z.string().trim().min(5, "invalid image").optional(),
+  logo: z.instanceof(File).optional(),
   description: z
     .string()
     .trim()
