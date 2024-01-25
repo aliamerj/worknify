@@ -1,15 +1,14 @@
 import { z } from "zod";
+import { MB } from "../constants";
 
 const TimePeriod = z
   .object({
     startDate: z.string({
       required_error: "Start date is required",
     }),
-    endDate: z
-      .string({
-        required_error: "End date is required",
-      })
-      .nullable(),
+    endDate: z.string({
+      required_error: "End date is required",
+    }),
   })
   .refine(
     (data) =>
@@ -23,14 +22,26 @@ export const projectSchema = z.object({
   id: z.number().optional(),
   type: z.enum(["private", "public", "permission"]),
   devs: z.array(z.string()).default([]),
-  ownerEmail: z.string().trim().min(1, "Owner should be assign").email(),
   link: z.string().min(1).max(100),
   name: z
     .string()
     .trim()
     .min(1, "Project name cannot be empty")
     .max(50, "Project name must be under 50 characters"),
-  logo: z.instanceof(File).optional(),
+  logo: z
+    .any()
+    .refine(
+      (file) => {
+        return file instanceof File && file.type.substring(0, 5) === "image";
+      },
+      {
+        message: "Invalid image",
+      },
+    )
+    .refine((file) => file instanceof File && file.size < MB, {
+      message: "image is too large. Maximum size is 1 MB",
+    })
+    .optional(),
   description: z
     .string()
     .trim()

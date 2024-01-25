@@ -1,0 +1,1 @@
+ALTER TABLE "dev" ALTER COLUMN "join_at" SET NOT NULL;

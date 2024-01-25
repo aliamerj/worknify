@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^0.3.9",
+    "@aws-sdk/client-s3": "^3.499.0",
+    "@aws-sdk/s3-request-presigner": "^3.499.0",
     "@hookform/resolvers": "^3.3.2",
     "@nextui-org/react": "^2.2.9",
     "axios": "^1.6.2",

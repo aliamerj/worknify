@@ -1,0 +1,1 @@
+ALTER TABLE "dev" ALTER COLUMN "project_id" SET DATA TYPE integer;

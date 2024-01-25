@@ -21,13 +21,16 @@ import { and, eq } from "drizzle-orm";
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user.id)
-    return NextResponse.json({}, { status: 401 });
+    return NextResponse.json(
+      { state: false, message: "Not authorized" },
+      { status: 401 },
+    );
 
   const body = await request.json();
   const validation = profileSchemaValidation.safeParse(body);
   if (!validation.success) {
     return NextResponse.json(
-      { state: true, body: validation.error.format() },
+      { state: false, message: validation.error.format() },
       { status: 400 },
     );
   }
@@ -97,7 +100,7 @@ export async function POST(request: NextRequest) {
       return newProfile;
     });
     return NextResponse.json(
-      { state: true, body: "profile created successfully" },
+      { state: true, message: "profile created successfully" },
       { status: 201 },
     );
   } catch (error: any) {
@@ -110,14 +113,21 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({}, { status: 401 });
+  if (!session)
+    return NextResponse.json(
+      { state: false, message: "Not authorized" },
+      { status: 401 },
+    );
   const body = await req.json();
   const validation = editProfileSchemaValidation.safeParse(body);
 
   if (!validation.success)
-    return NextResponse.json(validation.error.format(), {
-      status: 400,
-    });
+    return NextResponse.json(
+      { state: false, message: validation.error.format() },
+      {
+        status: 400,
+      },
+    );
   const {
     sections,
     educations,
