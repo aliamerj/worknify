@@ -33,7 +33,19 @@ export const dev = pgTable("dev", {
     .notNull(),
   joinAt: date("join_at").notNull(),
 });
+export const starProject = pgTable("star_project", {
+  projectId: integer("project_id")
+    .references(() => project.id, { onDelete: "cascade" })
+    .notNull(),
+  userId: text("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+});
 
+// star
+export type StarProjectSelection = typeof starProject.$inferSelect;
+export type StarProjectInsertion = typeof starProject.$inferInsert;
+// project
 export type ProjectSelection = typeof project.$inferSelect;
 export type ProjectInsertion = typeof project.$inferInsert;
 // dev

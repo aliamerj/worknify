@@ -6,6 +6,7 @@ interface StarIconProps {
   height?: number;
   width?: number;
   label?: string;
+  color?: string;
 }
 
 export const StarIcon: React.FC<StarIconProps> = ({
@@ -13,10 +14,11 @@ export const StarIcon: React.FC<StarIconProps> = ({
   size = 24,
   height,
   width,
+  color,
   label,
   ...props
 }) => {
-  const fillColor = isFilled ? "currentColor" : "none";
+  const fillColor = isFilled ? color ?? "currentColor" : "none";
   const strokeColor = "currentColor";
 
   return (

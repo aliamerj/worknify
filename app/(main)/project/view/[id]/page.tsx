@@ -4,33 +4,44 @@ import { eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { notFound } from "next/navigation";
 import ProjectHeader from "../../_components/_view_section/project_header/project_header";
-import { ProjectBody } from "../../_components/_view_section/project_header/project_body";
+
 import NotAllowedPage from "../../_components/not_allowed/not_allowed";
+import { ProjectBody } from "../../_components/_view_section/project_body/project_body";
 
 interface Props {
   params: { id: string };
 }
 export default async function ProjectViewPage({ params }: Props) {
+  const projectId = parseInt(params.id);
+  const sesstion = await getServerSession(authOptions);
+
   const project = await databaseDrizzle.query.project.findFirst({
-    where: (p) => eq(p.id, Number(params.id)),
+    where: (p) => eq(p.id, projectId),
   });
   if (!project) return notFound();
   const devs = await databaseDrizzle.query.dev.findMany({
-    where: (d) => eq(d.projectId, Number(params.id)),
+    where: (d) => eq(d.projectId, projectId),
   });
+  const isDev = devs.find((d) => d.devId === sesstion?.user.id);
 
   if (project.type === "private") {
-    const sesstion = await getServerSession(authOptions);
     if (!sesstion || !sesstion.user.id) return notFound();
-
-    const isDev = devs.find((d) => d.devId === sesstion.user.id);
     if (project.owner !== sesstion.user.id && !isDev) {
       return <NotAllowedPage />;
     }
   }
+  const stars = await databaseDrizzle.query.starProject.findMany({
+    where: (s) => eq(s.projectId, projectId),
+  });
+  const isStared = stars.find((s) => s.userId === sesstion?.user.id);
+
   return (
     <>
       <ProjectHeader
+        isJoined={project.owner === sesstion?.user.id || !!isDev}
+        projectId={projectId}
+        starsCount={stars.length}
+        stared={!!isStared}
         projectName={project.name}
         projectGoal={project.projectGoal}
         projectLogo={project.logo}

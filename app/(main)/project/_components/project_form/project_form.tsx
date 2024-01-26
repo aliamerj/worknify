@@ -21,6 +21,8 @@ import ReactQuill from "react-quill";
 import Image from "next/image";
 import axios from "axios";
 import { Loader } from "@/global-components/loader/loader";
+import { useRouter } from "next/navigation";
+import { AppRouter } from "@/utils/router/app_router";
 
 export const ProjectForm = () => {
   const { control, handleSubmit } = useForm<ProjectSchema>({
@@ -31,7 +33,7 @@ export const ProjectForm = () => {
     isError: boolean;
     message: string;
   };
-
+  const router = useRouter();
   const [message, setMessage] = useState<Message>();
   const [image, setImage] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState("public");
@@ -78,8 +80,9 @@ export const ProjectForm = () => {
       });
       if (data.logo && data.logo instanceof File)
         formData.append("logo", data.logo);
-      await axios.post("/api/project", formData);
-      setMessage({ isError: false, message: "successful" });
+      const res = await axios.post("/api/project", formData);
+      router.push(`${AppRouter.viewProject}/${res.data.projectId}`);
+      router.refresh();
     } catch (error: any) {
       setMessage({ isError: true, message: error.message });
     }
