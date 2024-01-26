@@ -6,7 +6,7 @@ import { UserAvatar } from "../userAvatar/userAvatar";
 import { Navbar, NavbarBrand, NavbarContent } from "@nextui-org/navbar";
 import Link from "next/link";
 import { Button, Tooltip } from "@nextui-org/react";
-import { ImBoxAdd } from "react-icons/im";
+import { MdLibraryAdd } from "react-icons/md";
 import { AppRouter } from "@/utils/router/app_router";
 export const NavBar = async () => {
   const sesstion = await getServerSession(authOptions);
@@ -37,7 +37,7 @@ export const NavBar = async () => {
               size="lg"
               aria-label="Like"
             >
-              <ImBoxAdd className="text-2xl" />
+              <MdLibraryAdd className="text-2xl" />
             </Button>
           </Tooltip>
         )}

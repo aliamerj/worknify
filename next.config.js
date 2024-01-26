@@ -16,6 +16,12 @@ const nextConfig = {
         port: "",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "worknify-project-logo.s3.eu-west-1.amazonaws.com",
+        port: "",
+        pathname: "**",
+      },
     ],
   },
 };

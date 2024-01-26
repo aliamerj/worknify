@@ -3,10 +3,12 @@ import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import * as users from "./schemes/userSchema";
 import * as allProfile from "./schemes/profileSchema";
+import * as allProject from './schemes/projectSchema'
 
 const schema = {
   ...users,
   ...allProfile,
+  ...allProject
 };
 const connection = process.env.DATABASE_URL as string;
 
