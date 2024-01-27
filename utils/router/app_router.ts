@@ -8,7 +8,8 @@ export const AppRouter = {
   //project
   createProject: "/project/create",
   editPrject: "/project/update",
-  viewProject: "/project/view",
+  viewProject: "/project/view/",
+  myProject: "/project/my",
 };
 export const ApiRouter = {
   signin: "/api/auth/signin",

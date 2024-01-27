@@ -45,6 +45,9 @@ export const UserAvatar = ({ userImage, name, email, userId }: IUserAvatar) => {
           >
             Profile
           </DropdownItem>
+          <DropdownItem key="profile" as={Link} href={AppRouter.myProject}>
+            My Projects
+          </DropdownItem>
           <DropdownItem key="notifications">
             <div className="flex justify-between">
               <p>Notifications</p>

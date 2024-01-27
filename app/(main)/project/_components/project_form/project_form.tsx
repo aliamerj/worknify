@@ -81,7 +81,7 @@ export const ProjectForm = () => {
       if (data.logo && data.logo instanceof File)
         formData.append("logo", data.logo);
       const res = await axios.post("/api/project", formData);
-      router.push(`${AppRouter.viewProject}/${res.data.projectId}`);
+      router.push(AppRouter.viewProject + res.data.projectId);
       router.refresh();
     } catch (error: any) {
       setMessage({ isError: true, message: error.message });
