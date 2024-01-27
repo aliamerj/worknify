@@ -1,8 +1,8 @@
 "use client";
 import { DevSelection, ProjectSelection } from "@/db/schemes/projectSchema";
 import { Tab, Tabs } from "@nextui-org/react";
-import DOMPurify from "dompurify";
 import AboutProject from "../../about_project/about_project";
+import DOMPurify from "isomorphic-dompurify";
 
 export const ProjectBody = ({
   project,

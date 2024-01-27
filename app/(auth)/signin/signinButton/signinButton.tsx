@@ -1,7 +1,6 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-
 import styles from "./signinButton.module.css";
 import Image from "next/image";
 export const SigninButtons = () => {

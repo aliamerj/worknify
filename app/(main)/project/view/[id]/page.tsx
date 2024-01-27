@@ -13,16 +13,20 @@ interface Props {
 }
 export default async function ProjectViewPage({ params }: Props) {
   const projectId = parseInt(params.id);
-  const sesstion = await getServerSession(authOptions);
-
   const project = await databaseDrizzle.query.project.findFirst({
     where: (p) => eq(p.id, projectId),
   });
   if (!project) return notFound();
+  const sesstion = await getServerSession(authOptions);
   const devs = await databaseDrizzle.query.dev.findMany({
     where: (d) => eq(d.projectId, projectId),
   });
+
   const isDev = devs.find((d) => d.devId === sesstion?.user.id);
+  const stars = await databaseDrizzle.query.starProject.findMany({
+    where: (s) => eq(s.projectId, projectId),
+  });
+  const isStared = stars.find((s) => s.userId === sesstion?.user.id);
 
   if (project.type === "private") {
     if (!sesstion || !sesstion.user.id) return notFound();
@@ -30,11 +34,6 @@ export default async function ProjectViewPage({ params }: Props) {
       return <NotAllowedPage />;
     }
   }
-  const stars = await databaseDrizzle.query.starProject.findMany({
-    where: (s) => eq(s.projectId, projectId),
-  });
-  const isStared = stars.find((s) => s.userId === sesstion?.user.id);
-
   return (
     <>
       <ProjectHeader
