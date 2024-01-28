@@ -6,7 +6,11 @@ import {
   updateProjectSchema,
 } from "@/utils/validations/projectValidation";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { s3, uploadProjectLogo } from "@/utils/aws/s3_bucket";
+import {
+  deleteProjectLogo,
+  s3,
+  uploadProjectLogo,
+} from "@/utils/aws/s3_bucket";
 import { databaseDrizzle } from "@/db/database";
 import { ProjectInsertion, project } from "@/db/schemes/projectSchema";
 import { and, eq } from "drizzle-orm";
@@ -79,7 +83,6 @@ export async function PATCH(request: NextRequest) {
     );
   const formatData = await request.formData();
   const body = serializeProjectData(formatData);
-
   const validated = updateProjectSchema.safeParse(body);
   if (!validated.success) {
     return NextResponse.json(
@@ -118,16 +121,63 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
+export async function DELETE(request: NextResponse) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user.id)
+    return NextResponse.json(
+      { state: false, message: "Not authenticated" },
+      { status: 401 },
+    );
+  const body = await request.json();
+  const projectId = parseInt(body.projectId);
+
+  if (!projectId)
+    return NextResponse.json(
+      { state: false, message: "Invalid Project,Please try again" },
+      { status: 400 },
+    );
+  try {
+    const logoKey = await databaseDrizzle
+      .delete(project)
+      .where(and(eq(project.id, projectId), eq(project.owner, session.user.id)))
+      .returning()
+      .then((res) => res[0].logo.split("/").pop());
+
+    if (!logoKey)
+      return NextResponse.json(
+        {
+          status: false,
+          message: "Project Not Found",
+        },
+        { status: 404 },
+      );
+    const deleteRequest = deleteProjectLogo(logoKey);
+    s3.send(deleteRequest);
+
+    return NextResponse.json(
+      { state: true, message: "Project Deleted successfully" },
+      { status: 200 },
+    );
+  } catch (error: any) {
+    return NextResponse.json(
+      { state: false, message: error.message },
+      { status: 500 },
+    );
+  }
+}
+
 function serializeProjectData(project: FormData) {
   const body: any = {};
   for (const [key, value] of project.entries()) {
-    if (key === "logo") {
-      body[key] = value;
-    } else {
-      try {
-        body[key] = JSON.parse(value as string);
-      } catch (error) {
+    if (key !== "id") {
+      if (key === "logo") {
         body[key] = value;
+      } else {
+        try {
+          body[key] = JSON.parse(value as string);
+        } catch (error) {
+          body[key] = value;
+        }
       }
     }
   }

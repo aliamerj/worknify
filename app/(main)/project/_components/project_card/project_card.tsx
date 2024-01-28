@@ -5,6 +5,7 @@ import DOMPurify from "isomorphic-dompurify";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
+import { DeleteProjectBtn } from "../delete_modal.tsx/delete_modal";
 
 export const ProjectCard = async ({
   owner,
@@ -78,12 +79,7 @@ export const ProjectCard = async ({
             >
               Edit
             </Link>
-            <Link
-              href=""
-              className="rounded bg-red-500 px-2 py-1 text-sm text-white hover:bg-red-600"
-            >
-              Delete
-            </Link>
+            <DeleteProjectBtn projectName={name} projectId={id} />
           </div>
         )}
       </div>

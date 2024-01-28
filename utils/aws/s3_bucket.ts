@@ -1,4 +1,8 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 
 export const s3 = new S3Client({
   region: process.env.AWS_S3_REGIN!,
@@ -22,4 +26,9 @@ export const uploadProjectLogo = (
     Metadata: {
       userId: userId,
     },
+  });
+export const deleteProjectLogo = (logoName: string) =>
+  new DeleteObjectCommand({
+    Bucket: process.env.AWS_S3_NAME!,
+    Key: logoName,
   });

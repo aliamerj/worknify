@@ -22,7 +22,7 @@ import {
 import ReactQuill from "react-quill";
 import Image from "next/image";
 import axios from "axios";
-import { Loader } from "@/global-components/loader/loader";
+import { LoaderFullPage } from "@/global-components/loader/loader";
 import { useRouter } from "next/navigation";
 import { AppRouter } from "@/utils/router/app_router";
 import { ProjectSelection } from "@/db/schemes/projectSchema";
@@ -43,8 +43,8 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
     compilation: project?.compilation,
     projectGoal: project?.projectGoal,
     timePeriod: {
-      startDate: new Date(project?.startDate!).toISOString(),
-      endDate: new Date(project?.endDate!).toISOString(),
+      startDate: project ? new Date(project?.startDate!).toISOString() : "",
+      endDate: project ? new Date(project?.endDate!).toISOString() : "",
     },
   };
   const { control, handleSubmit } = useForm<ProjectSchema>({
@@ -105,8 +105,6 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
   const onSubmit: SubmitHandler<UpdateProjectSchema> = async (data) => {
     var targetData = data;
     if (project) targetData = findDifferences(data, !!data.logo);
-    console.log(targetData);
-
     try {
       setIsLoading(true);
       const formData = new FormData();
@@ -129,6 +127,8 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
       if (!project) {
         const res = await axios.post("/api/project", formData);
         router.push(AppRouter.viewProject + res.data.projectId);
+        router.push(AppRouter.myProject);
+        router.refresh();
       } else {
         if (Object.keys(targetData).length > 1) {
           await axios.patch("/api/project", formData);
@@ -394,7 +394,7 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
       {isLoading && (
         <div className="fixed inset-0 flex items-center justify-center">
           <div className="absolute inset-0 bg-gray-500 bg-opacity-10 backdrop-grayscale backdrop-filter"></div>
-          <Loader />
+          <LoaderFullPage />
         </div>
       )}
     </>

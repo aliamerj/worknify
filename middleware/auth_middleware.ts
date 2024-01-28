@@ -8,7 +8,8 @@ const configPath = [
   "/profile/create",
   "/profile/edit",
   "/project/create",
-  "project/my",
+  "/project/my",
+  "/project/update",
 ];
 
 export const authMiddleware: MiddlewareFactory = (next) => {
