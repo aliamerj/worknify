@@ -7,7 +7,7 @@ export const AppRouter = {
   viewProfile: "/profile/view/",
   //project
   createProject: "/project/create",
-  editPrject: "/project/update",
+  editPrject: "/project/update/",
   viewProject: "/project/view/",
   myProject: "/project/my",
 };

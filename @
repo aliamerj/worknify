@@ -52,14 +52,13 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
     resolver: zodResolver(projectSchema),
   });
   type Message = {
-    isError?: boolean;
-    iswarning?: boolean;
+    isError: boolean;
     message: string;
   };
   const router = useRouter();
   const [message, setMessage] = useState<Message>();
   const [image, setImage] = useState<string | null>(project?.logo ?? null);
-  const [selectedType, setSelectedType] = useState(project?.type ?? "public");
+  const [selectedType, setSelectedType] = useState("public");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleImageChange = (
@@ -83,19 +82,15 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
     field.onChange(key);
     setSelectedType(key);
   };
-  function findDifferences(newData: UpdateProjectSchema, isLogo: boolean) {
+  function findDifferences(newData: UpdateProjectSchema) {
     const differences: any = {};
     Object.keys(newData).forEach((key) => {
       const typedKey = key as keyof UpdateProjectSchema;
-      if (!_.isEqual(initialData[typedKey], newData[typedKey])) {
+      if (
+        !_.isEqual(initialData[typedKey], newData[typedKey]) ||
+        typedKey != "id"
+      ) {
         differences[typedKey] = newData[typedKey];
-      }
-      differences["id"] = project?.id!;
-
-      if (isLogo) {
-        const logoLink = project?.logo.split("/") ?? "/";
-
-        differences["logoKey"] = logoLink[logoLink.length - 1].split("%")[0];
       }
     });
 
@@ -104,8 +99,7 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
 
   const onSubmit: SubmitHandler<UpdateProjectSchema> = async (data) => {
     var targetData = data;
-    if (project) targetData = findDifferences(data, !!data.logo);
-    console.log(targetData);
+    if (project) targetData = findDifferences(data);
 
     try {
       setIsLoading(true);
@@ -126,21 +120,16 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
       if (targetData.logo && targetData.logo instanceof File)
         formData.append("logo", targetData.logo);
 
-      if (!project) {
-        const res = await axios.post("/api/project", formData);
-        router.push(AppRouter.viewProject + res.data.projectId);
-      } else {
-        if (Object.keys(targetData).length > 1) {
-          await axios.patch("/api/project", formData);
-          router.push(AppRouter.viewProject + project.id!);
-          router.refresh();
-        } else {
-          setMessage({
-            iswarning: true,
-            message: "Looks like you haven't made any changes !",
-          });
+      if (!project) await axios.post("/api/project", formData);
+      else {
+        if (Object.keys(targetData).length !== 0) {
+          console.log(targetData);
         }
+        //  await axios.patch("/api/project", formData);
       }
+
+      // router.push(AppRouter.viewProject + res.data.projectId);
+      // router.refresh();
     } catch (error: any) {
       setMessage({ isError: true, message: error.message });
     }
@@ -158,11 +147,7 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
             <div
               role="alert"
               className={`mb-6 w-full rounded-lg p-5 text-base font-medium leading-6 text-white ${
-                message.isError
-                  ? "bg-red-500"
-                  : message.iswarning
-                    ? "bg-warning"
-                    : "bg-green-500"
+                message.isError ? "bg-red-500" : "bg-green-500"
               }`}
             >
               {message.message}
@@ -212,12 +197,13 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
             <div className="ml-10 mt-5 md:mt-0">
               <div className="relative">
                 {image ? (
-                  <div className="mb-4 h-28 w-28 overflow-hidden rounded-lg border-2 border-gray-300 shadow-md">
+                  <div className="mb-4 h-32 w-32 overflow-hidden rounded-lg border-2 border-gray-300 shadow-md">
                     <Image
                       src={image}
-                      layout="fill"
-                      objectFit="cover"
+                      width={32}
+                      height={32}
                       alt="Project Logo"
+                      className="h-full w-full object-cover"
                     />
                   </div>
                 ) : (

@@ -21,7 +21,6 @@ const TimePeriod = z
 export const projectSchema = z.object({
   id: z.number().optional(),
   type: z.enum(["private", "public", "permission"]),
-  devs: z.array(z.string()).default([]),
   link: z.string().min(1).max(100),
   name: z
     .string()
@@ -57,4 +56,46 @@ export const projectSchema = z.object({
   timePeriod: TimePeriod,
 });
 
+export const updateProjectSchema = z.object({
+  id: z.number().optional(),
+  type: z.enum(["private", "public", "permission"]).optional(),
+  link: z.string().min(1).max(100).optional(),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Project name cannot be empty")
+    .max(50, "Project name must be under 50 characters")
+    .optional(),
+  logo: z
+    .any()
+    .refine(
+      (file) => {
+        return file instanceof File && file.type.substring(0, 5) === "image";
+      },
+      {
+        message: "Invalid image",
+      },
+    )
+    .refine((file) => file instanceof File && file.size < MB, {
+      message: "image is too large. Maximum size is 1 MB",
+    })
+    .optional(),
+  description: z
+    .string()
+    .trim()
+    .min(10, "Description must be at least 10 characters")
+    .max(1000, "Description must be under 1000 characters")
+    .optional(),
+  compilation: z.number().optional(),
+  projectGoal: z
+    .string()
+    .trim()
+    .min(50, "Project goal must be at least 50 characters")
+    .max(100, "Project goal must be under 100 characters")
+    .optional(),
+
+  timePeriod: TimePeriod.optional(),
+});
+
 export type ProjectSchema = z.infer<typeof projectSchema>;
+export type UpdateProjectSchema = z.infer<typeof updateProjectSchema>;

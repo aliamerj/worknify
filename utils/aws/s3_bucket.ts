@@ -9,7 +9,7 @@ export const s3 = new S3Client({
 });
 
 export const uploadProjectLogo = (
-  projectName: string,
+  logoName: string,
   fileType: string,
   size: number,
   userId: string,
@@ -18,7 +18,7 @@ export const uploadProjectLogo = (
     Bucket: process.env.AWS_S3_NAME!,
     ContentType: fileType,
     ContentLength: size,
-    Key: projectName,
+    Key: logoName,
     Metadata: {
       userId: userId,
     },

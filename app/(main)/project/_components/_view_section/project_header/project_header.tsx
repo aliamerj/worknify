@@ -57,15 +57,15 @@ const ProjectHeader = ({
     <div className="mx-2 mt-5 border border-gray-200 bg-white p-6 shadow-sm">
       <div className="container mx-auto flex flex-col items-center sm:h-52 sm:flex-row sm:justify-evenly">
         <div className="flex items-center">
-          <div className="mr-4 rounded-md border border-gray-500">
+          <div className="relative h-16 w-20 flex-shrink-0 sm:h-36 sm:w-36 md:h-44 md:w-44">
             <Image
               src={projectLogo}
               alt={`${projectName} Logo`}
-              width={200}
-              height={200}
-              className="rounded-full"
+              layout="fill"
+              objectFit="cover"
+              className="rounded-lg pr-3"
             />
-          </div>
+          </div>{" "}
           <div>
             <div className="flex items-center text-2xl font-bold text-gray-800">
               <h1>{projectName}</h1>
