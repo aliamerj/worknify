@@ -4,7 +4,6 @@ import { ApiRouter } from "@/utils/router/app_router";
 import { Button, useDisclosure } from "@nextui-org/react";
 import axios from "axios";
 import { useState } from "react";
-import { GoAlertFill } from "react-icons/go";
 import { EmailModal } from "../email_modal/email_modal";
 import { SideErrorMessage } from "@/global-components/side_error_message/side_error_message";
 
@@ -25,8 +24,8 @@ export const ButtonHeader = ({
   const handleStar = async () => {
     setLoading(true);
     try {
-      if (isStared) await axios.delete(ApiRouter.star + profileId);
-      else await axios.post(ApiRouter.star + profileId);
+      if (star) await axios.delete(ApiRouter.profileStar + profileId);
+      else await axios.post(ApiRouter.profileStar + profileId);
       setLoading(false);
       setStar((current) => !current);
     } catch (error: any) {

@@ -14,6 +14,7 @@ export const AppRouter = {
 export const ApiRouter = {
   signin: "/api/auth/signin",
   signOut: "/api/auth/signout",
-  star: "/api/star/",
-  projectStar: "/api/projectStar/",
+  profileStar: "/api/profile/star/",
+  projectStar: "/api/project/star/",
+  projectJoin: "/api/project/join/",
 };

@@ -2,7 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["res.cloudinary.com"],
+    dangerouslyAllowSVG: true,
+    domains: ["res.cloudinary.com", "simpleicons.org"],
     remotePatterns: [
       {
         protocol: "https",

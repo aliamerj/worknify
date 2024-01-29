@@ -1,23 +1,23 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { databaseDrizzle } from "@/db/database";
-import { starProject } from "@/db/schemes/projectSchema";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { star } from "@/db/schemes/profileSchema";
 import { and, eq } from "drizzle-orm";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(
   _: NextRequest,
-  { params }: { params: { projectId: string } },
+  { params }: { params: { profileId: string } },
 ) {
   const session = await getServerSession(authOptions);
-  const projectId = parseInt(params.projectId);
-  if (!session || !session.user.id || !projectId)
+  const profileId = parseInt(params.profileId);
+  if (!session || !session.user.id || !profileId)
     return NextResponse.json({}, { status: 401 });
 
   try {
-    await databaseDrizzle.insert(starProject).values({
+    await databaseDrizzle.insert(star).values({
       userId: session.user.id,
-      projectId: projectId,
+      profileId: profileId,
     });
 
     return NextResponse.json(
@@ -34,21 +34,18 @@ export async function POST(
 
 export async function DELETE(
   _: NextRequest,
-  { params }: { params: { projectId: string } },
+  { params }: { params: { profileId: string } },
 ) {
   const session = await getServerSession(authOptions);
-  const projectId = parseInt(params.projectId);
-  if (!session || !session.user.id || !projectId)
+  const profileId = parseInt(params.profileId);
+  if (!session || !session.user.id || !profileId)
     return NextResponse.json({}, { status: 401 });
 
   try {
     await databaseDrizzle
-      .delete(starProject)
+      .delete(star)
       .where(
-        and(
-          eq(starProject.projectId, projectId),
-          eq(starProject.userId, session.user.id),
-        ),
+        and(eq(star.profileId, profileId), eq(star.userId, session.user.id)),
       );
 
     return NextResponse.json(

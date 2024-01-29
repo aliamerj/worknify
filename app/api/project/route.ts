@@ -96,6 +96,7 @@ export async function PATCH(request: NextRequest) {
     if (body.logoKey && body.logo instanceof File) {
       await setImageInBucket(session.user.id!, body.logoKey, body.logo);
     }
+
     if (name || type || projectGoal || link || description || timePeriod)
       await databaseDrizzle
         .update(project)
@@ -108,12 +109,14 @@ export async function PATCH(request: NextRequest) {
           startDate: timePeriod?.startDate,
           endDate: timePeriod?.endDate,
         })
-        .where(and(eq(project.owner, session.user.id!), eq(project.id, id!)));
+        .where(and(eq(project.owner, session.user.id!), eq(project.id, id)));
+
     return NextResponse.json(
       { state: true, message: "Project Updated successfully" },
       { status: 200 },
     );
   } catch (error: any) {
+    console.log(error);
     return NextResponse.json(
       { state: false, message: error.message },
       { status: 500 },
@@ -169,15 +172,14 @@ export async function DELETE(request: NextResponse) {
 function serializeProjectData(project: FormData) {
   const body: any = {};
   for (const [key, value] of project.entries()) {
-    if (key !== "id") {
-      if (key === "logo") {
+    if (key == "id") body["id"] = value;
+    if (key === "logo") {
+      body[key] = value;
+    } else {
+      try {
+        body[key] = JSON.parse(value as string);
+      } catch (error) {
         body[key] = value;
-      } else {
-        try {
-          body[key] = JSON.parse(value as string);
-        } catch (error) {
-          body[key] = value;
-        }
       }
     }
   }

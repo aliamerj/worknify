@@ -1,6 +1,6 @@
 "use client";
 import { StarIcon } from "@/global-components/icon/star_icon";
-import { ApiRouter } from "@/utils/router/app_router";
+import { ApiRouter, AppRouter } from "@/utils/router/app_router";
 import { Button, Spinner } from "@nextui-org/react";
 import axios from "axios";
 import Image from "next/image";
@@ -8,6 +8,10 @@ import { useState } from "react";
 import { RxDashboard } from "react-icons/rx";
 import { GoAlertFill } from "react-icons/go";
 import { IoMdGitNetwork } from "react-icons/io";
+import { BsPencilFill } from "react-icons/bs";
+import { useRouter } from "next/navigation";
+import { LoaderFullPage } from "@/global-components/loader/loader";
+
 interface Props {
   projectLogo: string;
   projectName: string;
@@ -16,8 +20,13 @@ interface Props {
   stared: boolean;
   projectId: number;
   isJoined: boolean;
+  isCreater: boolean;
+  projectType: "public" | "private" | "permission";
 }
-
+type Loading = {
+  isLoading: boolean;
+  on: "STAR" | "JOIN";
+};
 const ProjectHeader = ({
   projectName,
   projectGoal,
@@ -26,17 +35,52 @@ const ProjectHeader = ({
   stared,
   projectId,
   isJoined,
+  projectType,
+  isCreater,
 }: Props) => {
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<Loading>({
+    isLoading: false,
+    on: "STAR",
+  });
   const [isStared, setStar] = useState(stared);
   const [starCounter, setStarCount] = useState(starsCount);
-  const handleJoin = () => {
-    console.log("Join to the project");
+  const joinBtnName = (isJoin: boolean) => {
+    if (isCreater) return "Edit";
+    if (projectType === "public") {
+      if (isJoin) return "Unjoin";
+      else return "Join";
+    } else {
+      if (isJoin) return "Unjoin";
+      else return "Send Request";
+    }
+  };
+  const [isJoin, setIsJoin] = useState(isJoined);
+  const [joinBtn, setJoinBtn] = useState(joinBtnName(isJoined));
+
+  const route = useRouter();
+
+  const handleActionBtn = async () => {
+    setLoading({ isLoading: true, on: "JOIN" });
+    try {
+      if (isCreater) return route.push(AppRouter.editPrject + projectId);
+      if (!isJoin) {
+        await axios.post(ApiRouter.projectJoin + projectId);
+        setJoinBtn(joinBtnName(true));
+      } else {
+        await axios.delete(ApiRouter.projectJoin + projectId);
+        setJoinBtn(joinBtnName(false));
+      }
+      setIsJoin((current) => !current);
+    } catch (error: any) {
+      setError(error.message);
+      setTimeout(() => setError(null), 3000);
+    }
+    setLoading({ isLoading: false, on: "JOIN" });
   };
 
   const handleGivenStar = async () => {
-    setLoading(true);
+    setLoading({ isLoading: true, on: "STAR" });
     try {
       if (isStared) {
         await axios.delete(ApiRouter.projectStar + projectId);
@@ -50,27 +94,27 @@ const ProjectHeader = ({
       setError(error.message);
       setTimeout(() => setError(null), 3000);
     }
-    setLoading(false);
+    setLoading({ isLoading: false, on: "STAR" });
   };
 
   return (
-    <div className="mx-2 mt-5 border border-gray-200 bg-white p-6 shadow-sm">
-      <div className="container mx-auto flex flex-col items-center sm:h-52 sm:flex-row sm:justify-evenly">
+    <div className="mx-2 border border-gray-200 bg-white p-6 pb-14 shadow-sm">
+      <div className="container mx-auto flex flex-col items-center  sm:h-52 sm:flex-row sm:justify-evenly">
         <div className="flex items-center">
-          <div className="relative h-16 w-20 flex-shrink-0 sm:h-36 sm:w-36 md:h-44 md:w-44">
+          <div className="relative mr-3 h-16 w-20 flex-shrink-0 rounded-lg border border-gray-200 sm:h-36 sm:w-36 md:h-44 md:w-44">
             <Image
               src={projectLogo}
               alt={`${projectName} Logo`}
               layout="fill"
               objectFit="cover"
-              className="rounded-lg pr-3"
+              className="rounded-lg"
             />
           </div>{" "}
           <div>
             <div className="flex items-center text-2xl font-bold text-gray-800">
               <h1>{projectName}</h1>
               <div className="flex items-center pl-5">
-                {loading ? (
+                {loading.isLoading && loading.on === "STAR" ? (
                   <Spinner color="warning" />
                 ) : (
                   <div
@@ -89,13 +133,13 @@ const ProjectHeader = ({
         <div className="flex gap-3 pt-3 sm:flex-col ">
           <Button
             size="md"
-            color={isJoined ? "danger" : "primary"}
+            color={isCreater ? "danger" : isJoin ? "danger" : "primary"}
             variant="shadow"
             className="text-xl"
-            startContent={<IoMdGitNetwork />}
-            onClick={handleJoin}
+            startContent={isCreater ? <BsPencilFill /> : <IoMdGitNetwork />}
+            onClick={handleActionBtn}
           >
-            {isJoined ? "Unjoin" : "Join"}
+            {joinBtn}
           </Button>
           <Button
             size="md"
@@ -103,7 +147,7 @@ const ProjectHeader = ({
             variant="shadow"
             className="text-xl text-white"
             startContent={<RxDashboard />}
-            onClick={handleJoin}
+            onClick={() => console.log("Go To Dashboard")}
           >
             Dashboard
           </Button>
@@ -118,6 +162,7 @@ const ProjectHeader = ({
           </div>
         )}{" "}
       </div>
+      {loading.isLoading && loading.on === "JOIN" && <LoaderFullPage />}
     </div>
   );
 };

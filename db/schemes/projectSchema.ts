@@ -4,6 +4,7 @@ import {
   pgTable,
   serial,
   text,
+  unique,
   varchar,
 } from "drizzle-orm/pg-core";
 import { users } from "./userSchema";
@@ -24,15 +25,21 @@ export const project = pgTable("project", {
   endDate: date("end_date").notNull(),
 });
 
-export const dev = pgTable("dev", {
-  projectId: integer("project_id")
-    .references(() => project.id, { onDelete: "cascade" })
-    .notNull(),
-  devId: text("dev_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
-  joinAt: date("join_at").notNull(),
-});
+export const dev = pgTable(
+  "dev",
+  {
+    projectId: integer("project_id")
+      .references(() => project.id, { onDelete: "cascade" })
+      .notNull(),
+    devId: text("dev_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    joinAt: date("join_at").notNull(),
+  },
+  (t) => ({
+    uniqueConstraint: unique().on(t.projectId, t.devId),
+  }),
+);
 export const starProject = pgTable("star_project", {
   projectId: integer("project_id")
     .references(() => project.id, { onDelete: "cascade" })

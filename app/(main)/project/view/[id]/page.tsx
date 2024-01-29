@@ -7,6 +7,7 @@ import ProjectHeader from "../../_components/_view_section/project_header/projec
 
 import NotAllowedPage from "../../_components/not_allowed/not_allowed";
 import { ProjectBody } from "../../_components/_view_section/project_body/project_body";
+import { ProjectSchema } from "@/utils/validations/projectValidation";
 
 interface Props {
   params: { id: string };
@@ -38,12 +39,14 @@ export default async function ProjectViewPage({ params }: Props) {
     <>
       <ProjectHeader
         isJoined={project.owner === sesstion?.user.id || !!isDev}
+        isCreater={project.owner === sesstion?.user.id}
         projectId={projectId}
         starsCount={stars.length}
         stared={!!isStared}
         projectName={project.name}
         projectGoal={project.projectGoal}
         projectLogo={project.logo}
+        projectType={project.type as ProjectSchema["type"]}
       />
       <ProjectBody project={project} devs={devs} />
     </>

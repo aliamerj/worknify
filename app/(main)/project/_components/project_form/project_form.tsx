@@ -27,7 +27,13 @@ import { useRouter } from "next/navigation";
 import { AppRouter } from "@/utils/router/app_router";
 import { ProjectSelection } from "@/db/schemes/projectSchema";
 
-const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
+const ProjectForm = ({
+  project,
+  projectId,
+}: {
+  project?: ProjectSelection;
+  projectId: number;
+}) => {
   const projectType: "private" | "public" | "permission" =
     project?.type === "private" ||
     project?.type === "public" ||
@@ -35,7 +41,7 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
       ? (project.type as "private" | "public" | "permission")
       : "public";
   const initialData: UpdateProjectSchema = {
-    id: project?.id,
+    id: projectId,
     name: project?.name,
     type: projectType,
     link: project?.link,
@@ -83,7 +89,7 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
     field.onChange(key);
     setSelectedType(key);
   };
-  function findDifferences(newData: UpdateProjectSchema, isLogo: boolean) {
+  function findDifferences(newData: ProjectSchema, isLogo: boolean) {
     const differences: any = {};
     Object.keys(newData).forEach((key) => {
       const typedKey = key as keyof UpdateProjectSchema;
@@ -102,7 +108,7 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
     return differences;
   }
 
-  const onSubmit: SubmitHandler<UpdateProjectSchema> = async (data) => {
+  const onSubmit: SubmitHandler<ProjectSchema> = async (data) => {
     var targetData = data;
     if (project) targetData = findDifferences(data, !!data.logo);
     try {
