@@ -1,1 +1,0 @@
-ALTER TABLE "dev" DROP COLUMN IF EXISTS "join_at";

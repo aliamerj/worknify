@@ -27,23 +27,11 @@ import { useRouter } from "next/navigation";
 import { AppRouter } from "@/utils/router/app_router";
 import { ProjectSelection } from "@/db/schemes/projectSchema";
 
-const ProjectForm = ({
-  project,
-  projectId,
-}: {
-  project?: ProjectSelection;
-  projectId: number;
-}) => {
-  const projectType: "private" | "public" | "permission" =
-    project?.type === "private" ||
-    project?.type === "public" ||
-    project?.type === "permission"
-      ? (project.type as "private" | "public" | "permission")
-      : "public";
+const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
   const initialData: UpdateProjectSchema = {
-    id: projectId,
+    id: project?.id ?? 0,
     name: project?.name,
-    type: projectType,
+    type: project?.type,
     link: project?.link,
     description: project?.description,
     compilation: project?.compilation,
@@ -85,9 +73,10 @@ const ProjectForm = ({
   };
 
   const handleSelectType = (key: Key, field: ControllerRenderProps) => {
-    if (typeof key !== "string") return setSelectedType("public");
     field.onChange(key);
-    setSelectedType(key);
+    if(key === 'public') setSelectedType(key);
+    else if (key === 'permission') setSelectedType(key)
+    else if(key === 'private') setSelectedType(key)
   };
   function findDifferences(newData: ProjectSchema, isLogo: boolean) {
     const differences: any = {};

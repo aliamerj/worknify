@@ -10,7 +10,9 @@ import { GoAlertFill } from "react-icons/go";
 import { IoMdGitNetwork } from "react-icons/io";
 import { BsPencilFill } from "react-icons/bs";
 import { useRouter } from "next/navigation";
-import { LoaderFullPage } from "@/global-components/loader/loader";
+import { ProjectSchema } from "@/utils/validations/projectValidation";
+import { JoinProjectSchema } from "@/utils/validations/joinProjectValidation";
+import RequestPendingBox from "../../request_pending_box/request_pending_box";
 
 interface Props {
   projectLogo: string;
@@ -21,7 +23,9 @@ interface Props {
   projectId: number;
   isJoined: boolean;
   isCreater: boolean;
-  projectType: "public" | "private" | "permission";
+  owner: string;
+  projectType: ProjectSchema["type"];
+  isWaiting: boolean;
 }
 type Loading = {
   isLoading: boolean;
@@ -37,7 +41,10 @@ const ProjectHeader = ({
   isJoined,
   projectType,
   isCreater,
+  owner,
+  isWaiting,
 }: Props) => {
+  const [iswaiting, setIsWaiting] = useState(isWaiting);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState<Loading>({
     isLoading: false,
@@ -65,15 +72,23 @@ const ProjectHeader = ({
     try {
       if (isCreater) return route.push(AppRouter.editPrject + projectId);
       if (!isJoin) {
-        await axios.post(ApiRouter.projectJoin + projectId);
-        setJoinBtn(joinBtnName(true));
+        const projectJoin: JoinProjectSchema = {
+          projectType: projectType,
+          projectAdminId: owner,
+        };
+        const res = await axios.post(
+          ApiRouter.projectJoin + projectId,
+          projectJoin,
+        );
+        if (res.data.requstStatus === "JOINED") setJoinBtn(joinBtnName(true));
+        else setIsWaiting(true);
       } else {
         await axios.delete(ApiRouter.projectJoin + projectId);
         setJoinBtn(joinBtnName(false));
       }
       setIsJoin((current) => !current);
     } catch (error: any) {
-      setError(error.message);
+      setError(error.response.data.message);
       setTimeout(() => setError(null), 3000);
     }
     setLoading({ isLoading: false, on: "JOIN" });
@@ -131,16 +146,22 @@ const ProjectHeader = ({
           </div>
         </div>
         <div className="flex gap-3 pt-3 sm:flex-col ">
-          <Button
-            size="md"
-            color={isCreater ? "danger" : isJoin ? "danger" : "primary"}
-            variant="shadow"
-            className="text-xl"
-            startContent={isCreater ? <BsPencilFill /> : <IoMdGitNetwork />}
-            onClick={handleActionBtn}
-          >
-            {joinBtn}
-          </Button>
+          {!iswaiting || isCreater ? (
+            <Button
+              size="md"
+              disabled={iswaiting}
+              isLoading={loading.isLoading && loading.on === "JOIN"}
+              color={isCreater ? "danger" : isJoin ? "danger" : "primary"}
+              variant="shadow"
+              className="text-xl"
+              startContent={isCreater ? <BsPencilFill /> : <IoMdGitNetwork />}
+              onClick={handleActionBtn}
+            >
+              {joinBtn}
+            </Button>
+          ) : (
+            <RequestPendingBox />
+          )}
           <Button
             size="md"
             color="warning"
@@ -162,7 +183,6 @@ const ProjectHeader = ({
           </div>
         )}{" "}
       </div>
-      {loading.isLoading && loading.on === "JOIN" && <LoaderFullPage />}
     </div>
   );
 };

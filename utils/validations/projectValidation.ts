@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { MB } from "../constants";
 
+export const validProjectType: Readonly<[string, string, string]> = [
+  "private",
+  "public",
+  "permission",
+];
+
 const TimePeriod = z
   .object({
     startDate: z.string({
@@ -20,7 +26,7 @@ const TimePeriod = z
   );
 export const projectSchema = z.object({
   id: z.number().optional(),
-  type: z.enum(["private", "public", "permission"]),
+  type: z.enum(validProjectType),
   link: z.string().min(1).max(100),
   name: z
     .string()

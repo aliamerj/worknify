@@ -36,7 +36,7 @@ export const section = pgTable("section", {
 });
 
 export const star = pgTable(
-  "star",
+  "profile_star",
   {
     profileId: integer("profile_id")
       .references(() => profile.id, { onDelete: "cascade" })

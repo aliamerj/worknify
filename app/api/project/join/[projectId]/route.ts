@@ -4,9 +4,11 @@ import { databaseDrizzle } from "@/db/database";
 import { dev } from "@/db/schemes/projectSchema";
 import { and, eq } from "drizzle-orm";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { joinProjectSchema } from "@/utils/validations/joinProjectValidation";
+import { notification } from "@/db/schemes/notificationSchema";
 
 export async function POST(
-  _: NextRequest,
+  request: NextRequest,
   { params }: { params: { projectId: string } },
 ) {
   const session = await getServerSession(authOptions);
@@ -18,14 +20,43 @@ export async function POST(
     );
 
   try {
-    await databaseDrizzle.insert(dev).values({
-      devId: session.user.id,
-      projectId: projectId,
-      joinAt: new Date().toISOString(),
-    });
+    const body = await request.json();
+    const validate = joinProjectSchema.safeParse(body);
+    if (!validate.success || validate.data.projectAdminId === session.user.id)
+      return NextResponse.json(
+        { state: false, message: "invalid request" },
+        { status: 400 },
+      );
 
+    if (validate.data.projectType === "public") {
+      await databaseDrizzle.insert(dev).values({
+        devId: session.user.id,
+        projectId: projectId,
+        joinAt: new Date().toISOString(),
+      });
+
+      return NextResponse.json(
+        {
+          state: true,
+          message: "dev joined successfully",
+          requestStatus: "JOINED",
+        },
+        { status: 201 },
+      );
+    }
+
+    await databaseDrizzle.insert(notification).values({
+      senderId: session.user.id,
+      receiverId: validate.data.projectAdminId,
+      projectId: projectId,
+      notificationType: "JOIN_REQUEST",
+    });
     return NextResponse.json(
-      { state: true, body: "dev joined successfully" },
+      {
+        state: true,
+        message: "request has been send",
+        requestStatus: "WAITING",
+      },
       { status: 201 },
     );
   } catch (error: any) {
@@ -54,8 +85,8 @@ export async function DELETE(
       .where(and(eq(dev.projectId, projectId), eq(dev.devId, session.user.id)));
 
     return NextResponse.json(
-      { state: true, body: "Star deleted successfully" },
-      { status: 201 },
+      { state: true, body: "unjoined successfully" },
+      { status: 200 },
     );
   } catch (error: any) {
     return NextResponse.json(

@@ -1,6 +1,6 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { databaseDrizzle } from "@/db/database";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { notFound } from "next/navigation";
 import ProjectHeader from "../../_components/_view_section/project_header/project_header";
@@ -35,10 +35,21 @@ export default async function ProjectViewPage({ params }: Props) {
       return <NotAllowedPage />;
     }
   }
+  const isWaiting = await databaseDrizzle.query.notification.findFirst({
+    where: (n) =>
+      and(
+        eq(n.senderId, sesstion?.user.id!),
+        eq(n.receiverId, project.owner),
+        eq(n.notificationType, "JOIN_REQUEST"),
+        eq(n.projectId, projectId),
+      ),
+  });
   return (
     <>
       <ProjectHeader
+        isWaiting={!!isWaiting}
         isJoined={project.owner === sesstion?.user.id || !!isDev}
+        owner={project.owner}
         isCreater={project.owner === sesstion?.user.id}
         projectId={projectId}
         starsCount={stars.length}

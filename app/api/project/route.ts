@@ -12,7 +12,11 @@ import {
   uploadProjectLogo,
 } from "@/utils/aws/s3_bucket";
 import { databaseDrizzle } from "@/db/database";
-import { ProjectInsertion, project } from "@/db/schemes/projectSchema";
+import {
+  ProjectInsertion,
+  ProjectSelection,
+  project,
+} from "@/db/schemes/projectSchema";
 import { and, eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
@@ -47,7 +51,7 @@ export async function POST(request: NextRequest) {
         owner: session.user.id!,
         name: name,
         logo: imageUrl.split("?")[0],
-        type: type,
+        type: type as ProjectSelection["type"],
         link: link,
         projectGoal: projectGoal,
         description: description,

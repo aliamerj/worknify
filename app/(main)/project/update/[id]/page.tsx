@@ -33,7 +33,7 @@ const EditProjectPage = async ({ params }: Props) => {
 
   return (
     <div>
-      <ProjectForm project={project} projectId={projectId} />
+      <ProjectForm project={project} />
     </div>
   );
 };

@@ -6,16 +6,21 @@ import {
   text,
   unique,
   varchar,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import { users } from "./userSchema";
-
+export const projectType = pgEnum("project_type", [
+  "public",
+  "private",
+  "permission",
+]);
 export const project = pgTable("project", {
   id: serial("id").primaryKey(),
   owner: text("owner_id")
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
   name: varchar("name", { length: 60 }).notNull(),
-  type: varchar("type", { length: 60 }).notNull(),
+  type: projectType("project_type").notNull(),
   logo: text("logo").notNull(),
   link: varchar("project_link", { length: 255 }).notNull(),
   description: text("description").notNull(),
