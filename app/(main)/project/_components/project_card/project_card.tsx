@@ -74,7 +74,7 @@ export const ProjectCard = async ({
         {isCreator && (
           <div className="flex flex-col justify-center space-y-2 bg-gray-100 p-4">
             <Link
-              href={AppRouter.editPrject + id}
+              href={AppRouter.editProject + id}
               className="w-full rounded bg-blue-500 px-2 py-1 text-center text-sm text-white hover:bg-blue-600"
             >
               Edit

@@ -31,10 +31,10 @@ interface Props {
   params: { id: string };
 }
 async function ViewProfile({ params }: Props) {
-  const sesstion = await getServerSession(authOptions);
-  var id = sesstion?.user.id;
-  var image = sesstion?.user.image;
-  if (!sesstion || id !== params.id) {
+  const session = await getServerSession(authOptions);
+  var id = session?.user.id;
+  var image = session?.user.image;
+  if (!session || id !== params.id) {
     const user = await databaseDrizzle.query.users.findFirst({
       where: (u, o) => o.or(o.eq(u.id, params.id), o.eq(u.username, params.id)),
     });

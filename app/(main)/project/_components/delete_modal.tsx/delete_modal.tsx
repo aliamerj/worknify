@@ -25,7 +25,7 @@ export const DeleteProjectBtn = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const router = useRouter();
-  const handleDeleleProject = async () => {
+  const handleDeleteProject = async () => {
     setIsLoading(true);
     try {
       const res = await axios.delete("/api/project/", { data: { projectId } });
@@ -71,7 +71,7 @@ export const DeleteProjectBtn = ({
                 <Button
                   color="danger"
                   onPress={onClose}
-                  onClick={handleDeleleProject}
+                  onClick={handleDeleteProject}
                 >
                   Delete
                 </Button>

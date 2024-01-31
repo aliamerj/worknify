@@ -9,7 +9,7 @@ import { Button, Tooltip } from "@nextui-org/react";
 import { MdLibraryAdd } from "react-icons/md";
 import { AppRouter } from "@/utils/router/app_router";
 export const NavBar = async () => {
-  const sesstion = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
   return (
     <Navbar className={styles.container}>
       <NavbarBrand as={Link} href="/">
@@ -23,7 +23,7 @@ export const NavBar = async () => {
       </NavbarBrand>
 
       <NavbarContent justify="end">
-        {sesstion?.user && (
+        {session?.user && (
           <Tooltip
             content={"Create New Project"}
             placement="bottom"
@@ -41,12 +41,12 @@ export const NavBar = async () => {
             </Button>
           </Tooltip>
         )}
-        {sesstion?.user ? (
+        {session?.user ? (
           <UserAvatar
-            name={sesstion.user.name!}
-            email={sesstion.user.email!}
-            userImage={sesstion.user.image!}
-            userId={sesstion.user.id!}
+            name={session.user.name!}
+            email={session.user.email!}
+            userImage={session.user.image!}
+            userId={session.user.id!}
           />
         ) : (
           <Link className={styles.getStartedBtn} href="/api/auth/signin">

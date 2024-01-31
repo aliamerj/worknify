@@ -70,7 +70,7 @@ const ProjectHeader = ({
   const handleActionBtn = async () => {
     setLoading({ isLoading: true, on: "JOIN" });
     try {
-      if (isCreater) return route.push(AppRouter.editPrject + projectId);
+      if (isCreater) return route.push(AppRouter.editProject + projectId);
       if (!isJoin) {
         const projectJoin: JoinProjectSchema = {
           projectType: projectType,
@@ -80,7 +80,7 @@ const ProjectHeader = ({
           ApiRouter.projectJoin + projectId,
           projectJoin,
         );
-        if (res.data.requstStatus === "JOINED") setJoinBtn(joinBtnName(true));
+        if (res.data.requestStatus === "JOINED") setJoinBtn(joinBtnName(true));
         else setIsWaiting(true);
       } else {
         await axios.delete(ApiRouter.projectJoin + projectId);
