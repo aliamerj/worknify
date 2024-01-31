@@ -36,45 +36,55 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   }
-  const { logo, name, type, timePeriod, description, projectGoal, link } =
-    validation.data;
+  const {
+    logo,
+    name,
+    type,
+    timePeriod,
+    description,
+    projectGoal,
+    link,
+    techUsed,
+  } = validation.data;
 
-  if (logo && logo instanceof File) {
-    try {
-      const imageUrl = await setImageInBucket(
+  try {
+    var imageUrl;
+    if (logo && logo instanceof File) {
+      imageUrl = await setImageInBucket(
         session.user.id!,
         `${session.user.id!}-${name}`,
         logo,
       );
-
-      const newProject: ProjectInsertion = {
-        owner: session.user.id!,
-        name: name,
-        logo: imageUrl.split("?")[0],
-        type: type as ProjectSelection["type"],
-        link: link,
-        projectGoal: projectGoal,
-        description: description,
-        startDate: timePeriod.startDate,
-        endDate: timePeriod.endDate,
-      };
-
-      const res = await databaseDrizzle
-        .insert(project)
-        .values(newProject)
-        .returning({ id: project.id })
-        .then((pro) => pro[0]);
-
-      return NextResponse.json(
-        { state: true, projectId: res.id },
-        { status: 201 },
-      );
-    } catch (err) {
-      return NextResponse.json(
-        { state: false, message: "Failed to Upload Image" },
-        { status: 500 },
-      );
     }
+
+    const newProject: ProjectInsertion = {
+      owner: session.user.id!,
+      name: name,
+      logo: imageUrl && imageUrl.split("?")[0],
+      type: type as ProjectSelection["type"],
+      link: link,
+      projectGoal: projectGoal,
+      description: description,
+      startDate: timePeriod.startDate,
+      endDate: timePeriod.endDate,
+      techUsed: techUsed,
+    };
+
+    const res = await databaseDrizzle
+      .insert(project)
+      .values(newProject)
+      .returning({ id: project.id })
+      .then((pro) => pro[0]);
+
+    return NextResponse.json(
+      { state: true, projectId: res.id },
+      { status: 201 },
+    );
+  } catch (err) {
+    return NextResponse.json(
+      { state: false, message: "Failed to Upload Image" },
+      { status: 500 },
+    );
   }
 }
 
@@ -94,17 +104,34 @@ export async function PATCH(request: NextRequest) {
       { status: 400 },
     );
   }
-  const { id, name, description, link, timePeriod, type, projectGoal } =
-    validated.data;
+  const {
+    id,
+    name,
+    description,
+    link,
+    timePeriod,
+    type,
+    projectGoal,
+    techUsed,
+  } = validated.data;
   try {
     if (body.logoKey && body.logo instanceof File) {
       await setImageInBucket(session.user.id!, body.logoKey, body.logo);
     }
 
-    if (name || type || projectGoal || link || description || timePeriod)
+    if (
+      techUsed ||
+      name ||
+      type ||
+      projectGoal ||
+      link ||
+      description ||
+      timePeriod
+    )
       await databaseDrizzle
         .update(project)
         .set({
+          techUsed,
           name,
           type,
           projectGoal,
@@ -144,13 +171,13 @@ export async function DELETE(request: NextResponse) {
       { status: 400 },
     );
   try {
-    const logoKey = await databaseDrizzle
+    const targetProject = await databaseDrizzle
       .delete(project)
       .where(and(eq(project.id, projectId), eq(project.owner, session.user.id)))
       .returning()
-      .then((res) => res[0].logo.split("/").pop());
+      .then((res) => res[0]);
 
-    if (!logoKey)
+    if (!targetProject)
       return NextResponse.json(
         {
           status: false,
@@ -158,9 +185,10 @@ export async function DELETE(request: NextResponse) {
         },
         { status: 404 },
       );
-    const deleteRequest = deleteProjectLogo(logoKey);
-    s3.send(deleteRequest);
-
+    if (targetProject.logo) {
+      const deleteRequest = deleteProjectLogo(targetProject.logo);
+      s3.send(deleteRequest);
+    }
     return NextResponse.json(
       { state: true, message: "Project Deleted successfully" },
       { status: 200 },

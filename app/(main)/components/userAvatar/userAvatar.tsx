@@ -16,11 +16,24 @@ interface IUserAvatar {
   name: string;
   email: string;
   userId: string;
+  notificationsCount: number;
 }
 
-export const UserAvatar = ({ userImage, name, email, userId }: IUserAvatar) => {
+export const UserAvatar = ({
+  userImage,
+  name,
+  email,
+  userId,
+  notificationsCount,
+}: IUserAvatar) => {
+  const notifications = notificationsCount > 0 ?? null;
   return (
-    <Badge content="5" color="danger" shape="circle" showOutline={false}>
+    <Badge
+      content={notifications}
+      color="danger"
+      shape="circle"
+      showOutline={false}
+    >
       <Dropdown placement="bottom-end" className="bg-gray-200">
         <DropdownTrigger>
           <Avatar
@@ -45,15 +58,21 @@ export const UserAvatar = ({ userImage, name, email, userId }: IUserAvatar) => {
           >
             Profile
           </DropdownItem>
-          <DropdownItem key="profile" as={Link} href={AppRouter.myProject}>
+          <DropdownItem
+            key="profile"
+            as={Link}
+            href={AppRouter.myProject + userId}
+          >
             My Projects
           </DropdownItem>
           <DropdownItem key="notifications">
             <div className="flex justify-between">
               <p>Notifications</p>
-              <p className="rounded-full bg-red-600 px-1 text-sm font-bold text-white">
-                5
-              </p>
+              {notifications && (
+                <p className="rounded-full bg-red-600 px-1 text-sm font-bold text-white">
+                  {notifications}
+                </p>
+              )}
             </div>
           </DropdownItem>
 

@@ -4,7 +4,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input, Tab, Tabs } from "@nextui-org/react";
 import React, { Key, useState } from "react";
-import "react-quill/dist/quill.snow.css";
+import SimpleMDE from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
 import _ from "lodash";
 import {
   Controller,
@@ -19,23 +20,24 @@ import {
   UpdateProjectSchema,
   projectSchema,
 } from "@/utils/validations/projectValidation";
-import ReactQuill from "react-quill";
 import Image from "next/image";
 import axios from "axios";
 import { LoaderFullPage } from "@/global-components/loader/loader";
 import { useRouter } from "next/navigation";
 import { AppRouter } from "@/utils/router/app_router";
 import { ProjectSelection } from "@/db/schemes/projectSchema";
+import { TechPicker } from "@/app/(main)/profile/_components/_create_section/input_Fields/tech_picker";
 
 const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
   const initialData: UpdateProjectSchema = {
     id: project?.id ?? 0,
     name: project?.name,
-    type: project?.type,
+    type: project?.type ?? "public",
     link: project?.link,
     description: project?.description,
     compilation: project?.compilation,
     projectGoal: project?.projectGoal,
+    techUsed: project?.techUsed,
     timePeriod: {
       startDate: project ? new Date(project?.startDate!).toISOString() : "",
       endDate: project ? new Date(project?.endDate!).toISOString() : "",
@@ -53,7 +55,9 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
   const router = useRouter();
   const [message, setMessage] = useState<Message>();
   const [image, setImage] = useState<string | null>(project?.logo ?? null);
-  const [selectedType, setSelectedType] = useState(project?.type ?? "public");
+  const [selectedType, setSelectedType] = useState<ProjectSelection["type"]>(
+    project?.type ?? "public",
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   const handleImageChange = (
@@ -74,9 +78,9 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
 
   const handleSelectType = (key: Key, field: ControllerRenderProps) => {
     field.onChange(key);
-    if(key === 'public') setSelectedType(key);
-    else if (key === 'permission') setSelectedType(key)
-    else if(key === 'private') setSelectedType(key)
+    if (key === "permission") setSelectedType(key);
+    else if (key === "private") setSelectedType(key);
+    else setSelectedType("public");
   };
   function findDifferences(newData: ProjectSchema, isLogo: boolean) {
     const differences: any = {};
@@ -87,8 +91,8 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
       }
       differences["id"] = project?.id!;
 
-      if (isLogo) {
-        const logoLink = project?.logo.split("/") ?? "/";
+      if (isLogo && project?.logo) {
+        const logoLink = project.logo.split("/") ?? "/";
 
         differences["logoKey"] = logoLink[logoLink.length - 1].split("%")[0];
       }
@@ -98,6 +102,7 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
   }
 
   const onSubmit: SubmitHandler<ProjectSchema> = async (data) => {
+    console.log(data);
     var targetData = data;
     if (project) targetData = findDifferences(data, !!data.logo);
     try {
@@ -170,6 +175,7 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
               render={({ field, fieldState: { error } }) => (
                 <Tabs
                   variant="bordered"
+                  defaultSelectedKey="public"
                   aria-label="Tabs variants"
                   selectedKey={selectedType}
                   onSelectionChange={(key) =>
@@ -278,7 +284,7 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
                   label="Project Link"
                   className="max-w-full"
                   startContent={
-                    <div className="pointer-events-none flex items-center">
+                    <div className="pointer-events-none flex w-48 items-center">
                       <span className="text-sm text-default-400">
                         https://github.com/
                       </span>
@@ -289,8 +295,15 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
               )}
             />
           </div>
+          <Controller
+            name="techUsed"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <TechPicker isProject field={{ ...field }} error={error} />
+            )}
+          />
 
-          <div className="mb-6">
+          <div className="mb-6 mt-10">
             <Controller
               name="description"
               control={control}
@@ -302,9 +315,8 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
                     </p>
                   )}
                   <div className="h-72 max-h-64 w-full overflow-y-auto">
-                    <ReactQuill
+                    <SimpleMDE
                       {...field}
-                      theme="snow"
                       className="h-full w-full"
                       placeholder="Describe the project with more details"
                     />

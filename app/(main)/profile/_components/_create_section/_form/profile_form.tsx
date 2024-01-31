@@ -16,7 +16,7 @@ import {
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useProfileData } from "../../context/profile_context";
-import { SkillsPicker } from "../input_Fields/skills_input";
+import { TechPicker } from "../input_Fields/tech_picker";
 import ExperienceField from "../input_Fields/experience_field";
 import { EducationField } from "../input_Fields/education_field";
 import { SectionField } from "../input_Fields/section_field";
@@ -263,7 +263,7 @@ export const ProfileForm = () => {
             name="skills"
             control={control}
             render={({ field, fieldState: { error } }) => (
-              <SkillsPicker field={{ ...field }} error={error} />
+              <TechPicker field={{ ...field }} error={error} />
             )}
           />{" "}
           <div className="flex w-full flex-col gap-3">

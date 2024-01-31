@@ -37,13 +37,16 @@ export const projectSchema = z.object({
     .any()
     .refine(
       (file) => {
-        return file instanceof File && file.type.substring(0, 5) === "image";
+        return (
+          file ||
+          (file instanceof File && file.type.substring(0, 5) === "image")
+        );
       },
       {
         message: "Invalid image",
       },
     )
-    .refine((file) => file instanceof File && file.size < MB, {
+    .refine((file) => file || (file instanceof File && file.size < MB), {
       message: "image is too large. Maximum size is 1 MB",
     })
     .optional(),
@@ -58,6 +61,7 @@ export const projectSchema = z.object({
     .trim()
     .min(50, "Project goal must be at least 50 characters")
     .max(100, "Project goal must be under 100 characters"),
+  techUsed: z.string().min(1, "You should select one tech at lesst"),
 
   timePeriod: TimePeriod,
 });
@@ -99,6 +103,7 @@ export const updateProjectSchema = z.object({
     .min(50, "Project goal must be at least 50 characters")
     .max(100, "Project goal must be under 100 characters")
     .optional(),
+  techUsed: z.string().min(1, "You should select one tech at lesst").optional(),
 
   timePeriod: TimePeriod.optional(),
 });

@@ -26,6 +26,9 @@ export default async function ProjectViewPage({ params }: Props) {
   const isDev = devs.find((d) => d.devId === sesstion?.user.id);
   const stars = await databaseDrizzle.query.starProject.findMany({
     where: (s) => eq(s.projectId, projectId),
+    columns: {
+      userId: true,
+    },
   });
   const isStared = stars.find((s) => s.userId === sesstion?.user.id);
 
@@ -43,6 +46,9 @@ export default async function ProjectViewPage({ params }: Props) {
         eq(n.notificationType, "JOIN_REQUEST"),
         eq(n.projectId, projectId),
       ),
+    columns: {
+      id: true,
+    },
   });
   return (
     <>

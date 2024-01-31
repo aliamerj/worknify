@@ -50,6 +50,20 @@
       "when": 1706613453428,
       "tag": "0006_early_gabe_jones",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1706720500217,
+      "tag": "0007_married_zaran",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1706723545032,
+      "tag": "0008_ambitious_victor_mancha",
+      "breakpoints": true
     }
   ]
 }

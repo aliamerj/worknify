@@ -21,13 +21,14 @@ export const project = pgTable("project", {
     .notNull(),
   name: varchar("name", { length: 60 }).notNull(),
   type: projectType("project_type").notNull(),
-  logo: text("logo").notNull(),
+  logo: text("logo"),
   link: varchar("project_link", { length: 255 }).notNull(),
   description: text("description").notNull(),
   compilation: integer("compilation").default(0).notNull(),
   projectGoal: varchar("project_goal", { length: 120 }).notNull(),
   startDate: date("start_date").notNull(),
   endDate: date("end_date").notNull(),
+  techUsed: text("tech_used").notNull(),
 });
 
 export const dev = pgTable(

@@ -1,15 +1,23 @@
-import { ProfileSchema } from "@/utils/validations/profileValidation";
 import React, { useState, useEffect } from "react";
-import { ControllerRenderProps, FieldError } from "react-hook-form";
+import {
+  ControllerRenderProps,
+  FieldError,
+  FieldValues,
+} from "react-hook-form";
 import skillsJSON from "@/utils_files/skills.json";
 interface Option {
   name: string;
 }
-interface ISkillsPicker {
-  field: ControllerRenderProps<ProfileSchema>;
+interface ITechPicker<T extends FieldValues> {
+  field: ControllerRenderProps<T>;
   error?: FieldError;
+  isProject?: boolean;
 }
-export const SkillsPicker = ({ field, error }: ISkillsPicker) => {
+export const TechPicker = ({
+  field,
+  error,
+  isProject,
+}: ITechPicker<FieldValues>) => {
   const savedSkills =
     field.value?.toString().length != 0
       ? field.value?.toString().split(",")
@@ -61,7 +69,7 @@ export const SkillsPicker = ({ field, error }: ISkillsPicker) => {
   }, [selectedOptions]);
 
   return (
-    <div className="relative w-full max-w-full text-sm">
+    <div className="relative w-full max-w-full bg-red-100 text-sm">
       <div
         style={{
           borderStartStartRadius: "10px",
@@ -69,12 +77,15 @@ export const SkillsPicker = ({ field, error }: ISkillsPicker) => {
           borderEndEndRadius: showDropdown ? "0px" : "10px",
           borderEndStartRadius: showDropdown ? "0px" : "10px",
         }}
-        className={`flex flex-wrap gap-1 rounded-t-2xl bg-divider p-2 ${
+        className={`flex flex-wrap gap-1 rounded-t-2xl ${isProject ? "bg-white" : "bg-divider"} ${
           !!error ? "bg-red-200" : ""
         } `}
       >
         {selectedOptions.map((opt, index) => (
-          <div key={index} className="flex items-center rounded-md bg-white">
+          <div
+            key={index}
+            className={`flex items-center rounded-md ${!isProject ? "bg-white" : "bg-divider"}`}
+          >
             <div className="p-2">{opt}</div>
             <div
               onClick={() => removeOption(opt)}
@@ -84,16 +95,29 @@ export const SkillsPicker = ({ field, error }: ISkillsPicker) => {
             </div>
           </div>
         ))}
-
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => handleSearch(e.target.value)}
-          className={`flex-1  border-0 bg-transparent px-0 py-1 outline-none ${
-            !!error ? "bg-red-200 placeholder:text-red-500" : ""
-          }`}
-          placeholder="Select skills"
-        />
+        {isProject ? (
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            className={`flex flex-1 items-end justify-end border-0 border-b-2 border-gray-400 bg-white px-0 py-1 placeholder-gray-700 outline-none focus:border-black ${
+              !!error
+                ? "border-red-500 bg-red-100 placeholder:text-red-500"
+                : ""
+            }`}
+            placeholder="Tech will be used"
+          />
+        ) : (
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            className={`flex-1  border-0 bg-transparent px-0 py-1 outline-none ${
+              !!error ? "bg-red-200 placeholder:text-red-500" : ""
+            }`}
+            placeholder="Select skills"
+          />
+        )}
       </div>
       {!!error && <p className="m-1 pl-1 text-red-500">{error.message}</p>}
       {showDropdown && (

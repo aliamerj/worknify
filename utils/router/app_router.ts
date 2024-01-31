@@ -9,7 +9,7 @@ export const AppRouter = {
   createProject: "/project/create",
   editProject: "/project/update/",
   viewProject: "/project/view/",
-  myProject: "/project/my",
+  myProject: "/project/owner/",
 };
 export const ApiRouter = {
   signin: "/api/auth/signin",

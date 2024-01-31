@@ -14,6 +14,7 @@ import { Experience } from "../../_components/_view_section/experience/experienc
 import { Education } from "../../_components/_view_section/education/education";
 import Sections from "../../_components/_view_section/section/section";
 import { Header } from "../../_components/_view_section/header/header";
+import { Projects } from "../../_components/_view_section/projects/projects";
 
 const Skills = dynamic(
   () => import("@/app/(main)/profile/_components/_view_section/skills/skills"),
@@ -51,6 +52,20 @@ async function ViewProfile({ params }: Props) {
 
   const star = await databaseDrizzle.query.star.findMany({
     where: (s, o) => o.eq(s.profileId, profile?.id),
+    columns: {
+      userId: true,
+    },
+  });
+  const projects = await databaseDrizzle.query.project.findMany({
+    where: (p, o) => o.eq(p.owner, params.id),
+    columns: {
+      id: true,
+      logo: true,
+      name: true,
+      projectGoal: true,
+      techUsed: true,
+      link: true,
+    },
   });
   const isStared = star.findIndex((star) => (star.userId = params.id)) !== -1;
   return (
@@ -69,7 +84,11 @@ async function ViewProfile({ params }: Props) {
       />
       <ErrorBoundary>
         <Suspense fallback={<ShimmerLoading count={4} />}>
-          <ProfileSummary stars={star} />
+          <ProfileSummary
+            stars={star.length}
+            projects={projects.length}
+            userId={params.id}
+          />
         </Suspense>
       </ErrorBoundary>
       <ErrorBoundary>
@@ -78,6 +97,7 @@ async function ViewProfile({ params }: Props) {
         </Suspense>
       </ErrorBoundary>
       {profile.skills && <Skills skills={profile.skills} />}
+      <Projects projects={projects} />
       <ErrorBoundary>
         <Suspense fallback={<ShimmerLoading count={4} />}>
           <Education profileId={profile.id} />

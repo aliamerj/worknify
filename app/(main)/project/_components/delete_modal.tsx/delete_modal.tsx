@@ -38,12 +38,9 @@ export const DeleteProjectBtn = ({
   };
   return (
     <div>
-      <button
-        onClick={onOpen}
-        className="rounded bg-red-500 px-2 py-1 text-sm text-white hover:bg-red-600"
-      >
-        Delete
-      </button>
+      <div className="rounded bg-red-500 px-2 py-1 text-center text-sm text-white hover:bg-red-600">
+        <button onClick={onOpen}>Delete</button>
+      </div>
       <Modal
         isOpen={isOpen}
         placement="center"

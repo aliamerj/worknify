@@ -2,7 +2,7 @@
 import { DevSelection, ProjectSelection } from "@/db/schemes/projectSchema";
 import { Tab, Tabs } from "@nextui-org/react";
 import AboutProject from "../../about_project/about_project";
-import DOMPurify from "isomorphic-dompurify";
+import ReactMarkdown from "react-markdown";
 
 export const ProjectBody = ({
   project,
@@ -11,9 +11,6 @@ export const ProjectBody = ({
   project: ProjectSelection;
   devs: DevSelection[];
 }) => {
-  const createMarkup = (htmlContent: string) => {
-    return { __html: DOMPurify.sanitize(htmlContent) };
-  };
   let tabs = [
     {
       id: "overview",
@@ -48,10 +45,9 @@ export const ProjectBody = ({
             {item.id === "overview" ? (
               <div className="mx-2 mt-6 rounded-lg bg-white p-6 shadow-sm md:mx-20">
                 <div className="container mx-auto space-y-4">
-                  <div
-                    className="ql-editor m-0 mb-2 p-0"
-                    dangerouslySetInnerHTML={createMarkup(item.content ?? "")}
-                  />
+                  <article className="prose">
+                    <ReactMarkdown>{project.description}</ReactMarkdown>
+                  </article>
                 </div>
               </div>
             ) : (

@@ -20,6 +20,7 @@ const ProjectForm = dynamic(
     ),
   },
 );
+
 interface Props {
   params: { id: string };
 }

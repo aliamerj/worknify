@@ -13,9 +13,10 @@ import { useRouter } from "next/navigation";
 import { ProjectSchema } from "@/utils/validations/projectValidation";
 import { JoinProjectSchema } from "@/utils/validations/joinProjectValidation";
 import RequestPendingBox from "../../request_pending_box/request_pending_box";
+import { LiaLaptopCodeSolid } from "react-icons/lia";
 
 interface Props {
-  projectLogo: string;
+  projectLogo: string | null;
   projectName: string;
   projectGoal: string;
   starsCount: number;
@@ -117,13 +118,17 @@ const ProjectHeader = ({
       <div className="container mx-auto flex flex-col items-center  sm:h-52 sm:flex-row sm:justify-evenly">
         <div className="flex items-center">
           <div className="relative mr-3 h-16 w-20 flex-shrink-0 rounded-lg border border-gray-200 sm:h-36 sm:w-36 md:h-44 md:w-44">
-            <Image
-              src={projectLogo}
-              alt={`${projectName} Logo`}
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
-            />
+            {projectLogo ? (
+              <Image
+                src={projectLogo}
+                alt={`${projectName} Logo`}
+                layout="fill"
+                objectFit="cover"
+                className="rounded-lg"
+              />
+            ) : (
+              <LiaLaptopCodeSolid className="h-full w-full rounded-lg" />
+            )}
           </div>{" "}
           <div>
             <div className="flex items-center text-2xl font-bold text-gray-800">

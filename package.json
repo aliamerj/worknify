@@ -35,6 +35,8 @@
     "react-markdown": "^9.0.1",
     "react-quill": "^2.0.0",
     "react-simplemde-editor": "^5.2.0",
+    "rehype-raw": "^7.0.0",
+    "simple-markdown": "^0.7.3",
     "uuid": "^9.0.1",
     "validator": "^13.11.0",
     "zod": "^3.22.4"
