@@ -114,7 +114,7 @@ export const ProjectCard = async ({
                 label="Compilation"
                 aria-label="compilation"
                 size="sm"
-                value={compilation + 10}
+                value={compilation}
                 color="primary"
                 showValueLabel={true}
               />
