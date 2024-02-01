@@ -23,7 +23,7 @@ const MyProjectsPage = async ({ params: { userId } }: Props) => {
       projectGoal: true,
     },
   });
-  if (projects.length === 0) return notFound();
+
   const userName = await databaseDrizzle.query.profile.findFirst({
     where: (p) => eq(p.userId, userId),
     columns: {

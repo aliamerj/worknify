@@ -8,7 +8,7 @@ const configPath = [
   "/profile/create",
   "/profile/edit",
   "/project/create",
-  "/project/my",
+  "/notifications",
   "/project/update",
 ];
 

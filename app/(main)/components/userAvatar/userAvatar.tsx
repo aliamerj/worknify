@@ -27,12 +27,13 @@ export const UserAvatar = ({
   notificationsCount,
 }: IUserAvatar) => {
   const notifications = notificationsCount > 0 ?? null;
+
   return (
     <Badge
-      content={notifications}
+      content={notifications && notificationsCount}
       color="danger"
       shape="circle"
-      showOutline={false}
+      showOutline={notifications}
     >
       <Dropdown placement="bottom-end" className="bg-gray-200">
         <DropdownTrigger>
@@ -65,12 +66,16 @@ export const UserAvatar = ({
           >
             My Projects
           </DropdownItem>
-          <DropdownItem key="notifications">
+          <DropdownItem
+            key="notifications"
+            as={Link}
+            href={AppRouter.notification}
+          >
             <div className="flex justify-between">
               <p>Notifications</p>
               {notifications && (
-                <p className="rounded-full bg-red-600 px-1 text-sm font-bold text-white">
-                  {notifications}
+                <p className="rounded-full bg-red-600 px-2 font-bold text-white">
+                  {notificationsCount}
                 </p>
               )}
             </div>

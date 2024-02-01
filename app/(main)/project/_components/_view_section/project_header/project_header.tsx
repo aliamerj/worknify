@@ -11,9 +11,9 @@ import { IoMdGitNetwork } from "react-icons/io";
 import { BsPencilFill } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 import { ProjectSchema } from "@/utils/validations/projectValidation";
-import { JoinProjectSchema } from "@/utils/validations/joinProjectValidation";
 import RequestPendingBox from "../../request_pending_box/request_pending_box";
 import { LiaLaptopCodeSolid } from "react-icons/lia";
+import { NotificationSchema } from "@/utils/validations/notificationsValidation";
 
 interface Props {
   projectLogo: string | null;
@@ -73,9 +73,10 @@ const ProjectHeader = ({
     try {
       if (isCreater) return route.push(AppRouter.editProject + projectId);
       if (!isJoin) {
-        const projectJoin: JoinProjectSchema = {
+        const projectJoin: NotificationSchema = {
           projectType: projectType,
-          projectAdminId: owner,
+          senderId: owner,
+          notificationType: "JOIN_REQUEST",
         };
         const res = await axios.post(
           ApiRouter.projectJoin + projectId,

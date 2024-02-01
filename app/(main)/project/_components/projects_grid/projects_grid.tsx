@@ -24,16 +24,26 @@ const ProjectsGrid = ({
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 text-center">
         <h1 className="text-4xl font-bold text-gray-800">
-          {userName} Projects
+          {userName}'s Projects
         </h1>
         <p className="mt-2 text-gray-600">
           Browse through the projects {userName} has created or contributed to.
         </p>
       </div>
       <div>
-        {projects.map((project) => (
-          <ProjectCard key={project.id} {...project} fullName={userName} />
-        ))}
+        {projects.length === 0 ? (
+          <div className="text-center">
+            <p className="text-xl text-gray-800">No Projects Yet</p>
+            <p className="mt-2 text-gray-600">
+              It looks like {userName} hasn't started or contributed to any
+              projects yet. Stay tuned!
+            </p>
+          </div>
+        ) : (
+          projects.map((project) => (
+            <ProjectCard key={project.id} {...project} fullName={userName} />
+          ))
+        )}
       </div>
     </div>
   );

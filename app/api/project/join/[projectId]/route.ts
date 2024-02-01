@@ -4,7 +4,7 @@ import { databaseDrizzle } from "@/db/database";
 import { dev } from "@/db/schemes/projectSchema";
 import { and, eq } from "drizzle-orm";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { joinProjectSchema } from "@/utils/validations/joinProjectValidation";
+import { notificationSchema } from "@/utils/validations/notificationsValidation";
 import { notification } from "@/db/schemes/notificationSchema";
 
 export async function POST(
@@ -21,43 +21,105 @@ export async function POST(
 
   try {
     const body = await request.json();
-    const validate = joinProjectSchema.safeParse(body);
-    if (!validate.success || validate.data.projectAdminId === session.user.id)
+    const validate = notificationSchema.safeParse(body);
+    if (!validate.success || validate.data.senderId === session.user.id)
       return NextResponse.json(
         { state: false, message: "invalid request" },
         { status: 400 },
       );
+    if (validate.data.notificationType === "JOIN_REQUEST") {
+      if (validate.data.projectType === "public") {
+        await databaseDrizzle.insert(dev).values({
+          devId: session.user.id,
+          projectId: projectId,
+          joinAt: new Date().toISOString(),
+        });
 
-    if (validate.data.projectType === "public") {
-      await databaseDrizzle.insert(dev).values({
-        devId: session.user.id,
+        return NextResponse.json(
+          {
+            state: true,
+            message: "dev joined successfully",
+            requestStatus: "JOINED",
+          },
+          { status: 201 },
+        );
+      }
+
+      await databaseDrizzle.insert(notification).values({
+        senderId: session.user.id,
+        receiverId: validate.data.senderId,
         projectId: projectId,
-        joinAt: new Date().toISOString(),
+        notificationType: "JOIN_REQUEST",
       });
-
       return NextResponse.json(
         {
           state: true,
-          message: "dev joined successfully",
-          requestStatus: "JOINED",
+          message: "request has been send",
+          requestStatus: "WAITING",
         },
         { status: 201 },
       );
     }
-
-    await databaseDrizzle.insert(notification).values({
-      senderId: session.user.id,
-      receiverId: validate.data.projectAdminId,
-      projectId: projectId,
-      notificationType: "JOIN_REQUEST",
-    });
+    if (validate.data.notificationType === "ACCEPT_REQUEST") {
+      await databaseDrizzle.transaction(async (trx) => {
+        await trx.insert(dev).values({
+          devId: validate.data.senderId,
+          projectId: projectId,
+          joinAt: new Date().toISOString(),
+        });
+        await trx.insert(notification).values({
+          senderId: session.user.id!,
+          receiverId: validate.data.senderId,
+          projectId: projectId,
+          notificationType: "ACCEPT_REQUEST",
+        });
+        await trx
+          .delete(notification)
+          .where(
+            and(
+              eq(notification.projectId, projectId),
+              eq(notification.senderId, validate.data.senderId),
+              eq(notification.receiverId, session.user.id!),
+              eq(notification.notificationType, "JOIN_REQUEST"),
+            ),
+          );
+      });
+      return NextResponse.json(
+        {
+          state: true,
+          message: "New user has Joined the project",
+          requestStatus: "JOINED",
+        },
+        { status: 200 },
+      );
+    }
+    if (validate.data.notificationType === "REJECT_REQUEST") {
+      await databaseDrizzle.transaction(async (trx) => {
+        await trx.insert(notification).values({
+          senderId: session.user.id!,
+          receiverId: validate.data.senderId,
+          projectId: projectId,
+          notificationType: "REJECT_REQUEST",
+        });
+        await trx
+          .delete(notification)
+          .where(
+            and(
+              eq(notification.projectId, projectId),
+              eq(notification.senderId, validate.data.senderId),
+              eq(notification.receiverId, session.user.id!),
+              eq(notification.notificationType, "JOIN_REQUEST"),
+            ),
+          );
+      });
+    }
     return NextResponse.json(
       {
         state: true,
-        message: "request has been send",
-        requestStatus: "WAITING",
+        message: "User has Rejected to join the project",
+        requestStatus: "UNJOINED",
       },
-      { status: 201 },
+      { status: 200 },
     );
   } catch (error: any) {
     return NextResponse.json(

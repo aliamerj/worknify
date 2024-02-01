@@ -1,6 +1,7 @@
 export const AppRouter = {
   home: "/",
   signup: "/api/auth/signin",
+  notification: "/notifications",
   // profile
   createProfile: "/profile/create",
   editProfile: "/profile/update",
@@ -17,4 +18,5 @@ export const ApiRouter = {
   profileStar: "/api/profile/star/",
   projectStar: "/api/project/star/",
   projectJoin: "/api/project/join/",
+  notifications: "/api/notifications/",
 };

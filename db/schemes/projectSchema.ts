@@ -9,11 +9,12 @@ import {
   pgEnum,
 } from "drizzle-orm/pg-core";
 import { users } from "./userSchema";
-export const projectType = pgEnum("project_type", [
-  "public",
+export const projectTypeVaild: Readonly<[string, string, string]> = [
   "private",
+  "public",
   "permission",
-]);
+];
+export const projectType = pgEnum("project_type", projectTypeVaild);
 export const project = pgTable("project", {
   id: serial("id").primaryKey(),
   owner: text("owner_id")

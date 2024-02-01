@@ -8,8 +8,15 @@ import {
 } from "drizzle-orm/pg-core";
 import { users } from "./userSchema";
 import { project } from "./projectSchema";
-
-export const notificationType = pgEnum("notification_type", ["JOIN_REQUEST"]);
+export const notificationTypeVaild: Readonly<[string, string, string]> = [
+  "JOIN_REQUEST",
+  "ACCEPT_REQUEST",
+  "REJECT_REQUEST",
+];
+export const notificationType = pgEnum(
+  "notification_type",
+  notificationTypeVaild,
+);
 
 export const notification = pgTable(
   "notification",
@@ -35,3 +42,5 @@ export const notification = pgTable(
     ),
   }),
 );
+export type NotificationSelection = typeof notification.$inferSelect;
+export type NotificationsInsertion = typeof notification.$inferInsert;
