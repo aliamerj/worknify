@@ -11,6 +11,8 @@ export const AppRouter = {
   editProject: "/project/update/",
   viewProject: "/project/view/",
   myProject: "/project/owner/",
+  // dashboard
+  dashboardPage: "/dashboard/",
 };
 export const ApiRouter = {
   signin: "/api/auth/signin",

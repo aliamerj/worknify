@@ -14,6 +14,7 @@ import { ProjectSchema } from "@/utils/validations/projectValidation";
 import RequestPendingBox from "../../request_pending_box/request_pending_box";
 import { LiaLaptopCodeSolid } from "react-icons/lia";
 import { NotificationSchema } from "@/utils/validations/notificationsValidation";
+import Link from "next/link";
 
 interface Props {
   projectLogo: string | null;
@@ -169,12 +170,13 @@ const ProjectHeader = ({
             <RequestPendingBox />
           )}
           <Button
+            as={Link}
             size="md"
-            color="warning"
+            color="secondary"
             variant="shadow"
             className="text-xl text-white"
             startContent={<RxDashboard />}
-            onClick={() => console.log("Go To Dashboard")}
+            href={AppRouter.dashboardPage + projectId}
           >
             Dashboard
           </Button>
