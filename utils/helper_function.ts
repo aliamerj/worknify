@@ -11,6 +11,6 @@ export function convertContent(htmlContent: string) {
   return { __html: DOMPurify.sanitize(htmlContent) };
 }
 
-export function convertTimeToString(stringTime: string|null): string |null{
-  return stringTime? new Date(stringTime).toISOString(): null;
+export function convertTimeToString(stringTime: string | null): string | null {
+  return stringTime ? new Date(stringTime).toISOString() : null;
 }

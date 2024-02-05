@@ -1,5 +1,5 @@
 import { databaseDrizzle } from "@/db/database";
-import {  eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import React from "react";
 import ProjectsGrid from "../../_components/projects_grid/projects_grid";
 import { getServerSession } from "next-auth";
@@ -10,7 +10,7 @@ interface Props {
   params: { userId: string };
 }
 const MyProjectsPage = async ({ params: { userId } }: Props) => {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
   const projects = await databaseDrizzle.query.project.findMany({
     where: (p) => eq(p.owner, userId),
     columns: {
@@ -35,7 +35,10 @@ const MyProjectsPage = async ({ params: { userId } }: Props) => {
   });
   const isCurrentUser = userId === session?.user.id;
 
-  if (projects.length === 0 || !userName) return <Noprojects isCurrentUser={isCurrentUser} userName={userName?.fullName} />;
+  if (projects.length === 0 || !userName)
+    return (
+      <Noprojects isCurrentUser={isCurrentUser} userName={userName?.fullName} />
+    );
 
   return <ProjectsGrid projects={projects} userName={userName.fullName} />;
 };

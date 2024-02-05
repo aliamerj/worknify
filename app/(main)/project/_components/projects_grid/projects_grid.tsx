@@ -32,8 +32,8 @@ const ProjectsGrid = ({
       </div>
       <div>
         {projects.map((project) => (
-            <ProjectCard key={project.id} {...project} fullName={userName} />
-          ))}
+          <ProjectCard key={project.id} {...project} fullName={userName} />
+        ))}
       </div>
     </div>
   );

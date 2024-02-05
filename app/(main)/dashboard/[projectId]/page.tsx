@@ -1,4 +1,4 @@
-import { LeftSlider } from "../_component/left_slider/left_slider";
+import { Sidebar } from "../_component/left_slider/side_bar";
 
 interface Props {
   params: { projectId: string };
@@ -6,7 +6,7 @@ interface Props {
 export default async function DashboardPage({ params }: Props) {
   return (
     <div>
-      <LeftSlider />
+      <Sidebar />
       <h1>hello word, {params.projectId}</h1>
     </div>
   );

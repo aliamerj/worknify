@@ -99,7 +99,7 @@ export const authOptions: NextAuthOptions = {
       if (session) {
         session.user.id = token.sub;
       }
-        return session;
+      return session;
     },
     jwt: async ({ user, token }) => {
       if (user) {

@@ -18,7 +18,7 @@ export const Projects = ({ projects }: { projects: Project[] }) => {
     <section className="mx-12 mt-32">
       <Slide delay={0.16}>
         <div className="mb-16">
-          <h1 className="font-incognito mb-8 text-4xl font-bold leading-tight tracking-tighter text-gray-800 md:text-5xl dark:text-white">
+          <h1 className="font-incognito mb-8 text-4xl font-bold leading-tight tracking-tighter text-gray-800 dark:text-white md:text-5xl">
             Projects
           </h1>
         </div>

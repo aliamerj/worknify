@@ -28,7 +28,13 @@ import { AppRouter } from "@/utils/router/app_router";
 import { ProjectSelection } from "@/db/schemes/projectSchema";
 import { TechPicker } from "@/app/(main)/profile/_components/_create_section/input_Fields/tech_picker";
 
-const ProjectForm = ({ project,userId  }: { project?: ProjectSelection, userId:string }) => {
+const ProjectForm = ({
+  project,
+  userId,
+}: {
+  project?: ProjectSelection;
+  userId: string;
+}) => {
   const initialData: UpdateProjectSchema = {
     id: project?.id ?? 0,
     name: project?.name,

@@ -1,6 +1,5 @@
 "use client";
-import { formatDate } from "@/utils/helper_function";
-import { Button, Card, CardBody, CardHeader, Divider } from "@nextui-org/react";
+import { Button, Divider, useDisclosure } from "@nextui-org/react";
 import {
   DragDropContext,
   Droppable,
@@ -9,9 +8,10 @@ import {
 } from "@hello-pangea/dnd";
 import { useState } from "react";
 import { IoMdAdd } from "react-icons/io";
-import { SiTask } from "react-icons/si";
-import { IoHeartCircleOutline } from "react-icons/io5";
-type Feature = {
+
+import { FeaturesCard } from "../feature_card/features_card";
+import { AddFeatureModal } from "../add_feature_modal/add_feature_modal";
+export type Feature = {
   id: number;
   name: string;
   description: string;
@@ -21,7 +21,9 @@ type Feature = {
   tasksCount: number;
 };
 
-export const LeftSlider = () => {
+export const Sidebar = () => {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const [features, setFeatures] = useState<Feature[]>([
     {
       id: 1,
@@ -55,10 +57,11 @@ export const LeftSlider = () => {
 
     setFeatures(items);
   };
+
   return (
     <aside
       id="default-sidebar"
-      className="fixed left-0 top-0 z-40 h-screen w-80"
+      className="fixed left-0 top-10 h-screen w-80"
       aria-label="Sidebar"
     >
       <div className="h-full overflow-y-auto bg-gray-50 px-3 py-4 dark:bg-gray-800">
@@ -69,10 +72,12 @@ export const LeftSlider = () => {
               isIconOnly
               color="primary"
               variant="solid"
-              aria-label="Take a photo"
+              aria-label="add new feature"
+              onPress={onOpen}
             >
               <IoMdAdd className="text-2xl text-white" />
             </Button>
+            <AddFeatureModal isOpen={isOpen} onOpenChange={onOpenChange} />
           </li>
           <Divider />
           <DragDropContext
@@ -95,46 +100,7 @@ export const LeftSlider = () => {
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                         >
-                          <Card className="group flex max-w-[400px] items-center rounded-lg bg-gray-200 p-2">
-                            <CardHeader className="flex gap-3">
-                              <SiTask className="text-lg" />
-                              <div className="flex flex-col">
-                                <div className="flex items-center justify-between">
-                                  <p className="text-lg">{feature.name}</p>
-                                  <span className="ms-3 inline-flex h-3 w-3 items-center justify-center rounded-full bg-blue-100 p-3 text-small font-medium text-blue-800">
-                                    {feature.tasksCount}
-                                  </span>
-
-                                  <span className="text-gray-80 ms-3 inline-flex items-center justify-center rounded-full bg-gray-100 px-2 text-sm font-medium">
-                                    {feature.tag}
-                                  </span>
-                                  <Button
-                                    isIconOnly
-                                    className="-translate-y-2 translate-x-2 text-default-900/60 data-[hover]:bg-foreground/10"
-                                    radius="full"
-                                    variant="light"
-                                  >
-                                    <IoHeartCircleOutline
-                                      className={
-                                        true
-                                          ? "[&>path]:stroke-transparent"
-                                          : ""
-                                      }
-                                      fill={true ? "currentColor" : "none"}
-                                    />
-                                  </Button>
-                                </div>
-                                <p className="text-small text-default-500">
-                                  {formatDate(feature.startDate.toISOString())}{" "}
-                                  - {formatDate(feature.endDate.toISOString())}
-                                </p>
-                              </div>
-                            </CardHeader>
-                            <Divider />
-                            <CardBody>
-                              <p>{feature.description}</p>
-                            </CardBody>
-                          </Card>
+                          <FeaturesCard feature={feature} />
                         </li>
                       )}
                     </Draggable>

@@ -13,7 +13,7 @@ export const Experience = async ({ profileId }: { profileId: number }) => {
     <section className="mx-12 mt-32">
       <Slide delay={0.16}>
         <div className="mb-16">
-          <h1 className="font-incognito mb-8 text-4xl font-bold leading-tight tracking-tighter text-gray-800 md:text-5xl dark:text-white">
+          <h1 className="font-incognito mb-8 text-4xl font-bold leading-tight tracking-tighter text-gray-800 dark:text-white md:text-5xl">
             Work Experience
           </h1>
         </div>
@@ -24,7 +24,7 @@ export const Experience = async ({ profileId }: { profileId: number }) => {
           {jobs.map((data) => (
             <div
               key={data.id}
-              className="relative flex max-w-2xl items-start gap-x-4 before:absolute before:bottom-0 before:left-9 before:top-[5rem] before:w-[1px] before:bg-secondary lg:gap-x-6 dark:before:bg-primary"
+              className="relative flex max-w-2xl items-start gap-x-4 before:absolute before:bottom-0 before:left-9 before:top-[5rem] before:w-[1px] before:bg-secondary dark:before:bg-primary lg:gap-x-6"
             >
               <div className="dark:bg-primary-bg bg-secondary-bg relative grid min-h-[80px] min-w-[80px] place-items-center overflow-clip rounded-md border border-secondary p-2 dark:border-primary">
                 <MdWork className="object-cover text-3xl duration-300" />
