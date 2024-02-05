@@ -11,7 +11,7 @@ export const Noprofile = ({isCurrentUser}:{isCurrentUser: boolean}) => {
 
   const actionButton = isCurrentUser ? (
     <Button as={Link} href={AppRouter.createProfile} color='primary' variant='shadow'>
-      Create My Profile
+      Create Your Profile
     </Button>
   ) : null;
 
