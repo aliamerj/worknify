@@ -1,13 +1,16 @@
 import { databaseDrizzle } from "@/db/database";
-import { eq } from "drizzle-orm";
+import {  eq } from "drizzle-orm";
 import React from "react";
 import ProjectsGrid from "../../_components/projects_grid/projects_grid";
-import { notFound } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { Noprojects } from "../../_components/no_projects/no_projects";
 
 interface Props {
   params: { userId: string };
 }
 const MyProjectsPage = async ({ params: { userId } }: Props) => {
+  const session = await getServerSession(authOptions)
   const projects = await databaseDrizzle.query.project.findMany({
     where: (p) => eq(p.owner, userId),
     columns: {
@@ -30,7 +33,9 @@ const MyProjectsPage = async ({ params: { userId } }: Props) => {
       fullName: true,
     },
   });
-  if (!userName) return notFound();
+  const isCurrentUser = userId === session?.user.id;
+
+  if (projects.length === 0 || !userName) return <Noprojects isCurrentUser={isCurrentUser} userName={userName?.fullName} />;
 
   return <ProjectsGrid projects={projects} userName={userName.fullName} />;
 };

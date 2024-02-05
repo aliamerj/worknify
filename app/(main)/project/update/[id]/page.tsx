@@ -34,7 +34,7 @@ const EditProjectPage = async ({ params }: Props) => {
 
   return (
     <div>
-      <ProjectForm project={project} />
+      <ProjectForm project={project} userId={session?.user.id!} />
     </div>
   );
 };

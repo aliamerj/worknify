@@ -31,19 +31,9 @@ const ProjectsGrid = ({
         </p>
       </div>
       <div>
-        {projects.length === 0 ? (
-          <div className="text-center">
-            <p className="text-xl text-gray-800">No Projects Yet</p>
-            <p className="mt-2 text-gray-600">
-              It looks like {userName} hasn't started or contributed to any
-              projects yet. Stay tuned!
-            </p>
-          </div>
-        ) : (
-          projects.map((project) => (
+        {projects.map((project) => (
             <ProjectCard key={project.id} {...project} fullName={userName} />
-          ))
-        )}
+          ))}
       </div>
     </div>
   );

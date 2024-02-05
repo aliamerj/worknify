@@ -28,7 +28,7 @@ import { AppRouter } from "@/utils/router/app_router";
 import { ProjectSelection } from "@/db/schemes/projectSchema";
 import { TechPicker } from "@/app/(main)/profile/_components/_create_section/input_Fields/tech_picker";
 
-const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
+const ProjectForm = ({ project,userId  }: { project?: ProjectSelection, userId:string }) => {
   const initialData: UpdateProjectSchema = {
     id: project?.id ?? 0,
     name: project?.name,
@@ -127,7 +127,7 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
       if (!project) {
         const res = await axios.post("/api/project", formData);
         router.push(AppRouter.viewProject + res.data.projectId);
-        router.push(AppRouter.myProject);
+        router.push(AppRouter.myProject + userId);
         router.refresh();
       } else {
         if (Object.keys(targetData).length > 1) {

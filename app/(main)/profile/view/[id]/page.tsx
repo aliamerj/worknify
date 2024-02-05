@@ -15,6 +15,7 @@ import { Education } from "../../_components/_view_section/education/education";
 import Sections from "../../_components/_view_section/section/section";
 import { Header } from "../../_components/_view_section/header/header";
 import { Projects } from "../../_components/_view_section/projects/projects";
+import { Noprofile } from '../../_components/_view_section/no_profile/no_profile';
 
 const Skills = dynamic(
   () => import("@/app/(main)/profile/_components/_view_section/skills/skills"),
@@ -48,7 +49,8 @@ async function ViewProfile({ params }: Props) {
     where: (p, o) => o.eq(p.userId, id!),
   });
 
-  if (!profile) notFound();
+
+  if (!profile) return <Noprofile isCurrentUser={id === params.id}/>;
 
   const star = await databaseDrizzle.query.star.findMany({
     where: (s, o) => o.eq(s.profileId, profile?.id),

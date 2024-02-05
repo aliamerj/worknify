@@ -108,18 +108,21 @@ export const LeftSlider = () => {
                                   <span className="text-gray-80 ms-3 inline-flex items-center justify-center rounded-full bg-gray-100 px-2 text-sm font-medium">
                                     {feature.tag}
                                   </span>
-              <Button
-                isIconOnly
-                className="text-default-900/60 data-[hover]:bg-foreground/10 -translate-y-2 translate-x-2"
-                radius="full"
-                variant="light"
-
-              >
-                <IoHeartCircleOutline
-                  className={true ? "[&>path]:stroke-transparent" : ""}
-                  fill={true ? "currentColor" : "none"}
-                />
-              </Button>
+                                  <Button
+                                    isIconOnly
+                                    className="-translate-y-2 translate-x-2 text-default-900/60 data-[hover]:bg-foreground/10"
+                                    radius="full"
+                                    variant="light"
+                                  >
+                                    <IoHeartCircleOutline
+                                      className={
+                                        true
+                                          ? "[&>path]:stroke-transparent"
+                                          : ""
+                                      }
+                                      fill={true ? "currentColor" : "none"}
+                                    />
+                                  </Button>
                                 </div>
                                 <p className="text-small text-default-500">
                                   {formatDate(feature.startDate.toISOString())}{" "}

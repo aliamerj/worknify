@@ -63,7 +63,7 @@ export const projectSchema = z.object({
 
 export const updateProjectSchema = z.object({
   id: z.number(),
-  type: z.enum(["private", "public", "permission"]).optional(),
+  type: z.enum(projectTypeVaild).optional(),
   link: z.string().min(1).max(100).optional(),
   name: z
     .string()
