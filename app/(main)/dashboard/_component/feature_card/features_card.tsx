@@ -1,12 +1,13 @@
 import { Card, CardBody, CardHeader, Divider } from "@nextui-org/react";
 import { SiTask } from "react-icons/si";
-import { Feature } from "../left_slider/left_slider";
+
 import { formatDate } from "@/utils/helper_function";
 import { RiDeleteBin5Line } from "react-icons/ri";
+import { FeatureSelection } from "@/db/schemes/featureSchema";
 
-export const FeaturesCard = ({ feature }: { feature: Feature }) => {
+export const FeaturesCard = ({ feature }: { feature: FeatureSelection }) => {
   return (
-    <Card className="group relative flex max-w-[400px] items-center rounded-lg bg-gray-200 p-2">
+    <Card className="group relative flex max-h-44 w-80 items-center rounded-lg bg-gray-200 p-2">
       <div className="absolute right-2 top-2 z-50 hover:cursor-pointer">
         <button
           onClick={() => {}}
@@ -20,17 +21,17 @@ export const FeaturesCard = ({ feature }: { feature: Feature }) => {
         <SiTask className="text-lg" />
         <div className="flex flex-col">
           <div className="flex items-center justify-between">
-            <p className="text-lg">{feature.name}</p>
+            <p className="text-lg">{feature.featureName}</p>
             <span className="ms-3 inline-flex h-3 w-3 items-center justify-center rounded-full bg-blue-100 p-3 text-small font-medium text-blue-800">
-              {feature.tasksCount}
+              0
             </span>
             <span className="text-gray-80 ms-3 inline-flex items-center justify-center rounded-full bg-gray-100 px-2 text-sm font-medium">
-              {feature.tag}
+              {feature.tags}
             </span>
           </div>
           <p className="text-small text-default-500">
-            {formatDate(feature.startDate.toISOString())} -{" "}
-            {formatDate(feature.endDate.toISOString())}
+            {feature.startDate && formatDate(feature.startDate)} -{" "}
+            {feature.endDate && formatDate(feature.endDate)}
           </p>
         </div>
       </CardHeader>

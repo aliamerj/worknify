@@ -5,12 +5,13 @@ import * as users from "./schemes/userSchema";
 import * as allProfile from "./schemes/profileSchema";
 import * as allProject from "./schemes/projectSchema";
 import * as allNotification from "./schemes/notificationSchema";
-
+import * as allFeatures from "./schemes/featureSchema";
 const schema = {
   ...users,
   ...allProfile,
   ...allProject,
   ...allNotification,
+  ...allFeatures,
 };
 const connection = process.env.DATABASE_URL as string;
 

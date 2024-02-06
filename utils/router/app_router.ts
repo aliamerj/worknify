@@ -21,4 +21,5 @@ export const ApiRouter = {
   projectStar: "/api/project/star/",
   projectJoin: "/api/project/join/",
   notifications: "/api/notifications/",
+  features: "/api/feature",
 };

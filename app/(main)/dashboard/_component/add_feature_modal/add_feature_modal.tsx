@@ -12,9 +12,7 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  Checkbox,
   Input,
-  Link,
   Textarea,
 } from "@nextui-org/react";
 import {
@@ -26,11 +24,21 @@ import {
 export const AddFeatureModal = ({
   isOpen,
   onOpenChange,
+  currentFeatures,
+  projectId,
+  pushNewFeature,
 }: {
   isOpen: boolean;
+  projectId: number;
   onOpenChange: () => void;
+  currentFeatures: FeatureSelection[];
+  pushNewFeature: (feature: FeatureSelection) => void;
 }) => {
+  const getHighestOrder = () =>
+    currentFeatures.reduce((max, feature) => Math.max(max, feature.order), 0);
+
   const { control, handleSubmit } = useForm<FeaureSchema>({
+    defaultValues: { order: getHighestOrder() + 1, projectId: projectId },
     resolver: zodResolver(featureSchema),
   });
   const [tags, setTags] = useState<string[]>([]);
@@ -38,8 +46,31 @@ export const AddFeatureModal = ({
     setTags(myTags);
     field.onChange(tags);
   };
+  type TypeSubmit = {
+    data: FeaureSchema;
+    onClose: () => void;
+  };
 
-  const onSubmit: SubmitHandler<FeaureSchema> = async (data) => {
+  const onSubmit: SubmitHandler<TypeSubmit> = async ({ data, onClose }) => {
+    try {
+      await axios.post(ApiRouter.features, data);
+      const newFeature: FeatureSelection = {
+        id: Date.now().valueOf(),
+        projectId: data.projectId,
+        order: data.order,
+        featureName: data.featureName,
+        description: data.description ?? "",
+        tags: data.tag.join(";"),
+        startDate: data.timePeriod.startDate,
+        endDate: data.timePeriod.endDate,
+      };
+
+      pushNewFeature(newFeature);
+      onClose();
+    } catch (error) {
+      console.log("ERRRRRRR");
+    }
+
     console.log(data);
   };
 
@@ -56,7 +87,10 @@ export const AddFeatureModal = ({
         <ModalContent>
           {(onClose) => (
             <>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={handleSubmit((data) => onSubmit({ data, onClose }))}
+                className="space-y-6"
+              >
                 <ModalHeader className="flex flex-col gap-1">
                   Add new Feature to your app
                 </ModalHeader>
@@ -86,7 +120,6 @@ export const AddFeatureModal = ({
                     control={control}
                     render={({ field, fieldState: { error } }) => (
                       <Textarea
-                        isRequired
                         variant="bordered"
                         isInvalid={!!error}
                         errorMessage={error?.message}
@@ -132,7 +165,6 @@ export const AddFeatureModal = ({
                             <div className="relative rounded-lg border border-gray-400 shadow-sm">
                               <DatePicker
                                 showIcon
-                                required
                                 placeholderText="Start Date"
                                 selected={
                                   field.value ? new Date(field.value) : null
@@ -165,7 +197,6 @@ export const AddFeatureModal = ({
                                 selected={
                                   field.value ? new Date(field.value) : null
                                 }
-                                required
                                 onChange={(date) =>
                                   field.onChange(date?.toISOString())
                                 }
@@ -198,3 +229,7 @@ export const AddFeatureModal = ({
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { TagsInput } from "../tag_input/tag_input";
+import { FeatureInsertion, FeatureSelection } from "@/db/schemes/featureSchema";
+import axios from "axios";
+import { ApiRouter } from "@/utils/router/app_router";
+import { random } from "lodash";

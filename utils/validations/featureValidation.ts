@@ -4,11 +4,9 @@ const TimePeriod = z
     startDate: z.string({
       required_error: "Start date is required",
     }),
-    endDate: z
-      .string({
-        required_error: "End date is required",
-      })
-      .nullable(),
+    endDate: z.string({
+      required_error: "End date is required",
+    }),
   })
   .refine(
     (data) =>
@@ -20,6 +18,7 @@ const TimePeriod = z
   );
 export const featureSchema = z.object({
   id: z.number().optional(),
+  projectId: z.number(),
   featureName: z
     .string()
     .trim()
@@ -30,15 +29,18 @@ export const featureSchema = z.object({
       .string()
       .trim()
       .min(1, "Company name cannot be empty")
-      .max(60, "Company name must be under 50 characters"),
+      .max(60, "Company name must be under 50 characters")
+      .refine((value) => !value.includes(";"), {
+        message: "tags cannot contain the character ';'",
+      }),
   ),
   description: z
     .string()
     .trim()
-    .min(5, "Description must be at least 5 characters")
     .max(500, "Description must be under 500 characters")
     .optional(),
   taskCount: z.number().default(0),
+  order: z.number().min(0),
   timePeriod: TimePeriod,
 });
 
