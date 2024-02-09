@@ -50,7 +50,7 @@ export async function DELETE(
 
     return NextResponse.json(
       { state: true, body: "Star deleted successfully" },
-      { status: 201 },
+      { status: 200 },
     );
   } catch (error: any) {
     return NextResponse.json(

@@ -73,7 +73,10 @@ export const NotificationBtn = ({
         </button>
       )}
       {isError && (
-        <SideErrorMessage errorMessage="Oops! Something went wrong. Please try again later." />
+        <SideErrorMessage
+          isError={isError}
+          errorMessage="Oops! Something went wrong. Please try again later."
+        />
       )}
     </div>
   );

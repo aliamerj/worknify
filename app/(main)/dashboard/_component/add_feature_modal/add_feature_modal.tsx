@@ -5,6 +5,11 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { TagsInput } from "../tag_input/tag_input";
+import { FeatureSelection } from "@/db/schemes/featureSchema";
+
 import {
   Modal,
   ModalContent,
@@ -20,6 +25,9 @@ import {
   ControllerRenderProps,
   SubmitHandler,
 } from "react-hook-form";
+import axios from "axios";
+import { ApiRouter } from "@/utils/router/app_router";
+import { MessageRes } from "../left_slider/side_bar";
 
 export const AddFeatureModal = ({
   isOpen,
@@ -27,12 +35,14 @@ export const AddFeatureModal = ({
   currentFeatures,
   projectId,
   pushNewFeature,
+  setMessageRes,
 }: {
   isOpen: boolean;
   projectId: number;
   onOpenChange: () => void;
   currentFeatures: FeatureSelection[];
   pushNewFeature: (feature: FeatureSelection) => void;
+  setMessageRes: (res: MessageRes) => void;
 }) => {
   const getHighestOrder = () =>
     currentFeatures.reduce((max, feature) => Math.max(max, feature.order), 0);
@@ -42,9 +52,11 @@ export const AddFeatureModal = ({
     resolver: zodResolver(featureSchema),
   });
   const [tags, setTags] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const onSettingTags = (myTags: string[], field: ControllerRenderProps) => {
     setTags(myTags);
-    field.onChange(tags);
+    field.onChange(myTags);
   };
   type TypeSubmit = {
     data: FeaureSchema;
@@ -53,25 +65,28 @@ export const AddFeatureModal = ({
 
   const onSubmit: SubmitHandler<TypeSubmit> = async ({ data, onClose }) => {
     try {
-      await axios.post(ApiRouter.features, data);
+      setIsLoading(true);
+      const res = await axios.post(ApiRouter.features, data);
       const newFeature: FeatureSelection = {
-        id: Date.now().valueOf(),
+        id: res.data.featureId,
         projectId: data.projectId,
         order: data.order,
         featureName: data.featureName,
         description: data.description ?? "",
-        tags: data.tag.join(";"),
-        startDate: data.timePeriod.startDate,
-        endDate: data.timePeriod.endDate,
+        tags: data.tag?.join(";") ?? "",
+        startDate: data.timePeriod.startDate ?? null,
+        endDate: data.timePeriod.endDate ?? null,
       };
-
       pushNewFeature(newFeature);
+      setMessageRes({ isError: false, message: res.data.message });
       onClose();
-    } catch (error) {
-      console.log("ERRRRRRR");
+    } catch (error: any) {
+      setMessageRes({
+        isError: true,
+        message: error.response.data.message,
+      });
     }
-
-    console.log(data);
+    setIsLoading(false);
   };
 
   return (
@@ -138,15 +153,11 @@ export const AddFeatureModal = ({
                       <div className="w-full">
                         <TagsInput
                           tags={tags}
+                          error={error}
                           onSettingTags={(mytags) =>
                             onSettingTags(mytags, { ...field })
                           }
                         />
-                        {error && (
-                          <p className="mt-2 text-xs text-red-500">
-                            {error?.message}
-                          </p>
-                        )}
                       </div>
                     )}
                   />
@@ -213,7 +224,7 @@ export const AddFeatureModal = ({
                   <Button color="danger" variant="flat" onPress={onClose}>
                     Close
                   </Button>
-                  <Button color="primary" type="submit">
+                  <Button color="primary" type="submit" isLoading={isLoading}>
                     Save
                   </Button>
                 </ModalFooter>
@@ -225,11 +236,3 @@ export const AddFeatureModal = ({
     </>
   );
 };
-
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { TagsInput } from "../tag_input/tag_input";
-import { FeatureInsertion, FeatureSelection } from "@/db/schemes/featureSchema";
-import axios from "axios";
-import { ApiRouter } from "@/utils/router/app_router";
-import { random } from "lodash";

@@ -147,7 +147,6 @@ export async function PATCH(request: NextRequest) {
       { status: 200 },
     );
   } catch (error: any) {
-    console.log(error);
     return NextResponse.json(
       { state: false, message: error.message },
       { status: 500 },

@@ -62,7 +62,7 @@ export const ButtonHeader = ({
       >
         Star
       </Button>
-      {error && <SideErrorMessage errorMessage={error} />}
+      {error && <SideErrorMessage errorMessage={error} isError={error} />}
     </div>
   );
 };

@@ -4,9 +4,11 @@ import { RiCloseCircleLine } from "react-icons/ri";
 export const TagsInput = ({
   tags,
   onSettingTags,
+  error,
 }: {
   tags: string[];
   onSettingTags: (tags: string[]) => void;
+  error: any;
 }) => {
   const [input, setInput] = useState("");
 
@@ -27,13 +29,17 @@ export const TagsInput = ({
 
   return (
     <div className="flex flex-col">
+      {error &&
+        error.map((err: any) => (
+          <p className="mb-2 ml-2 text-xs text-red-500">{err.message}</p>
+        ))}
       <input
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type and press Enter to add tags"
-        className="mb-2 w-full rounded-xl  border border-gray-300 p-2 shadow"
+        className={`mb-2 w-full rounded-xl ${!!error ? "border-medium border-red-400" : "border border-gray-300"}  p-2 shadow`}
       />
       <div className="flex flex-wrap gap-2">
         {tags.map((tag, index) => (

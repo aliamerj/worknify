@@ -1,16 +1,16 @@
 import { z } from "zod";
 const TimePeriod = z
   .object({
-    startDate: z.string({
-      required_error: "Start date is required",
-    }),
-    endDate: z.string({
-      required_error: "End date is required",
-    }),
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
   })
   .refine(
     (data) =>
-      !(data.endDate && new Date(data.endDate) < new Date(data.startDate)),
+      !(
+        data.endDate &&
+        data.startDate &&
+        new Date(data.endDate) < new Date(data.startDate)
+      ),
     {
       message: "End date must be after the start date",
       path: ["endDate"],
@@ -24,16 +24,23 @@ export const featureSchema = z.object({
     .trim()
     .min(1, "Feature name must be at least 1 characters")
     .max(30, "Role must be under 30 characters"),
-  tag: z.array(
-    z
-      .string()
-      .trim()
-      .min(1, "Company name cannot be empty")
-      .max(60, "Company name must be under 50 characters")
-      .refine((value) => !value.includes(";"), {
-        message: "tags cannot contain the character ';'",
-      }),
-  ),
+  tag: z
+    .array(
+      z
+        .string()
+        .trim()
+        .refine(
+          (value) => !value.includes(";"),
+          "tags cannot contain the character ';'",
+        )
+        .refine(
+          (value) => value.trim().length <= 5,
+          "tag must be under 5 characters",
+        ),
+    )
+    .max(5, "No more than 5 tags are allowed")
+    .optional(),
+
   description: z
     .string()
     .trim()
@@ -43,5 +50,12 @@ export const featureSchema = z.object({
   order: z.number().min(0),
   timePeriod: TimePeriod,
 });
+
+export const featureDeleteSchema = z.object({
+  projectId: z.number(),
+  featureId: z.number(),
+});
+
+export type FeatureDeleteSchema = z.infer<typeof featureDeleteSchema>;
 
 export type FeaureSchema = z.infer<typeof featureSchema>;

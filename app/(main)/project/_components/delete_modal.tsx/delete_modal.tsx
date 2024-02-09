@@ -77,7 +77,7 @@ export const DeleteProjectBtn = ({
           )}
         </ModalContent>
       </Modal>
-      {error && <SideErrorMessage errorMessage={error} />}
+      {error && <SideErrorMessage errorMessage={error} isError={error} />}
       {isLoading && <LoaderFullPage />}
     </div>
   );

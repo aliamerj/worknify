@@ -108,7 +108,6 @@ const ProjectForm = ({
   }
 
   const onSubmit: SubmitHandler<ProjectSchema> = async (data) => {
-    console.log(data);
     var targetData = data;
     if (project) targetData = findDifferences(data, !!data.logo);
     try {
