@@ -22,4 +22,5 @@ export const ApiRouter = {
   projectJoin: "/api/project/join/",
   notifications: "/api/notifications/",
   features: "/api/feature",
+  reorderFeatures: "/api/feature/reorder",
 };

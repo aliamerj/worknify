@@ -7,48 +7,88 @@ import { FeatureSelection } from "@/db/schemes/featureSchema";
 import axios from "axios";
 import { ApiRouter } from "@/utils/router/app_router";
 import { MessageRes } from "../left_slider/side_bar";
-import { useSession } from "next-auth/react";
-
+import { FaPencilAlt } from "react-icons/fa";
+import { FeatureSchema } from "@/utils/validations/featureValidation";
 
 export const FeaturesCard = ({
+  setFeatureToUpdate,
   feature,
   removeFeature,
   setMessageRes,
   isOwner,
+  onOpen,
 }: {
   feature: FeatureSelection;
-    isOwner:boolean
+  isOwner: boolean;
+  setFeatureToUpdate: (feature: FeatureSchema) => void;
   setMessageRes: (res: MessageRes) => void;
   removeFeature: (id: number) => void;
+  onOpen: () => void;
 }) => {
   return (
     <>
       <Card className="group relative flex max-h-44 w-80 items-center rounded-lg bg-background p-2">
-        {isOwner &&  <div className="absolute right-2 top-2 z-50 hover:cursor-pointer">
-          <button
-            onClick={async () => {
-              try {
-                const res = await axios.delete(ApiRouter.features, {
-                  data: {
-                    projectId: feature.projectId,
-                    featureId: feature.id,
-                  },
-                });
-                setMessageRes({ isError: false, message: res.data.message });
-                removeFeature(feature.id);
-              } catch (error: any) {
-                setMessageRes({
-                  isError: true,
-                  message: error.response.data.message,
-                });
-              }
-            }}
-            className="rounded-full border border-transparent bg-transparent p-1 text-danger-600 hover:border-gray-300 hover:text-danger-700"
-            aria-label="Delete feature"
-          >
-            <RiDeleteBin5Line className="text-xl" />
-          </button>
-        </div>}
+        {isOwner && (
+          <div className="absolute right-2 top-2 z-50 hover:cursor-pointer">
+            <div className="flex flex-col">
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await axios.delete(ApiRouter.features, {
+                      data: {
+                        projectId: feature.projectId,
+                        featureId: feature.id,
+                      },
+                    });
+                    setMessageRes({
+                      isError: false,
+                      message: res.data.message,
+                    });
+                    removeFeature(feature.id);
+                  } catch (error: any) {
+                    setMessageRes({
+                      isError: true,
+                      message: error.response.data.message,
+                    });
+                  }
+                }}
+                className="rounded-full border border-transparent bg-transparent p-1 text-danger-500 hover:border-gray-300 hover:text-danger-600"
+                aria-label="Delete feature"
+              >
+                <RiDeleteBin5Line className="text-xl" />
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    setFeatureToUpdate({
+                      id: feature.id,
+                      projectId: feature.projectId,
+                      order: feature.order,
+                      taskCount: 0,
+                      featureName: feature.featureName,
+                      description: feature.description ?? undefined,
+                      tag: feature.tags?.split(";") ?? undefined,
+                      timePeriod: {
+                        startDate: feature.startDate ?? undefined,
+                        endDate: feature.endDate ?? undefined,
+                      },
+                    });
+                    onOpen();
+                  } catch (error: any) {
+                    setMessageRes({
+                      isError: true,
+                      message: error.response.data.message,
+                    });
+                  }
+                }}
+                className="rounded-full border border-transparent bg-transparent p-1 text-warning-600 hover:border-gray-300 hover:text-warning-500"
+                aria-label="Delete feature"
+              >
+                <FaPencilAlt className="text-xl" />
+              </button>
+            </div>
+          </div>
+        )}
         <CardHeader className="flex gap-3">
           <SiTask className="text-lg" />
           <div className="flex flex-col">

@@ -1,14 +1,16 @@
 import {
-  FeaureSchema,
+  EditFeatureShema,
+  FeatureSchema,
   featureSchema,
 } from "@/utils/validations/featureValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { TagsInput } from "../tag_input/tag_input";
 import { FeatureSelection } from "@/db/schemes/featureSchema";
+import _ from "lodash";
 
 import {
   Modal,
@@ -36,6 +38,8 @@ export const AddFeatureModal = ({
   projectId,
   pushNewFeature,
   setMessageRes,
+  featureToEdit,
+  updateFeature,
 }: {
   isOpen: boolean;
   projectId: number;
@@ -43,15 +47,31 @@ export const AddFeatureModal = ({
   currentFeatures: FeatureSelection[];
   pushNewFeature: (feature: FeatureSelection) => void;
   setMessageRes: (res: MessageRes) => void;
+  featureToEdit: FeatureSchema | null;
+  updateFeature: (feature: FeatureSelection) => void;
 }) => {
   const getHighestOrder = () =>
     currentFeatures.reduce((max, feature) => Math.max(max, feature.order), 0);
+  const [tags, setTags] = useState<string[]>([]);
 
-  const { control, handleSubmit } = useForm<FeaureSchema>({
-    defaultValues: { order: getHighestOrder() + 1, projectId: projectId },
+  const { control, handleSubmit, reset } = useForm<FeatureSchema>({
     resolver: zodResolver(featureSchema),
   });
-  const [tags, setTags] = useState<string[]>([]);
+  useEffect(() => {
+    let formDefaultValues = featureToEdit
+      ? { ...featureToEdit, tag: featureToEdit.tag ?? [] }
+      : {
+          order: getHighestOrder() + 1,
+          projectId: projectId,
+          featureName: "",
+          description: "",
+          startDate: "",
+          endDate: "",
+          tags: [],
+        };
+    featureToEdit ? setTags(featureToEdit.tag ?? []) : setTags([]);
+    reset(formDefaultValues);
+  }, [isOpen, featureToEdit, reset]);
   const [isLoading, setIsLoading] = useState(false);
 
   const onSettingTags = (myTags: string[], field: ControllerRenderProps) => {
@@ -59,25 +79,48 @@ export const AddFeatureModal = ({
     field.onChange(myTags);
   };
   type TypeSubmit = {
-    data: FeaureSchema;
+    data: FeatureSchema;
     onClose: () => void;
   };
+  function findDifferences(
+    newData: FeatureSchema,
+    initalValues: FeatureSchema,
+  ) {
+    const differences: any = {};
+    Object.keys(newData).forEach((key) => {
+      const typedKey = key as keyof EditFeatureShema;
+      if (!_.isEqual(initalValues[typedKey], newData[typedKey])) {
+        differences[typedKey] = newData[typedKey];
+      }
+      differences["id"] = initalValues.id!;
+      differences["projectId"] = initalValues.projectId!;
+    });
+    return differences;
+  }
 
   const onSubmit: SubmitHandler<TypeSubmit> = async ({ data, onClose }) => {
     try {
+      let res;
       setIsLoading(true);
-      const res = await axios.post(ApiRouter.features, data);
-      const newFeature: FeatureSelection = {
-        id: res.data.featureId,
-        projectId: data.projectId,
-        order: data.order,
-        featureName: data.featureName,
-        description: data.description ?? "",
-        tags: data.tag?.join(";") ?? "",
-        startDate: data.timePeriod.startDate ?? null,
-        endDate: data.timePeriod.endDate ?? null,
-      };
-      pushNewFeature(newFeature);
+      if (featureToEdit) {
+        const diff = findDifferences(data, featureToEdit);
+        res = await axios.patch(ApiRouter.features, diff);
+        console.log(res.data.data);
+        updateFeature({ ...res.data.data });
+      } else {
+        res = await axios.post(ApiRouter.features, data);
+        const newFeature: FeatureSelection = {
+          id: res.data.featureId,
+          projectId: data.projectId,
+          order: data.order,
+          featureName: data.featureName,
+          description: data.description ?? "",
+          tags: data.tag?.join(";") ?? "",
+          startDate: data.timePeriod.startDate ?? null,
+          endDate: data.timePeriod.endDate ?? null,
+        };
+        pushNewFeature(newFeature);
+      }
       setMessageRes({ isError: false, message: res.data.message });
       onClose();
     } catch (error: any) {
@@ -224,8 +267,12 @@ export const AddFeatureModal = ({
                   <Button color="danger" variant="flat" onPress={onClose}>
                     Close
                   </Button>
-                  <Button color="primary" type="submit" isLoading={isLoading}>
-                    Save
+                  <Button
+                    color={featureToEdit ? "warning" : "primary"}
+                    type="submit"
+                    isLoading={isLoading}
+                  >
+                    {featureToEdit ? "Update" : "Save"}
                   </Button>
                 </ModalFooter>
               </form>

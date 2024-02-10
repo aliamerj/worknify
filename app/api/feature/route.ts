@@ -2,7 +2,8 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
 import {
-  featureDeleteSchema,
+  editFeatureSchema,
+  deleteFeatureSchema,
   featureSchema,
 } from "@/utils/validations/featureValidation";
 import { databaseDrizzle } from "@/db/database";
@@ -27,13 +28,18 @@ export async function POST(request: NextRequest) {
   }
   const { featureName, order, description, tag, timePeriod, projectId } =
     validation.data;
-  const targetProject= await databaseDrizzle.select().from(project).where((p)=> and(eq(p.owner, session.user.id!), eq(p.id,projectId)));
-  if(!targetProject){
-      return NextResponse.json(
-      { state: false, message: "Only the owner of this project can add new feature" },
+  const targetProject = await databaseDrizzle
+    .select()
+    .from(project)
+    .where((p) => and(eq(p.owner, session.user.id!), eq(p.id, projectId)));
+  if (!targetProject) {
+    return NextResponse.json(
+      {
+        state: false,
+        message: "Only the owner of this project can add new feature",
+      },
       { status: 401 },
     );
-
   }
 
   const newFeature: FeatureInsertion = {
@@ -68,6 +74,69 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export async function PATCH(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user.id)
+    return NextResponse.json(
+      { state: false, message: "Not authenticated" },
+      { status: 401 },
+    );
+  const body = await request.json();
+  const validated = editFeatureSchema.safeParse(body);
+  if (!validated.success) {
+    return NextResponse.json(
+      { state: false, message: validated.error.format() },
+      { status: 400 },
+    );
+  }
+  const { id, projectId, featureName, description, timePeriod, tag } =
+    validated.data;
+  try {
+    const targetProject = await databaseDrizzle
+      .select()
+      .from(project)
+      .where((p) => and(eq(p.owner, session.user.id!), eq(p.id, projectId)));
+    if (!targetProject) {
+      return NextResponse.json(
+        {
+          state: false,
+          message: "Only the owner of this project can update new feature",
+        },
+        { status: 401 },
+      );
+    }
+
+    if (featureName || description || timePeriod || tag) {
+      const newFeature = await databaseDrizzle
+        .update(feature)
+        .set({
+          featureName,
+          description,
+          tags: tag?.join(";"),
+          startDate: timePeriod?.startDate,
+          endDate: timePeriod?.endDate,
+        })
+        .where(and(eq(feature.projectId, projectId), eq(feature.id, id)))
+        .returning()
+        .then((fea) => fea[0]);
+
+      return NextResponse.json(
+        {
+          state: true,
+          message: "Feature Updated successfully",
+          data: newFeature,
+        },
+        { status: 200 },
+      );
+    }
+  } catch (error: any) {
+    return NextResponse.json(
+      { state: false, message: error.message },
+      { status: 500 },
+    );
+  }
+}
+
 export async function DELETE(request: NextResponse) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user.id)
@@ -76,7 +145,7 @@ export async function DELETE(request: NextResponse) {
       { status: 401 },
     );
   const body = await request.json();
-  const validation = featureDeleteSchema.safeParse(body);
+  const validation = deleteFeatureSchema.safeParse(body);
   if (!validation.success) {
     return NextResponse.json(
       { state: false, message: validation.error.format() },
