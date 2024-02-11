@@ -1,7 +1,7 @@
 import { databaseDrizzle } from "@/db/database";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { Sidebar } from "../_component/left_slider/side_bar";
+import { TaskMangementPage } from "../_component/task_mangement_page/task_mangement_page";
 
 interface Props {
   params: { projectId: string };
@@ -18,9 +18,14 @@ export default async function DashboardPage({ params }: Props) {
   const isOwner = session?.user.id === project?.owner;
 
   return (
-    <div>
-      <Sidebar currentFeatures={features} projectId={id} isOwner={isOwner} />
-      <h1>hello word, {params.projectId}</h1>
-    </div>
+    <TaskMangementPage
+      features={features}
+      projectId={id}
+      isOwner={isOwner}
+      projectName={project?.name!}
+      projectComplation={project?.compilation!}
+      projectGoal={project?.projectGoal!}
+      projectLogo={project?.logo ?? undefined}
+    />
   );
 }
