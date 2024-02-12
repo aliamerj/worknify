@@ -46,8 +46,15 @@ export const Sidebar = ({
   const setFeatureToUpdate = (feature: FeatureSchema | null) =>
     setFeatureValues(feature);
 
-  const sidebarClasses = isSidebarOpen ? "w-96" : "w-16";
-  const contentClasses = isSidebarOpen ? "opacity-100" : "opacity-0";
+  const sidebarClasses = isSidebarOpen
+    ? "w-96 opacity-100"
+    : "w-16 opacity-100";
+  const contentTransitionClasses =
+    "transition-opacity duration-300 ease-in-out";
+  const contentVisibilityClasses = isSidebarOpen
+    ? "opacity-100 visible"
+    : "opacity-0 invisible";
+  const contentDelayClasses = isSidebarOpen ? "delay-300" : "delay-0";
   return (
     <>
       <div
@@ -55,9 +62,9 @@ export const Sidebar = ({
       >
         <div className="relative flex h-full">
           <div
-            className={`flex w-96 flex-col items-center  py-4 transition-opacity duration-500 ease-in-out ${contentClasses}`}
+            className={`flex w-96 flex-col items-center py-4 ${contentTransitionClasses} ${contentVisibilityClasses} ${contentDelayClasses}`}
           >
-            <div className="flex w-full items-center justify-evenly py-4 text-2xl font-bold">
+            <div className="flex w-full items-center justify-evenly py-4 text-2xl font-bold text-white">
               <h1 className="text-white">App Features</h1>
               <Tooltip
                 placement="right-end"

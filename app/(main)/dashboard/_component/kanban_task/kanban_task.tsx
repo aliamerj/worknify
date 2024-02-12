@@ -20,22 +20,22 @@ type ColumnStyles = {
 const columnStyles: ColumnStyles = {
   New: {
     icon: AiOutlinePlusCircle,
-    bgColor: "bg-blue-100",
-    textColor: "text-blue-800",
+    bgColor: "bg-secondary",
+    textColor: "text-secondary-100",
   },
   "In Progress": {
     icon: AiOutlineSync,
-    bgColor: "bg-yellow-100",
+    bgColor: "bg-warning-300",
     textColor: "text-yellow-800",
   },
   "Ready to Test": {
     icon: AiOutlineExperiment,
-    bgColor: "bg-orange-100",
+    bgColor: "bg-danger-300",
     textColor: "text-orange-800",
   },
   Done: {
     icon: AiOutlineCheckCircle,
-    bgColor: "bg-green-100",
+    bgColor: "bg-success-300",
     textColor: "text-green-800",
   },
 };
