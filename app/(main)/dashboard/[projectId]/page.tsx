@@ -2,11 +2,13 @@ import { databaseDrizzle } from "@/db/database";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { TaskMangementPage } from "../_component/task_mangement_page/task_mangement_page";
+import { parseInt } from "lodash";
 
 interface Props {
   params: { projectId: string };
+  searchParams: { feature?: string };
 }
-export default async function DashboardPage({ params }: Props) {
+export default async function DashboardPage({ params, searchParams }: Props) {
   const session = await getServerSession(authOptions);
   const id = parseInt(params.projectId);
   const features = await databaseDrizzle.query.feature.findMany({
@@ -19,6 +21,7 @@ export default async function DashboardPage({ params }: Props) {
 
   return (
     <TaskMangementPage
+      selectedFeatureId={searchParams.feature}
       features={features}
       projectId={id}
       isOwner={isOwner}

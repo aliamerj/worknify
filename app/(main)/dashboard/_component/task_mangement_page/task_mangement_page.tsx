@@ -2,11 +2,7 @@
 import { FeatureSelection } from "@/db/schemes/featureSchema";
 import { Sidebar } from "../left_slider/side_bar";
 import { useEffect, useRef, useState } from "react";
-import {
-  AiOutlineArrowLeft,
-  AiOutlineBulb,
-  AiOutlineProject,
-} from "react-icons/ai";
+import { AiOutlineProject } from "react-icons/ai";
 import { Progress, Spinner } from "@nextui-org/react";
 import Image from "next/image";
 import {
@@ -16,10 +12,14 @@ import {
 } from "@hello-pangea/dnd";
 import { ReorderFeatureSchema } from "@/utils/validations/featureValidation";
 import axios from "axios";
-import { ApiRouter } from "@/utils/router/app_router";
+import { ApiRouter, AppRouter } from "@/utils/router/app_router";
 import { SideErrorMessage } from "@/global-components/side_error_message/side_error_message";
-import { MessageRes } from "../../hooks/useMessage";
+import { useMessage } from "../../hooks/useMessage";
 import { useFeatures } from "../../hooks/useFeatures";
+import { useRouter } from "next/navigation";
+import { EmptyBoardFeature } from "../empty_board_feature/empty_board_feature";
+import { FaLightbulb } from "react-icons/fa";
+import { BoardFeature } from "../board_feature/board_feature";
 
 export enum DroppableIds {
   featuresList = "FEATURE_LIST",
@@ -34,6 +34,7 @@ interface ITaskMangementPage {
   projectGoal: string;
   projectComplation: number;
   projectLogo?: string;
+  selectedFeatureId?: string;
 }
 
 export const TaskMangementPage = ({
@@ -44,7 +45,9 @@ export const TaskMangementPage = ({
   projectGoal,
   projectComplation,
   projectLogo,
+  selectedFeatureId,
 }: ITaskMangementPage) => {
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const {
     features: currentFeatures,
@@ -53,15 +56,11 @@ export const TaskMangementPage = ({
     updateFeature,
     updateFeatureOrder,
   } = useFeatures(features);
+  const { message, setMessageRes } = useMessage();
   const [newFeatureOrder, setNewFeatureOrder] =
     useState<ReorderFeatureSchema>();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<MessageRes | null>(null);
-  const setMessageRes = (res: MessageRes) => {
-    setMessage(res);
-    setTimeout(() => setMessage(null), 5000);
-  };
 
   const handleToggleSidebar = () => setIsSidebarOpen((current) => !current);
 
@@ -109,6 +108,9 @@ export const TaskMangementPage = ({
   };
 
   const handleShowDetailsDrop = (featureId: string) => {
+    const query = featureId ? `?feature=${featureId}` : "";
+    router.push(AppRouter.dashboardPage + projectId + query);
+
     console.log(`Show details for feature ${featureId}`);
   };
 
@@ -138,6 +140,10 @@ export const TaskMangementPage = ({
       }
     }
   }, [newFeatureOrder, setNewFeatureOrder]);
+  // selected Feature
+  const selectedFeature = features.find(
+    (f) => f.id === parseInt(selectedFeatureId ?? ""),
+  );
 
   return (
     <>
@@ -168,7 +174,7 @@ export const TaskMangementPage = ({
                     alt={`${projectName} logo`}
                     layout="fill"
                     objectFit="cover"
-                    className="rounded-full"
+                    className="rounded-md"
                   />
                 </div>
               ) : (
@@ -176,8 +182,8 @@ export const TaskMangementPage = ({
               )}
               <h1 className="text-3xl font-semibold">{projectName}</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <AiOutlineBulb className="text-2xl text-warning" />
+            <div className="flex items-center space-x-4 pl-5">
+              <FaLightbulb className="text-2xl text-warning" />
               <p className="text-xl text-gray-600">{projectGoal}</p>
             </div>
             <div className="py-4">
@@ -192,26 +198,17 @@ export const TaskMangementPage = ({
               />
             </div>
             <Droppable droppableId={DroppableIds.featuresDisplayer}>
-              {(provided) => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-400 p-10"
-                  style={{
-                    height: "calc(100vh - 260px)",
-                  }}
-                >
-                  <div className="flex items-center justify-center space-x-2 text-lg text-gray-600">
-                    <AiOutlineArrowLeft className="text-xl font-bold text-primary" />
-                    <p>Drop feature card to explore the dashboard</p>
-                  </div>
-
-                  <p className="text-sm text-gray-500">
-                    Discover detailed insights and more...
-                  </p>
-                  {provided.placeholder}
-                </div>
-              )}
+              {(provided, snap) =>
+                !selectedFeature ? (
+                  <EmptyBoardFeature provided={provided} />
+                ) : (
+                  <BoardFeature
+                    provided={provided}
+                    feature={selectedFeature}
+                    isDraggingOver={snap.isDraggingOver}
+                  />
+                )
+              }
             </Droppable>
           </div>
         </DragDropContext>
