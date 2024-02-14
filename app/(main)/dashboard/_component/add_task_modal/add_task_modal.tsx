@@ -1,15 +1,8 @@
-import {
-  EditFeatureShema,
-  FeatureSchema,
-  featureSchema,
-} from "@/utils/validations/featureValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { TagsInput } from "../tag_input/tag_input";
-import { FeatureSelection } from "@/db/schemes/featureSchema";
 import _ from "lodash";
 
 import {
@@ -21,79 +14,76 @@ import {
   Button,
   Input,
   Textarea,
+  Autocomplete,
+  AutocompleteItem,
+  Avatar,
 } from "@nextui-org/react";
-import {
-  Controller,
-  ControllerRenderProps,
-  SubmitHandler,
-} from "react-hook-form";
+import { Controller, SubmitHandler } from "react-hook-form";
 import axios from "axios";
 import { ApiRouter } from "@/utils/router/app_router";
 import { MessageRes } from "../../hooks/useMessage";
+import { TaskSelection } from "@/db/schemes/taskSchema";
+import {
+  EditTaskShema,
+  TaskSchema,
+  taskSchema,
+} from "@/utils/validations/taskValidation";
+import { DevInfo } from "../../[projectId]/page";
 
-export const AddFeatureModal = ({
+export const AddTaskModal = ({
   isOpen,
   onOpenChange,
-  currentFeatures,
-  projectId,
-  pushNewFeature,
+  currentNewTask,
+  featureId,
+  pushNewTask,
   setMessageRes,
-  featureToEdit,
+  taskToEdit,
   updateFeature,
+  devInfo,
 }: {
   isOpen: boolean;
-  projectId: number;
+  featureId: number;
   onOpenChange: () => void;
-  currentFeatures: FeatureSelection[];
-  pushNewFeature: (feature: FeatureSelection) => void;
+  currentNewTask: TaskSelection[];
+  pushNewTask: (task: TaskSelection) => void;
   setMessageRes: (res: MessageRes) => void;
-  featureToEdit: FeatureSchema | null;
-  updateFeature: (feature: FeatureSelection) => void;
+  taskToEdit: TaskSchema | null;
+  updateFeature: (feature: TaskSelection) => void;
+  devInfo: DevInfo[];
 }) => {
   const getHighestOrder = () =>
-    currentFeatures.reduce((max, feature) => Math.max(max, feature.order), 0);
-  const [tags, setTags] = useState<string[]>([]);
+    currentNewTask.reduce((max, feature) => Math.max(max, feature.order), 0);
 
-  const { control, handleSubmit, reset } = useForm<FeatureSchema>({
-    resolver: zodResolver(featureSchema),
+  const { control, handleSubmit, reset } = useForm<TaskSchema>({
+    defaultValues: { status: "New" },
+    resolver: zodResolver(taskSchema),
   });
   useEffect(() => {
-    let formDefaultValues = featureToEdit
-      ? { ...featureToEdit, tag: featureToEdit.tag ?? [] }
-      : {
-          order: getHighestOrder() + 1,
-          projectId: projectId,
-          featureName: "",
-          description: "",
-          startDate: "",
-          endDate: "",
-          tags: [],
-        };
-    featureToEdit ? setTags(featureToEdit.tag ?? []) : setTags([]);
+    let formDefaultValues = taskToEdit ?? {
+      order: getHighestOrder() + 1,
+      featureId: featureId,
+      featureName: "",
+      description: "",
+      startDate: "",
+      endDate: "",
+    };
     reset(formDefaultValues);
-  }, [isOpen, featureToEdit, reset]);
+  }, [isOpen, taskToEdit, reset]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const onSettingTags = (myTags: string[], field: ControllerRenderProps) => {
-    setTags(myTags);
-    field.onChange(myTags);
-  };
   type TypeSubmit = {
-    data: FeatureSchema;
+    data: TaskSchema;
     onClose: () => void;
   };
-  function findDifferences(
-    newData: FeatureSchema,
-    initalValues: FeatureSchema,
-  ) {
+  function findDifferences(newData: TaskSchema, initalValues: TaskSchema) {
     const differences: any = {};
     Object.keys(newData).forEach((key) => {
-      const typedKey = key as keyof EditFeatureShema;
+      const typedKey = key as keyof EditTaskShema;
       if (!_.isEqual(initalValues[typedKey], newData[typedKey])) {
         differences[typedKey] = newData[typedKey];
       }
       differences["id"] = initalValues.id!;
-      differences["projectId"] = initalValues.projectId!;
+      differences["featureId"] = initalValues.featureId!;
     });
     return differences;
   }
@@ -102,24 +92,25 @@ export const AddFeatureModal = ({
     try {
       let res;
       setIsLoading(true);
-      if (featureToEdit) {
-        const diff = findDifferences(data, featureToEdit);
+      if (taskToEdit) {
+        const diff = findDifferences(data, taskToEdit);
         res = await axios.patch(ApiRouter.features, diff);
         console.log(res.data.data);
         updateFeature({ ...res.data.data });
       } else {
         res = await axios.post(ApiRouter.features, data);
-        const newFeature: FeatureSelection = {
+        const newTask: TaskSelection = {
           id: res.data.featureId,
-          projectId: data.projectId,
+          AssignedTo: data.AssignedTo,
+          featureId: data.featureId,
           order: data.order,
-          featureName: data.featureName,
+          name: data.name,
           description: data.description ?? "",
-          tags: data.tag?.join(";") ?? "",
+          status: "New",
           startDate: data.timePeriod.startDate ?? null,
           endDate: data.timePeriod.endDate ?? null,
         };
-        pushNewFeature(newFeature);
+        pushNewTask(newTask);
       }
       setMessageRes({ isError: false, message: res.data.message });
       onClose();
@@ -138,9 +129,9 @@ export const AddFeatureModal = ({
         className="bg-white"
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        backdrop="blur"
+        backdrop="opaque"
         placement="top-center"
-        size="2xl"
+        size="md"
       >
         <ModalContent>
           {(onClose) => (
@@ -150,11 +141,11 @@ export const AddFeatureModal = ({
                 className="space-y-6"
               >
                 <ModalHeader className="flex flex-col gap-1">
-                  Add new Feature to your app
+                  New Task
                 </ModalHeader>
                 <ModalBody>
                   <Controller
-                    name="featureName"
+                    name="name"
                     control={control}
                     render={({ field, fieldState: { error } }) => (
                       <Input
@@ -190,20 +181,46 @@ export const AddFeatureModal = ({
                     )}
                   />
                   <Controller
-                    name="tag"
+                    name="AssignedTo"
                     control={control}
                     render={({ field, fieldState: { error } }) => (
-                      <div className="w-full">
-                        <TagsInput
-                          tags={tags}
-                          error={error}
-                          onSettingTags={(mytags) =>
-                            onSettingTags(mytags, { ...field })
-                          }
-                        />
-                      </div>
+                      <Autocomplete
+                        defaultItems={devInfo}
+                        variant="bordered"
+                        label="Assigned to"
+                        placeholder="Select a dev"
+                        labelPlacement="inside"
+                        className="w-full"
+                        size="sm"
+                      >
+                        {(devInfo) => (
+                          <AutocompleteItem
+                            key={devInfo.id}
+                            textValue={devInfo.name}
+                            color="primary"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Avatar
+                                alt={devInfo.name}
+                                className="flex-shrink-0"
+                                size="sm"
+                                src={devInfo.image}
+                              />
+                              <div className="flex flex-col">
+                                <span className="text-small">
+                                  {devInfo.name}
+                                </span>
+                                <span className="text-tiny">
+                                  {devInfo.email}
+                                </span>
+                              </div>
+                            </div>
+                          </AutocompleteItem>
+                        )}
+                      </Autocomplete>
                     )}
                   />
+
                   <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div className="flex flex-col">
                       <Controller
@@ -268,11 +285,11 @@ export const AddFeatureModal = ({
                     Close
                   </Button>
                   <Button
-                    color={featureToEdit ? "warning" : "primary"}
+                    color={taskToEdit ? "warning" : "primary"}
                     type="submit"
                     isLoading={isLoading}
                   >
-                    {featureToEdit ? "Update" : "Save"}
+                    {taskToEdit ? "Update" : "Save"}
                   </Button>
                 </ModalFooter>
               </form>

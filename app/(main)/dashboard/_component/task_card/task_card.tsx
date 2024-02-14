@@ -14,7 +14,7 @@ export const TaskCard = ({
       ref={provided.innerRef}
       {...provided.draggableProps}
       {...provided.dragHandleProps}
-      className="space-y-1 rounded bg-white p-2 shadow"
+      className="mb-2 space-y-1 rounded bg-white p-3 shadow"
     >
       <h4 className="text-md font-bold">{task.name}</h4>
       <p className="text-sm text-gray-600">{task.description}</p>

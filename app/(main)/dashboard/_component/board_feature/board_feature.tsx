@@ -11,69 +11,47 @@ import {
 } from "react-icons/ai";
 import { DroppableArea } from "../droppable_area/droppable_area";
 import { KanbanTask } from "../kanban_task/kanban_task";
-
-export type ColumnId = "New" | "In Progress" | "Ready to Test" | "Done";
-export interface Task {
-  id: string;
-  name: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  status: ColumnId;
-  assignedTo: string;
-}
-
-const mockTasks: Task[] = [
-  {
-    id: "task-1",
-    name: "Design the user interface",
-    description:
-      "Create wireframes and high-fidelity designs for the new feature.",
-    startDate: "2021-09-01",
-    endDate: "2021-09-10",
-    status: "New",
-    assignedTo: "Alice",
-  },
-  {
-    id: "task-2",
-    name: "Implement feature X",
-    description: "Develop the backend and frontend components for feature X.",
-    startDate: "2021-09-05",
-    endDate: "2021-09-20",
-    status: "In Progress",
-    assignedTo: "Bob",
-  },
-  {
-    id: "task-3",
-    name: "Write unit tests",
-    description:
-      "Cover all new functionality with unit tests to ensure reliability.",
-    startDate: "2021-09-15",
-    endDate: "2021-09-25",
-    status: "Ready to Test",
-    assignedTo: "Charlie",
-  },
-  {
-    id: "task-4",
-    name: "Deploy to staging",
-    description:
-      "Deploy the latest build to the staging environment for testing.",
-    startDate: "2021-09-26",
-    endDate: "2021-09-30",
-    status: "Done",
-    assignedTo: "Dave",
-  },
-];
+import { Button, useDisclosure } from "@nextui-org/react";
+import { useState } from "react";
+import { TaskSchema } from "@/utils/validations/taskValidation";
+import { AddTaskModal } from "../add_task_modal/add_task_modal";
+import { ColumnId, TaskSelection } from "@/db/schemes/taskSchema";
+import { useTaskColumns } from "../../hooks/useTasks";
+import { useMessage } from "../../hooks/useMessage";
+import { DevInfo } from "../../[projectId]/page";
 
 export const BoardFeature = ({
   provided,
   feature,
   isDraggingOver,
+  devInfo,
 }: {
   provided: DroppableProvided;
   feature: FeatureSelection;
   isDraggingOver: boolean;
+  devInfo: DevInfo[];
 }) => {
+  const tasks: TaskSelection[] = [];
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [taskValues, setTaskValues] = useState<TaskSchema | null>(null);
+  const initialColumns: Record<ColumnId, TaskSelection[]> = {
+    New: [],
+    "In Progress": [],
+    "Ready to Test": [],
+    Done: [],
+  };
+  const columns: Record<ColumnId, TaskSelection[]> = tasks.reduce(
+    (acc, task) => {
+      acc[task.status].push(task);
+      return acc;
+    },
+    initialColumns,
+  );
+  const { taskColumn, updateTaskOrder, pushTask, updateTask } =
+    useTaskColumns(columns);
+  const { message, setMessageRes } = useMessage();
+
+  const setTaskToUpdate = (task: TaskSchema | null) => setTaskValues(task);
   return (
     <div
       {...provided.droppableProps}
@@ -114,8 +92,32 @@ export const BoardFeature = ({
             {feature.endDate ? formatDate(feature.endDate) : "N/A"}
           </span>
         </div>
+        <div className="mt-5">
+          <Button
+            color="primary"
+            variant="shadow"
+            size="lg"
+            onPress={(_) => {
+              setTaskToUpdate(null);
+              onOpen();
+            }}
+          >
+            Create New Feature
+          </Button>
+        </div>
       </div>
-      <KanbanTask tasks={mockTasks} />
+      <KanbanTask taskColumn={taskColumn} updateTaskOrder={updateTaskOrder} />
+      <AddTaskModal
+        taskToEdit={taskValues}
+        isOpen={isOpen}
+        featureId={feature.id}
+        onOpenChange={onOpenChange}
+        currentNewTask={[]}
+        pushNewTask={pushTask}
+        updateFeature={updateTask}
+        setMessageRes={setMessageRes}
+        devInfo={devInfo}
+      />
     </div>
   );
 };

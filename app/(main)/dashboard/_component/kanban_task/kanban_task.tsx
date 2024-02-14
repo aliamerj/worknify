@@ -1,4 +1,9 @@
-import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  OnDragEndResponder,
+} from "@hello-pangea/dnd";
 import { IconType } from "react-icons";
 import {
   AiOutlineCheckCircle,
@@ -7,7 +12,8 @@ import {
   AiOutlineSync,
 } from "react-icons/ai";
 import { TaskCard } from "../task_card/task_card";
-import { ColumnId, Task } from "../board_feature/board_feature";
+import { ColumnsTask, useTaskColumns } from "../../hooks/useTasks";
+import { ColumnId, TaskSelection } from "@/db/schemes/taskSchema";
 
 type ColumnStyles = {
   [key in ColumnId]: {
@@ -39,26 +45,82 @@ const columnStyles: ColumnStyles = {
     textColor: "text-green-800",
   },
 };
-export const KanbanTask = ({ tasks }: { tasks: Task[] }) => {
-  const initialColumns: Record<ColumnId, Task[]> = {
-    New: [],
-    "In Progress": [],
-    "Ready to Test": [],
-    Done: [],
-  };
-  const columns: Record<ColumnId, Task[]> = tasks.reduce((acc, task) => {
-    acc[task.status].push(task);
-    return acc;
-  }, initialColumns);
+export const KanbanTask = ({
+  updateTaskOrder,
+  taskColumn,
+}: {
+  updateTaskOrder: (columnsTask: ColumnsTask) => void;
+  taskColumn: ColumnsTask;
+}) => {
+  const onDragEnd: OnDragEndResponder = (result) => {
+    const { source, destination } = result;
 
-  const onDragEnd = (result: any) => {
-    /* Implement based on your app's needs */
+    // if the task is dropped outside a droppable area
+    if (!destination) return;
+
+    const startColumnId = source.droppableId as ColumnId;
+    const finishColumnId = destination.droppableId as ColumnId;
+
+    const startColumn = taskColumn[startColumnId];
+    const finishColumn = taskColumn[finishColumnId];
+
+    // Reordering within the same column
+    if (startColumnId === finishColumnId) {
+      const newTasks = Array.from(startColumn);
+      const [removedTask] = newTasks.splice(source.index, 1);
+      newTasks.splice(destination.index, 0, removedTask);
+
+      // Update the order property based on the task's new index
+      const updatedTasks = newTasks.map((task, index) => ({
+        ...task,
+        order: index,
+      }));
+      updateTaskOrder({
+        ...taskColumn,
+        [startColumnId]: updatedTasks,
+      });
+      // Optionally, send update to the backend
+      // updateTasksInDatabase(startColumnId, updatedTasks);
+    } else {
+      // Moving from one column to another
+      const startTasks = Array.from(startColumn);
+      const finishTasks = Array.from(finishColumn);
+      const [removedTask] = startTasks.splice(source.index, 1);
+
+      // Update the removed task's status and reset its order
+      const updatedRemovedTask = {
+        ...removedTask,
+        status: finishColumnId,
+        order: destination.index,
+      };
+      finishTasks.splice(destination.index, 0, updatedRemovedTask);
+
+      // Update the order property for both start and finish column tasks
+      const updatedStartTasks = startTasks.map((task, index) => ({
+        ...task,
+        order: index,
+      }));
+      const updatedFinishTasks = finishTasks.map((task, index) => ({
+        ...task,
+        order: index,
+      }));
+
+      updateTaskOrder({
+        ...taskColumn,
+        [startColumnId]: updatedStartTasks,
+        [finishColumnId]: updatedFinishTasks,
+      });
+
+      // Optionally, send updates to the backend
+      // updateTasksInDatabase(startColumnId, updatedStartTasks);
+      //updateTasksInDatabase(finishColumnId, updatedFinishTasks);
+    }
   };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="flex flex-wrap justify-between gap-4">
-        {Object.entries(columns).map(([columnId, tasks]) => {
+        {Object.entries(taskColumn).map(([columnId, tasks]) => {
           const {
             icon: ColumnIcon,
             bgColor,
@@ -73,7 +135,7 @@ export const KanbanTask = ({ tasks }: { tasks: Task[] }) => {
                   className={`${bgColor} w-full min-w-80 rounded p-4 shadow  lg:w-1/5`}
                 >
                   <div
-                    className={`font-semibold ${textColor} flex items-center gap-2 pb-2`}
+                    className={`font-semibold ${textColor} flex items-center gap-4 pb-2`}
                   >
                     <ColumnIcon className="text-2xl" />
                     <h3>{columnId}</h3>
@@ -81,7 +143,7 @@ export const KanbanTask = ({ tasks }: { tasks: Task[] }) => {
                   {tasks.map((task, index) => (
                     <Draggable
                       key={task.id}
-                      draggableId={task.id}
+                      draggableId={task.id.toString()}
                       index={index}
                     >
                       {(provided) => (

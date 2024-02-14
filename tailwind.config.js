@@ -52,8 +52,8 @@ const config = {
               foreground: "#E4EBF3",
             },
             content1: {
-              DEFAULT: "#040E32",
-              foreground: "#fff",
+              DEFAULT: "#ebebed",
+              foreground: "#040E32",
             },
             content2: {
               DEFAULT: "#9BBEC8",

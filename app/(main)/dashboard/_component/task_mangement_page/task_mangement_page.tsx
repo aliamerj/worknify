@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { EmptyBoardFeature } from "../empty_board_feature/empty_board_feature";
 import { FaLightbulb } from "react-icons/fa";
 import { BoardFeature } from "../board_feature/board_feature";
+import { DevInfo } from "../../[projectId]/page";
 
 export enum DroppableIds {
   featuresList = "FEATURE_LIST",
@@ -33,8 +34,9 @@ interface ITaskMangementPage {
   projectName: string;
   projectGoal: string;
   projectComplation: number;
-  projectLogo?: string;
+  projectLogo: string | null;
   selectedFeatureId?: string;
+  devsInfo: DevInfo[];
 }
 
 export const TaskMangementPage = ({
@@ -46,6 +48,7 @@ export const TaskMangementPage = ({
   projectComplation,
   projectLogo,
   selectedFeatureId,
+  devsInfo,
 }: ITaskMangementPage) => {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -69,6 +72,11 @@ export const TaskMangementPage = ({
   };
 
   const handleOnDragEnd: OnDragEndResponder = (result) => {
+    if (!isOwner)
+      return setMessageRes({
+        isError: true,
+        message: "Only The Creator of this project can Reorder the features ",
+      });
     if (!result.destination) return;
     const { droppableId } = result.destination;
     if (droppableId === DroppableIds.featuresDisplayer) {
@@ -206,6 +214,7 @@ export const TaskMangementPage = ({
                     provided={provided}
                     feature={selectedFeature}
                     isDraggingOver={snap.isDraggingOver}
+                    devInfo={devsInfo}
                   />
                 )
               }
