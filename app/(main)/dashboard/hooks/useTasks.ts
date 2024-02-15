@@ -7,9 +7,12 @@ export type ColumnsTask = Record<ColumnId, TaskSelection[]>;
 export const useTaskColumns = (initialTask: ColumnsTask) => {
   const [taskColumn, setTaskColumn] = useState<ColumnsTask>(initialTask);
 
-  const pushTask = useCallback((task: TaskSelection) => {
-  setTaskColumn((current)=> ({...current, new:[...current.New,task]}))
-  }, []);
+ const pushTask = useCallback((task: TaskSelection) => {
+setTaskColumn(prev => ({
+  ...prev,
+  [task.status]: [...prev[task.status], task],
+}));
+}, []);
 
   const removeTask = useCallback((id: number, columnId:ColumnId) => {
     setTaskColumn((current) => {

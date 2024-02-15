@@ -29,49 +29,43 @@ import {
 } from "react-hook-form";
 import axios from "axios";
 import { ApiRouter } from "@/utils/router/app_router";
-import { MessageRes } from "../../hooks/useMessage";
+import { useDashboardContext } from "../../context/context_dashboard";
+import { useApiCallContext } from "@/utils/context/api_call_context";
 
 export const AddFeatureModal = ({
   isOpen,
   onOpenChange,
-  currentFeatures,
-  projectId,
-  pushNewFeature,
-  setMessageRes,
-  featureToEdit,
-  updateFeature,
 }: {
   isOpen: boolean;
-  projectId: number;
   onOpenChange: () => void;
-  currentFeatures: FeatureSelection[];
-  pushNewFeature: (feature: FeatureSelection) => void;
-  setMessageRes: (res: MessageRes) => void;
-  featureToEdit: FeatureSchema | null;
-  updateFeature: (feature: FeatureSelection) => void;
 }) => {
+  const { features, selectedFeatureToUpdate, project, featureActions } =
+    useDashboardContext();
+  const { setMessageRes } = useApiCallContext();
   const getHighestOrder = () =>
-    currentFeatures.reduce((max, feature) => Math.max(max, feature.order), 0);
+    features.reduce((max, feature) => Math.max(max, feature.order), 0);
   const [tags, setTags] = useState<string[]>([]);
 
   const { control, handleSubmit, reset } = useForm<FeatureSchema>({
     resolver: zodResolver(featureSchema),
   });
   useEffect(() => {
-    let formDefaultValues = featureToEdit
-      ? { ...featureToEdit, tag: featureToEdit.tag ?? [] }
+    let formDefaultValues = selectedFeatureToUpdate
+      ? { ...selectedFeatureToUpdate, tag: selectedFeatureToUpdate.tag ?? [] }
       : {
           order: getHighestOrder() + 1,
-          projectId: projectId,
+          projectId: project.id,
           featureName: "",
           description: "",
           startDate: "",
           endDate: "",
           tags: [],
         };
-    featureToEdit ? setTags(featureToEdit.tag ?? []) : setTags([]);
+    selectedFeatureToUpdate
+      ? setTags(selectedFeatureToUpdate.tag ?? [])
+      : setTags([]);
     reset(formDefaultValues);
-  }, [isOpen, featureToEdit, reset]);
+  }, [isOpen, selectedFeatureToUpdate, reset]);
   const [isLoading, setIsLoading] = useState(false);
 
   const onSettingTags = (myTags: string[], field: ControllerRenderProps) => {
@@ -102,11 +96,11 @@ export const AddFeatureModal = ({
     try {
       let res;
       setIsLoading(true);
-      if (featureToEdit) {
-        const diff = findDifferences(data, featureToEdit);
+      if (selectedFeatureToUpdate) {
+        const diff = findDifferences(data, selectedFeatureToUpdate);
         res = await axios.patch(ApiRouter.features, diff);
         console.log(res.data.data);
-        updateFeature({ ...res.data.data });
+        featureActions.updateFeature({ ...res.data.data });
       } else {
         res = await axios.post(ApiRouter.features, data);
         const newFeature: FeatureSelection = {
@@ -119,7 +113,7 @@ export const AddFeatureModal = ({
           startDate: data.timePeriod.startDate ?? null,
           endDate: data.timePeriod.endDate ?? null,
         };
-        pushNewFeature(newFeature);
+        featureActions.pushFeature(newFeature);
       }
       setMessageRes({ isError: false, message: res.data.message });
       onClose();
@@ -268,11 +262,11 @@ export const AddFeatureModal = ({
                     Close
                   </Button>
                   <Button
-                    color={featureToEdit ? "warning" : "primary"}
+                    color={selectedFeatureToUpdate ? "warning" : "primary"}
                     type="submit"
                     isLoading={isLoading}
                   >
-                    {featureToEdit ? "Update" : "Save"}
+                    {selectedFeatureToUpdate ? "Update" : "Save"}
                   </Button>
                 </ModalFooter>
               </form>

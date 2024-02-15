@@ -6,25 +6,25 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { FeatureSelection } from "@/db/schemes/featureSchema";
 import axios from "axios";
 import { ApiRouter } from "@/utils/router/app_router";
-import { MessageRes } from "../left_slider/side_bar";
 import { FaPencilAlt } from "react-icons/fa";
-import { FeatureSchema } from "@/utils/validations/featureValidation";
+import { useDashboardContext } from "../../context/context_dashboard";
+import { useApiCallContext } from "@/utils/context/api_call_context";
+import { useCallback } from "react";
 
 export const FeaturesCard = ({
-  setFeatureToUpdate,
-  feature,
-  removeFeature,
-  setMessageRes,
-  isOwner,
   onOpen,
+  feature,
 }: {
-  feature: FeatureSelection;
-  isOwner: boolean;
-  setFeatureToUpdate: (feature: FeatureSchema) => void;
-  setMessageRes: (res: MessageRes) => void;
-  removeFeature: (id: number) => void;
   onOpen: () => void;
+  feature: FeatureSelection;
 }) => {
+  const { isOwner, featureActions, setSelectedFeatureToUpdate, tasks } =
+    useDashboardContext();
+  const { setMessageRes } = useApiCallContext();
+  const getTaskCount = useCallback(
+    () => tasks.filter((t) => t.featureId === feature.id).length,
+    [tasks],
+  );
   return (
     <>
       <Card className="group relative flex max-h-44 w-80 items-center rounded-lg bg-background p-2">
@@ -44,7 +44,7 @@ export const FeaturesCard = ({
                       isError: false,
                       message: res.data.message,
                     });
-                    removeFeature(feature.id);
+                    featureActions.removeFeature(feature.id);
                   } catch (error: any) {
                     setMessageRes({
                       isError: true,
@@ -60,7 +60,7 @@ export const FeaturesCard = ({
               <button
                 onClick={async () => {
                   try {
-                    setFeatureToUpdate({
+                    setSelectedFeatureToUpdate({
                       id: feature.id,
                       projectId: feature.projectId,
                       order: feature.order,
@@ -95,7 +95,7 @@ export const FeaturesCard = ({
             <div className="flex items-center justify-start">
               <p className="text-lg">{feature.featureName}</p>
               <span className="ms-3 inline-flex h-3 w-3 items-center justify-center rounded-full bg-blue-100 p-3 text-small font-medium text-blue-800">
-                0
+                {getTaskCount()}
               </span>
             </div>
             <p className="text-small text-default-500">

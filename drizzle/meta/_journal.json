@@ -113,6 +113,13 @@
       "when": 1707934940361,
       "tag": "0015_left_scarecrow",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1707996927444,
+      "tag": "0016_curly_machine_man",
+      "breakpoints": true
     }
   ]
 }

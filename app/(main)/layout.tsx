@@ -3,6 +3,7 @@ import { Rubik } from "next/font/google";
 import "../globals.css";
 import { Providers } from "../providers";
 import { NavBar } from "./components/navbar/Navbar";
+import { ApiCallProvider } from "@/utils/context/api_call_context";
 
 const rubik = Rubik({
   subsets: ["latin"],
@@ -23,8 +24,10 @@ export default function RootLayout({
     <html lang="en" className="light">
       <body className={rubik.className}>
         <Providers>
-          <NavBar />
-          {children}
+          <ApiCallProvider>
+            <NavBar />
+            {children}
+          </ApiCallProvider>
         </Providers>
       </body>
     </html>

@@ -12,8 +12,8 @@ import {
   AiOutlineSync,
 } from "react-icons/ai";
 import { TaskCard } from "../task_card/task_card";
-import { ColumnsTask, useTaskColumns } from "../../hooks/useTasks";
-import { ColumnId, TaskSelection } from "@/db/schemes/taskSchema";
+import { ColumnId } from "@/db/schemes/taskSchema";
+import { useDashboardContext } from "../../context/context_dashboard";
 
 type ColumnStyles = {
   [key in ColumnId]: {
@@ -45,13 +45,8 @@ const columnStyles: ColumnStyles = {
     textColor: "text-green-800",
   },
 };
-export const KanbanTask = ({
-  updateTaskOrder,
-  taskColumn,
-}: {
-  updateTaskOrder: (columnsTask: ColumnsTask) => void;
-  taskColumn: ColumnsTask;
-}) => {
+export const KanbanTask = ({ featureId }: { featureId: number }) => {
+  const { taskColumn, taskActions } = useDashboardContext();
   const onDragEnd: OnDragEndResponder = (result) => {
     const { source, destination } = result;
 
@@ -75,7 +70,7 @@ export const KanbanTask = ({
         ...task,
         order: index,
       }));
-      updateTaskOrder({
+      taskActions.updateTaskOrder({
         ...taskColumn,
         [startColumnId]: updatedTasks,
       });
@@ -105,7 +100,7 @@ export const KanbanTask = ({
         order: index,
       }));
 
-      updateTaskOrder({
+      taskActions.updateTaskOrder({
         ...taskColumn,
         [startColumnId]: updatedStartTasks,
         [finishColumnId]: updatedFinishTasks,
@@ -140,17 +135,20 @@ export const KanbanTask = ({
                     <ColumnIcon className="text-2xl" />
                     <h3>{columnId}</h3>
                   </div>
-                  {tasks.map((task, index) => (
-                    <Draggable
-                      key={task.id}
-                      draggableId={task.id.toString()}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <TaskCard task={task} provided={provided} />
-                      )}
-                    </Draggable>
-                  ))}
+                  {tasks.map(
+                    (task, index) =>
+                      task.featureId === featureId && (
+                        <Draggable
+                          key={task.id}
+                          draggableId={task.id.toString()}
+                          index={index}
+                        >
+                          {(provided) => (
+                            <TaskCard task={task} provided={provided} />
+                          )}
+                        </Draggable>
+                      ),
+                  )}
                   {provided.placeholder}
                 </div>
               )}

@@ -1,4 +1,3 @@
-import { FeatureSchema } from "@/utils/validations/featureValidation";
 import {
   Button,
   Divider,
@@ -7,44 +6,25 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { Droppable, Draggable } from "@hello-pangea/dnd";
-import { useState } from "react";
+
 import { IoMdAdd } from "react-icons/io";
 
 import { MdOutlineNavigateBefore, MdOutlineNavigateNext } from "react-icons/md";
 import { FeaturesCard } from "../feature_card/features_card";
 import { AddFeatureModal } from "../add_feature_modal/add_feature_modal";
-import { FeatureSelection } from "@/db/schemes/featureSchema";
-import { DroppableIds } from "../task_mangement_page/task_mangement_page";
-import { MessageRes } from "../../hooks/useMessage";
 
+import { DroppableIds } from "../task_mangement_page/task_mangement_page";
+import { useDashboardContext } from "../../context/context_dashboard";
 export const Sidebar = ({
-  isOwner,
-  projectId,
-  currentFeatures,
   isSidebarOpen,
   onOpenSidebar,
-  setMessageRes,
-  removeFeature,
-  pushNewFeature,
-  updateFeature,
 }: {
-  projectId: number;
-  isOwner: boolean;
-  currentFeatures: FeatureSelection[];
   isSidebarOpen: boolean;
-  setMessageRes: (res: MessageRes) => void;
-  removeFeature: (id: number) => void;
-  pushNewFeature: (feature: FeatureSelection) => void;
-  updateFeature: (feature: FeatureSelection) => void;
   onOpenSidebar: () => void;
 }) => {
+  const { features, isOwner, setSelectedFeatureToUpdate } =
+    useDashboardContext();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [featureValues, setFeatureValues] = useState<FeatureSchema | null>(
-    null,
-  );
-
-  const setFeatureToUpdate = (feature: FeatureSchema | null) =>
-    setFeatureValues(feature);
 
   const sidebarClasses = isSidebarOpen
     ? "w-96 opacity-100"
@@ -83,7 +63,7 @@ export const Sidebar = ({
                     variant="solid"
                     aria-label="add new feature"
                     onPress={(_) => {
-                      setFeatureToUpdate(null);
+                      setSelectedFeatureToUpdate(null);
                       onOpen();
                     }}
                   >
@@ -94,7 +74,7 @@ export const Sidebar = ({
             </div>
             <Divider className="bg-white text-white" />
             <div className="flex w-full flex-col items-center py-4">
-              {currentFeatures.length === 0 && (
+              {features.length === 0 && (
                 <div className="pt-10 text-center">
                   <p className="mb-2 text-lg font-medium text-white">
                     No features added yet.
@@ -117,7 +97,7 @@ export const Sidebar = ({
                       }}
                     >
                       <div style={{ direction: "ltr", padding: "0 10px" }}>
-                        {currentFeatures
+                        {features
                           .sort((a, b) => a.order - b.order)
                           .map((feature, index) => (
                             <Draggable
@@ -134,12 +114,8 @@ export const Sidebar = ({
                                   {...provided.dragHandleProps}
                                 >
                                   <FeaturesCard
-                                    setFeatureToUpdate={setFeatureToUpdate}
                                     onOpen={onOpen}
                                     feature={feature}
-                                    isOwner={isOwner}
-                                    setMessageRes={(res) => setMessageRes(res)}
-                                    removeFeature={removeFeature}
                                   />
                                 </li>
                               )}
@@ -166,16 +142,7 @@ export const Sidebar = ({
           </button>
         </div>
       </div>
-      <AddFeatureModal
-        featureToEdit={featureValues}
-        isOpen={isOpen}
-        projectId={projectId}
-        onOpenChange={onOpenChange}
-        currentFeatures={currentFeatures}
-        pushNewFeature={pushNewFeature}
-        updateFeature={updateFeature}
-        setMessageRes={setMessageRes}
-      />
+      <AddFeatureModal isOpen={isOpen} onOpenChange={onOpenChange} />
     </>
   );
 };

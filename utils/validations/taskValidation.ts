@@ -20,12 +20,13 @@ const TimePeriod = z
 export const taskSchema = z.object({
   id: z.number().optional(),
   featureId: z.number(),
+  projectId:z.number(),
   name: z
     .string()
     .trim()
     .min(1, "task name must be at least 1 characters")
     .max(30, "task must be under 30 characters"),
-  AssignedTo:z.string().trim().min(1).nullable(),
+  AssignedTo:z.string().trim().min(1).nullable(), 
   description: z
     .string()
     .trim()

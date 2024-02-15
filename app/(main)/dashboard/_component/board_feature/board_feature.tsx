@@ -1,4 +1,3 @@
-import { FeatureSelection } from "@/db/schemes/featureSchema";
 import { formatDate } from "@/utils/helper_function";
 import { DroppableProvided } from "@hello-pangea/dnd";
 
@@ -12,46 +11,22 @@ import {
 import { DroppableArea } from "../droppable_area/droppable_area";
 import { KanbanTask } from "../kanban_task/kanban_task";
 import { Button, useDisclosure } from "@nextui-org/react";
-import { useState } from "react";
-import { TaskSchema } from "@/utils/validations/taskValidation";
 import { AddTaskModal } from "../add_task_modal/add_task_modal";
-import { ColumnId, TaskSelection } from "@/db/schemes/taskSchema";
-import { useTaskColumns } from "../../hooks/useTasks";
-import { useMessage } from "../../hooks/useMessage";
-import { DevInfo } from "../../[projectId]/page";
+import { useDashboardContext } from "../../context/context_dashboard";
+import { FeatureSelection } from "@/db/schemes/featureSchema";
 
 export const BoardFeature = ({
   provided,
-  feature,
   isDraggingOver,
-  devInfo,
+  feature,
 }: {
   provided: DroppableProvided;
-  feature: FeatureSelection;
   isDraggingOver: boolean;
-  devInfo: DevInfo[];
+  feature: FeatureSelection;
 }) => {
-  const tasks: TaskSelection[] = [];
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [taskValues, setTaskValues] = useState<TaskSchema | null>(null);
-  const initialColumns: Record<ColumnId, TaskSelection[]> = {
-    New: [],
-    "In Progress": [],
-    "Ready to Test": [],
-    Done: [],
-  };
-  const columns: Record<ColumnId, TaskSelection[]> = tasks.reduce(
-    (acc, task) => {
-      acc[task.status].push(task);
-      return acc;
-    },
-    initialColumns,
-  );
-  const { taskColumn, updateTaskOrder, pushTask, updateTask } =
-    useTaskColumns(columns);
-  const { message, setMessageRes } = useMessage();
+  const { setSelectedTaskToUpdate } = useDashboardContext();
 
-  const setTaskToUpdate = (task: TaskSchema | null) => setTaskValues(task);
   return (
     <div
       {...provided.droppableProps}
@@ -98,7 +73,7 @@ export const BoardFeature = ({
             variant="shadow"
             size="lg"
             onPress={(_) => {
-              setTaskToUpdate(null);
+              setSelectedTaskToUpdate(null);
               onOpen();
             }}
           >
@@ -106,17 +81,11 @@ export const BoardFeature = ({
           </Button>
         </div>
       </div>
-      <KanbanTask taskColumn={taskColumn} updateTaskOrder={updateTaskOrder} />
+      <KanbanTask featureId={feature.id} />
       <AddTaskModal
-        taskToEdit={taskValues}
         isOpen={isOpen}
-        featureId={feature.id}
         onOpenChange={onOpenChange}
-        currentNewTask={[]}
-        pushNewTask={pushTask}
-        updateFeature={updateTask}
-        setMessageRes={setMessageRes}
-        devInfo={devInfo}
+        featureId={feature.id}
       />
     </div>
   );

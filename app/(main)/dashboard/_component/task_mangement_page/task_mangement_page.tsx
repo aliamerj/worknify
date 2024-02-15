@@ -1,7 +1,6 @@
 "use client";
-import { FeatureSelection } from "@/db/schemes/featureSchema";
 import { Sidebar } from "../left_slider/side_bar";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AiOutlineProject } from "react-icons/ai";
 import { Progress, Spinner } from "@nextui-org/react";
 import Image from "next/image";
@@ -14,56 +13,26 @@ import { ReorderFeatureSchema } from "@/utils/validations/featureValidation";
 import axios from "axios";
 import { ApiRouter, AppRouter } from "@/utils/router/app_router";
 import { SideErrorMessage } from "@/global-components/side_error_message/side_error_message";
-import { useMessage } from "../../hooks/useMessage";
-import { useFeatures } from "../../hooks/useFeatures";
 import { useRouter } from "next/navigation";
 import { EmptyBoardFeature } from "../empty_board_feature/empty_board_feature";
 import { FaLightbulb } from "react-icons/fa";
 import { BoardFeature } from "../board_feature/board_feature";
-import { DevInfo } from "../../[projectId]/page";
+import { useDashboardContext } from "../../context/context_dashboard";
+import { useApiCallContext } from "@/utils/context/api_call_context";
 
 export enum DroppableIds {
   featuresList = "FEATURE_LIST",
   featuresDisplayer = "FEATURE_DISPLAYER",
 }
 
-interface ITaskMangementPage {
-  features: FeatureSelection[];
-  projectId: number;
-  isOwner: boolean;
-  projectName: string;
-  projectGoal: string;
-  projectComplation: number;
-  projectLogo: string | null;
-  selectedFeatureId?: string;
-  devsInfo: DevInfo[];
-}
-
-export const TaskMangementPage = ({
-  features,
-  projectId,
-  isOwner,
-  projectName,
-  projectGoal,
-  projectComplation,
-  projectLogo,
-  selectedFeatureId,
-  devsInfo,
-}: ITaskMangementPage) => {
+export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const {
-    features: currentFeatures,
-    pushFeature,
-    removeFeature,
-    updateFeature,
-    updateFeatureOrder,
-  } = useFeatures(features);
-  const { message, setMessageRes } = useMessage();
+  const { features, isOwner, project, featureActions } = useDashboardContext();
+  const { setMessageRes, message, isLoading, setIsLoading } =
+    useApiCallContext();
   const [newFeatureOrder, setNewFeatureOrder] =
     useState<ReorderFeatureSchema>();
-
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleToggleSidebar = () => setIsSidebarOpen((current) => !current);
 
@@ -93,7 +62,7 @@ export const TaskMangementPage = ({
   };
 
   const reorderFeatures = (sourceIndex: number, destinationIndex: number) => {
-    const items = Array.from(currentFeatures);
+    const items = Array.from(features);
     // Remove the item from its current position
     const [reorderedItem] = items.splice(sourceIndex, 1);
     // Insert the item at its new position
@@ -104,10 +73,10 @@ export const TaskMangementPage = ({
       order: index + 1,
     }));
     // Update the state with the newly ordered features
-    updateFeatureOrder(updatedFeatures);
+    featureActions.updateFeatureOrder(updatedFeatures);
     // Prepare the order data for the backend update
     setNewFeatureOrder({
-      projectId: projectId,
+      projectId: project.id,
       items: updatedFeatures.map(({ id, order }) => ({
         featureId: id,
         order,
@@ -117,8 +86,7 @@ export const TaskMangementPage = ({
 
   const handleShowDetailsDrop = (featureId: string) => {
     const query = featureId ? `?feature=${featureId}` : "";
-    router.push(AppRouter.dashboardPage + projectId + query);
-
+    router.push(AppRouter.dashboardPage + project.id + query);
     console.log(`Show details for feature ${featureId}`);
   };
 
@@ -148,10 +116,8 @@ export const TaskMangementPage = ({
       }
     }
   }, [newFeatureOrder, setNewFeatureOrder]);
-  // selected Feature
-  const selectedFeature = features.find(
-    (f) => f.id === parseInt(selectedFeatureId ?? ""),
-  );
+
+  const feature = features.find((f) => f.id === featureId);
 
   return (
     <>
@@ -161,25 +127,18 @@ export const TaskMangementPage = ({
           onDragStart={handleOnDragStart}
         >
           <Sidebar
-            currentFeatures={currentFeatures}
-            projectId={projectId}
-            isOwner={isOwner}
             isSidebarOpen={isSidebarOpen}
             onOpenSidebar={handleToggleSidebar}
-            pushNewFeature={pushFeature}
-            removeFeature={removeFeature}
-            updateFeature={updateFeature}
-            setMessageRes={setMessageRes}
           />
           <div
             className={`flex-1 p-5 transition-all duration-300 ease-in-out ${isSidebarOpen ? "ml-96" : "ml-16"}`}
           >
             <div className="flex items-center space-x-4">
-              {projectLogo ? (
+              {project.logo ? (
                 <div className="relative h-16 w-16 flex-shrink-0">
                   <Image
-                    src={projectLogo}
-                    alt={`${projectName} logo`}
+                    src={project.logo}
+                    alt={`${project.name} logo`}
                     layout="fill"
                     objectFit="cover"
                     className="rounded-md"
@@ -188,18 +147,18 @@ export const TaskMangementPage = ({
               ) : (
                 <AiOutlineProject className="text-4xl text-primary" />
               )}
-              <h1 className="text-3xl font-semibold">{projectName}</h1>
+              <h1 className="text-3xl font-semibold">{project.name}</h1>
             </div>
             <div className="flex items-center space-x-4 pl-5">
               <FaLightbulb className="text-2xl text-warning" />
-              <p className="text-xl text-gray-600">{projectGoal}</p>
+              <p className="text-xl text-gray-600">{project.projectGoal}</p>
             </div>
             <div className="py-4">
               <Progress
                 label="Completion Progress"
                 aria-label="Completion..."
                 size="sm"
-                value={projectComplation}
+                value={project.compilation}
                 color="primary"
                 showValueLabel={true}
                 className="max-w-full"
@@ -207,14 +166,13 @@ export const TaskMangementPage = ({
             </div>
             <Droppable droppableId={DroppableIds.featuresDisplayer}>
               {(provided, snap) =>
-                !selectedFeature ? (
+                !feature ? (
                   <EmptyBoardFeature provided={provided} />
                 ) : (
                   <BoardFeature
                     provided={provided}
-                    feature={selectedFeature}
                     isDraggingOver={snap.isDraggingOver}
-                    devInfo={devsInfo}
+                    feature={feature}
                   />
                 )
               }

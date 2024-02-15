@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { TaskMangementPage } from "../_component/task_mangement_page/task_mangement_page";
 import { parseInt } from "lodash";
 import { notFound } from "next/navigation";
+import { DashboardProvider } from "../context/context_dashboard";
 export interface DevInfo {
   id: string;
   image: string;
@@ -26,6 +27,9 @@ export default async function DashboardPage({ params, searchParams }: Props) {
   const features = await databaseDrizzle.query.feature.findMany({
     where: (f, o) => o.eq(f.projectId, id),
   });
+  const tasks = await databaseDrizzle.query.tasks.findMany({
+    where: (t, o) => o.eq(t.projectId, id),
+  });
   const devIds = await databaseDrizzle.query.dev.findMany({
     where: (d, o) => o.eq(d.projectId, id),
     columns: {
@@ -37,19 +41,20 @@ export default async function DashboardPage({ params, searchParams }: Props) {
   const devsInfo = await getDevsInfo(contributers);
 
   const isOwner = session?.user.id === project?.owner;
+  const selectedFeatureId = parseInt(searchParams.feature ?? "");
 
   return (
-    <TaskMangementPage
-      selectedFeatureId={searchParams.feature}
-      features={features}
-      projectId={id}
-      isOwner={isOwner}
-      projectName={project.name}
-      projectComplation={project.compilation}
-      projectGoal={project.projectGoal}
-      projectLogo={project.logo}
-      devsInfo={devsInfo}
-    />
+    <DashboardProvider
+      initialData={{
+        project,
+        features,
+        tasks,
+        devsInfo,
+        isOwner,
+      }}
+    >
+      <TaskMangementPage featureId={selectedFeatureId} />
+    </DashboardProvider>
   );
 }
 async function getDevsInfo(contributers: string[]): Promise<DevInfo[]> {

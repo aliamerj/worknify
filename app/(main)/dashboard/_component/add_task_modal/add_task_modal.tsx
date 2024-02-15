@@ -21,54 +21,53 @@ import {
 import { Controller, SubmitHandler } from "react-hook-form";
 import axios from "axios";
 import { ApiRouter } from "@/utils/router/app_router";
-import { MessageRes } from "../../hooks/useMessage";
 import { TaskSelection } from "@/db/schemes/taskSchema";
 import {
   EditTaskShema,
   TaskSchema,
   taskSchema,
 } from "@/utils/validations/taskValidation";
-import { DevInfo } from "../../[projectId]/page";
+import { useDashboardContext } from "../../context/context_dashboard";
+import { useApiCallContext } from "@/utils/context/api_call_context";
 
 export const AddTaskModal = ({
   isOpen,
   onOpenChange,
-  currentNewTask,
   featureId,
-  pushNewTask,
-  setMessageRes,
-  taskToEdit,
-  updateFeature,
-  devInfo,
 }: {
   isOpen: boolean;
-  featureId: number;
   onOpenChange: () => void;
-  currentNewTask: TaskSelection[];
-  pushNewTask: (task: TaskSelection) => void;
-  setMessageRes: (res: MessageRes) => void;
-  taskToEdit: TaskSchema | null;
-  updateFeature: (feature: TaskSelection) => void;
-  devInfo: DevInfo[];
+  featureId: number;
 }) => {
+  const { tasks, project, selectedTaskToUpdate, taskActions, devsInfo } =
+    useDashboardContext();
+  const { setMessageRes } = useApiCallContext();
   const getHighestOrder = () =>
-    currentNewTask.reduce((max, feature) => Math.max(max, feature.order), 0);
+    tasks.reduce((max, feature) => Math.max(max, feature.order), 0);
 
   const { control, handleSubmit, reset } = useForm<TaskSchema>({
-    defaultValues: { status: "New" },
+    defaultValues: {
+      status: "New",
+      AssignedTo: null,
+      featureId: featureId,
+      projectId: project.id,
+    },
     resolver: zodResolver(taskSchema),
   });
   useEffect(() => {
-    let formDefaultValues = taskToEdit ?? {
+    let formDefaultValues = selectedTaskToUpdate ?? {
       order: getHighestOrder() + 1,
       featureId: featureId,
       featureName: "",
       description: "",
       startDate: "",
       endDate: "",
+      status: "New",
+      AssignedTo: null,
+      projectId: project.id,
     };
     reset(formDefaultValues);
-  }, [isOpen, taskToEdit, reset]);
+  }, [isOpen, selectedTaskToUpdate, reset]);
   const [isLoading, setIsLoading] = useState(false);
 
   type TypeSubmit = {
@@ -92,16 +91,17 @@ export const AddTaskModal = ({
     try {
       let res;
       setIsLoading(true);
-      if (taskToEdit) {
-        const diff = findDifferences(data, taskToEdit);
-        res = await axios.patch(ApiRouter.features, diff);
-        console.log(res.data.data);
-        updateFeature({ ...res.data.data });
+      if (selectedTaskToUpdate) {
+        const diff = findDifferences(data, selectedTaskToUpdate);
+        //   res = await axios.patch(ApiRouter.features, diff);
+        console.log({ diff });
       } else {
-        res = await axios.post(ApiRouter.features, data);
+        res = await axios.post(ApiRouter.tasks, data);
+
         const newTask: TaskSelection = {
-          id: res.data.featureId,
-          AssignedTo: data.AssignedTo,
+          id: res.data.taskId,
+          projectId: data.projectId,
+          assignedTo: data.AssignedTo,
           featureId: data.featureId,
           order: data.order,
           name: data.name,
@@ -110,9 +110,10 @@ export const AddTaskModal = ({
           startDate: data.timePeriod.startDate ?? null,
           endDate: data.timePeriod.endDate ?? null,
         };
-        pushNewTask(newTask);
+        taskActions.pushTask(newTask);
+        setMessageRes({ isError: false, message: res.data.message });
       }
-      setMessageRes({ isError: false, message: res.data.message });
+
       onClose();
     } catch (error: any) {
       setMessageRes({
@@ -184,40 +185,48 @@ export const AddTaskModal = ({
                     name="AssignedTo"
                     control={control}
                     render={({ field, fieldState: { error } }) => (
-                      <Autocomplete
-                        defaultItems={devInfo}
-                        variant="bordered"
-                        label="Assigned to"
-                        placeholder="Select a dev"
-                        labelPlacement="inside"
-                        className="w-full"
-                        size="sm"
-                      >
-                        {(devInfo) => (
-                          <AutocompleteItem
-                            key={devInfo.id}
-                            textValue={devInfo.name}
-                            color="primary"
-                          >
-                            <div className="flex items-center gap-2">
-                              <Avatar
-                                alt={devInfo.name}
-                                className="flex-shrink-0"
-                                size="sm"
-                                src={devInfo.image}
-                              />
-                              <div className="flex flex-col">
-                                <span className="text-small">
-                                  {devInfo.name}
-                                </span>
-                                <span className="text-tiny">
-                                  {devInfo.email}
-                                </span>
-                              </div>
-                            </div>
-                          </AutocompleteItem>
+                      <>
+                        {error && (
+                          <p className="mb-1 text-xs italic text-red-500">
+                            {error.message}
+                          </p>
                         )}
-                      </Autocomplete>
+                        <Autocomplete
+                          defaultItems={devsInfo}
+                          variant="bordered"
+                          label="Assigned to"
+                          placeholder="Select a dev"
+                          labelPlacement="inside"
+                          className="w-full"
+                          size="sm"
+                          onSelectionChange={(e) => field.onChange(e)}
+                        >
+                          {(devInfo) => (
+                            <AutocompleteItem
+                              key={devInfo.id}
+                              textValue={devInfo.name}
+                              color="primary"
+                            >
+                              <div className="flex items-center gap-2">
+                                <Avatar
+                                  alt={devInfo.name}
+                                  className="flex-shrink-0"
+                                  size="sm"
+                                  src={devInfo.image}
+                                />
+                                <div className="flex flex-col">
+                                  <span className="text-small">
+                                    {devInfo.name}
+                                  </span>
+                                  <span className="text-tiny">
+                                    {devInfo.email}
+                                  </span>
+                                </div>
+                              </div>
+                            </AutocompleteItem>
+                          )}
+                        </Autocomplete>
+                      </>
                     )}
                   />
 
@@ -285,11 +294,11 @@ export const AddTaskModal = ({
                     Close
                   </Button>
                   <Button
-                    color={taskToEdit ? "warning" : "primary"}
+                    color={selectedTaskToUpdate ? "warning" : "primary"}
                     type="submit"
                     isLoading={isLoading}
                   >
-                    {taskToEdit ? "Update" : "Save"}
+                    {selectedTaskToUpdate ? "Update" : "Save"}
                   </Button>
                 </ModalFooter>
               </form>
