@@ -14,6 +14,11 @@ import {
 import { TaskCard } from "../task_card/task_card";
 import { ColumnId } from "@/db/schemes/taskSchema";
 import { useDashboardContext } from "../../context/context_dashboard";
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { useApiCallContext } from "@/utils/context/api_call_context";
+import { ReorderTaskSchema } from "@/utils/validations/taskValidation";
+import { ApiRouter } from "@/utils/router/app_router";
 
 type ColumnStyles = {
   [key in ColumnId]: {
@@ -45,72 +50,92 @@ const columnStyles: ColumnStyles = {
     textColor: "text-green-800",
   },
 };
-export const KanbanTask = ({ featureId }: { featureId: number }) => {
-  const { taskColumn, taskActions } = useDashboardContext();
+export const KanbanTask = ({
+  featureId,
+  onOpen,
+}: {
+  featureId: number;
+  onOpen: () => void;
+}) => {
+  const { taskColumn, taskActions, project } = useDashboardContext();
+  const { setIsLoading, setMessageRes } = useApiCallContext();
+  const [newTasksOrder, setNewTasksOrder] = useState<ReorderTaskSchema>();
+
   const onDragEnd: OnDragEndResponder = (result) => {
     const { source, destination } = result;
 
-    // if the task is dropped outside a droppable area
-    if (!destination) return;
+    // Early return if dropped outside a droppable area or no movement
+    if (
+      !destination ||
+      (destination.droppableId === source.droppableId &&
+        destination.index === source.index)
+    ) {
+      return;
+    }
 
     const startColumnId = source.droppableId as ColumnId;
     const finishColumnId = destination.droppableId as ColumnId;
 
-    const startColumn = taskColumn[startColumnId];
-    const finishColumn = taskColumn[finishColumnId];
+    // Clone the current columns to avoid direct state mutation
+    let newColumns = { ...taskColumn };
+    const startTasks = Array.from(newColumns[startColumnId]);
+    const movedTask = startTasks[source.index];
 
-    // Reordering within the same column
+    // Remove the task from its original position
+    startTasks.splice(source.index, 1);
+
     if (startColumnId === finishColumnId) {
-      const newTasks = Array.from(startColumn);
-      const [removedTask] = newTasks.splice(source.index, 1);
-      newTasks.splice(destination.index, 0, removedTask);
-
-      // Update the order property based on the task's new index
-      const updatedTasks = newTasks.map((task, index) => ({
-        ...task,
-        order: index,
-      }));
-      taskActions.updateTaskOrder({
-        ...taskColumn,
-        [startColumnId]: updatedTasks,
-      });
-      // Optionally, send update to the backend
-      // updateTasksInDatabase(startColumnId, updatedTasks);
+      // Insert the task at its new position within the same column
+      startTasks.splice(destination.index, 0, movedTask);
+      newColumns[startColumnId] = startTasks;
     } else {
-      // Moving from one column to another
-      const startTasks = Array.from(startColumn);
-      const finishTasks = Array.from(finishColumn);
-      const [removedTask] = startTasks.splice(source.index, 1);
-
-      // Update the removed task's status and reset its order
-      const updatedRemovedTask = {
-        ...removedTask,
-        status: finishColumnId,
-        order: destination.index,
-      };
-      finishTasks.splice(destination.index, 0, updatedRemovedTask);
-
-      // Update the order property for both start and finish column tasks
-      const updatedStartTasks = startTasks.map((task, index) => ({
-        ...task,
-        order: index,
-      }));
-      const updatedFinishTasks = finishTasks.map((task, index) => ({
-        ...task,
-        order: index,
-      }));
-
-      taskActions.updateTaskOrder({
-        ...taskColumn,
-        [startColumnId]: updatedStartTasks,
-        [finishColumnId]: updatedFinishTasks,
-      });
-
-      // Optionally, send updates to the backend
-      // updateTasksInDatabase(startColumnId, updatedStartTasks);
-      //updateTasksInDatabase(finishColumnId, updatedFinishTasks);
+      // Handle moving between columns
+      const finishTasks = Array.from(newColumns[finishColumnId]);
+      movedTask.status = finishColumnId; // Update the task's status
+      finishTasks.splice(destination.index, 0, movedTask);
+      newColumns[startColumnId] = startTasks;
+      newColumns[finishColumnId] = finishTasks;
     }
+
+    // Update the local state with the new columns
+    taskActions.updateTaskOrder(newColumns);
+
+    // Prepare and send the update payload to the backend
+    // Assuming a more efficient backend update mechanism
+    const updatePayload: ReorderTaskSchema = {
+      taskId: movedTask.id,
+      featureId: featureId,
+      projectId: project.id,
+      newStatus: finishColumnId !== startColumnId ? finishColumnId : null,
+
+      newOrder: destination.index + 1,
+    };
+    setNewTasksOrder(updatePayload);
   };
+
+  const isInitialMount = useRef(true);
+  useEffect(() => {
+    async function updates() {
+      setIsLoading(true);
+      try {
+        const res = await axios.patch(ApiRouter.reorderTasks, newTasksOrder);
+        setMessageRes({ isError: false, message: res.data.message });
+      } catch (error: any) {
+        setMessageRes({
+          isError: true,
+          message: error.response.data.message,
+        });
+      }
+      setIsLoading(false);
+    }
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+    } else {
+      if (newTasksOrder) {
+        updates();
+      }
+    }
+  }, [newTasksOrder, setNewTasksOrder]);
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -135,20 +160,26 @@ export const KanbanTask = ({ featureId }: { featureId: number }) => {
                     <ColumnIcon className="text-2xl" />
                     <h3>{columnId}</h3>
                   </div>
-                  {tasks.map(
-                    (task, index) =>
-                      task.featureId === featureId && (
-                        <Draggable
-                          key={task.id}
-                          draggableId={task.id.toString()}
-                          index={index}
-                        >
-                          {(provided) => (
-                            <TaskCard task={task} provided={provided} />
-                          )}
-                        </Draggable>
-                      ),
-                  )}
+                  {tasks
+                    .sort((a, b) => a.order - b.order)
+                    .map(
+                      (task, index) =>
+                        task.featureId === featureId && (
+                          <Draggable
+                            key={task.id}
+                            draggableId={task.id.toString()}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <TaskCard
+                                task={task}
+                                provided={provided}
+                                onOpen={onOpen}
+                              />
+                            )}
+                          </Draggable>
+                        ),
+                    )}
                   {provided.placeholder}
                 </div>
               )}

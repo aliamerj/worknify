@@ -1,8 +1,8 @@
 import { z } from "zod";
 const TimePeriod = z
   .object({
-    startDate: z.string().optional(),
-    endDate: z.string().optional(),
+    startDate: z.string().nullable(),
+    endDate: z.string().nullable(),
   })
   .refine(
     (data) =>
@@ -48,7 +48,7 @@ export const featureSchema = z.object({
     .optional(),
   taskCount: z.number().default(0),
   order: z.number().min(0),
-  timePeriod: TimePeriod,
+  timePeriod: TimePeriod.nullable(),
 });
 
 export const deleteFeatureSchema = z.object({

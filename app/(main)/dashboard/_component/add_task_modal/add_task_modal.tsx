@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import _ from "lodash";
 
@@ -41,34 +41,32 @@ export const AddTaskModal = ({
 }) => {
   const { tasks, project, selectedTaskToUpdate, taskActions, devsInfo } =
     useDashboardContext();
-  const { setMessageRes } = useApiCallContext();
+  const { setMessageRes, setIsLoading, isLoading } = useApiCallContext();
   const getHighestOrder = () =>
     tasks.reduce((max, feature) => Math.max(max, feature.order), 0);
 
   const { control, handleSubmit, reset } = useForm<TaskSchema>({
     defaultValues: {
       status: "New",
-      AssignedTo: null,
+      assignedTo: null,
       featureId: featureId,
       projectId: project.id,
     },
     resolver: zodResolver(taskSchema),
   });
   useEffect(() => {
-    let formDefaultValues = selectedTaskToUpdate ?? {
+    let formDefaultValues: TaskSchema = selectedTaskToUpdate ?? {
       order: getHighestOrder() + 1,
       featureId: featureId,
-      featureName: "",
+      name: "",
       description: "",
-      startDate: "",
-      endDate: "",
+      timePeriod: null,
       status: "New",
-      AssignedTo: null,
+      assignedTo: null,
       projectId: project.id,
     };
     reset(formDefaultValues);
   }, [isOpen, selectedTaskToUpdate, reset]);
-  const [isLoading, setIsLoading] = useState(false);
 
   type TypeSubmit = {
     data: TaskSchema;
@@ -83,6 +81,7 @@ export const AddTaskModal = ({
       }
       differences["id"] = initalValues.id!;
       differences["featureId"] = initalValues.featureId!;
+      differences["projectId"] = initalValues.projectId!;
     });
     return differences;
   }
@@ -93,27 +92,25 @@ export const AddTaskModal = ({
       setIsLoading(true);
       if (selectedTaskToUpdate) {
         const diff = findDifferences(data, selectedTaskToUpdate);
-        //   res = await axios.patch(ApiRouter.features, diff);
-        console.log({ diff });
+        res = await axios.patch(ApiRouter.tasks, diff);
+        taskActions.updateTask({ ...res.data.data });
       } else {
         res = await axios.post(ApiRouter.tasks, data);
-
         const newTask: TaskSelection = {
           id: res.data.taskId,
           projectId: data.projectId,
-          assignedTo: data.AssignedTo,
+          assignedTo: data.assignedTo,
           featureId: data.featureId,
           order: data.order,
           name: data.name,
           description: data.description ?? "",
           status: "New",
-          startDate: data.timePeriod.startDate ?? null,
-          endDate: data.timePeriod.endDate ?? null,
+          startDate: data.timePeriod?.startDate ?? null,
+          endDate: data.timePeriod?.endDate ?? null,
         };
         taskActions.pushTask(newTask);
-        setMessageRes({ isError: false, message: res.data.message });
       }
-
+      setMessageRes({ isError: false, message: res.data.message });
       onClose();
     } catch (error: any) {
       setMessageRes({
@@ -182,7 +179,7 @@ export const AddTaskModal = ({
                     )}
                   />
                   <Controller
-                    name="AssignedTo"
+                    name="assignedTo"
                     control={control}
                     render={({ field, fieldState: { error } }) => (
                       <>
@@ -199,6 +196,7 @@ export const AddTaskModal = ({
                           labelPlacement="inside"
                           className="w-full"
                           size="sm"
+                          selectedKey={field.value ?? ""}
                           onSelectionChange={(e) => field.onChange(e)}
                         >
                           {(devInfo) => (

@@ -81,7 +81,7 @@ export const BoardFeature = ({
           </Button>
         </div>
       </div>
-      <KanbanTask featureId={feature.id} />
+      <KanbanTask featureId={feature.id} onOpen={onOpen} />
       <AddTaskModal
         isOpen={isOpen}
         onOpenChange={onOpenChange}

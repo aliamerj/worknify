@@ -1,12 +1,6 @@
 "use client";
 import _ from "lodash";
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 import { FeatureSelection } from "@/db/schemes/featureSchema";
 import { ColumnId, TaskSelection } from "@/db/schemes/taskSchema";
 import { ProjectSelection } from "@/db/schemes/projectSchema";
@@ -131,6 +125,7 @@ export const DashboardProvider: React.FC<{
       tasks,
       taskColumn,
       selectedFeatureToUpdate,
+      selectedTaskToUpdate,
     ],
   );
 

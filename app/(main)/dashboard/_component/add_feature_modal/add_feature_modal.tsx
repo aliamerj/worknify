@@ -41,7 +41,7 @@ export const AddFeatureModal = ({
 }) => {
   const { features, selectedFeatureToUpdate, project, featureActions } =
     useDashboardContext();
-  const { setMessageRes } = useApiCallContext();
+  const { setMessageRes, setIsLoading, isLoading } = useApiCallContext();
   const getHighestOrder = () =>
     features.reduce((max, feature) => Math.max(max, feature.order), 0);
   const [tags, setTags] = useState<string[]>([]);
@@ -57,17 +57,14 @@ export const AddFeatureModal = ({
           projectId: project.id,
           featureName: "",
           description: "",
-          startDate: "",
-          endDate: "",
-          tags: [],
+          timePeriod: null,
+          tag: [],
         };
     selectedFeatureToUpdate
       ? setTags(selectedFeatureToUpdate.tag ?? [])
       : setTags([]);
     reset(formDefaultValues);
   }, [isOpen, selectedFeatureToUpdate, reset]);
-  const [isLoading, setIsLoading] = useState(false);
-
   const onSettingTags = (myTags: string[], field: ControllerRenderProps) => {
     setTags(myTags);
     field.onChange(myTags);
@@ -99,7 +96,6 @@ export const AddFeatureModal = ({
       if (selectedFeatureToUpdate) {
         const diff = findDifferences(data, selectedFeatureToUpdate);
         res = await axios.patch(ApiRouter.features, diff);
-        console.log(res.data.data);
         featureActions.updateFeature({ ...res.data.data });
       } else {
         res = await axios.post(ApiRouter.features, data);
@@ -110,8 +106,8 @@ export const AddFeatureModal = ({
           featureName: data.featureName,
           description: data.description ?? "",
           tags: data.tag?.join(";") ?? "",
-          startDate: data.timePeriod.startDate ?? null,
-          endDate: data.timePeriod.endDate ?? null,
+          startDate: data.timePeriod?.startDate ?? null,
+          endDate: data.timePeriod?.endDate ?? null,
         };
         featureActions.pushFeature(newFeature);
       }

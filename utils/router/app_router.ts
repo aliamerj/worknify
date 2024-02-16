@@ -23,5 +23,6 @@ export const ApiRouter = {
   notifications: "/api/notifications/",
   features: "/api/feature",
   reorderFeatures: "/api/feature/reorder",
-  tasks: '/api/task'
+  tasks: "/api/task",
+  reorderTasks: "/api/task/reorder",
 };

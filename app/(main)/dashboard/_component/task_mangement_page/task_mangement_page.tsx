@@ -1,6 +1,6 @@
 "use client";
 import { Sidebar } from "../left_slider/side_bar";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AiOutlineProject } from "react-icons/ai";
 import { Progress, Spinner } from "@nextui-org/react";
 import Image from "next/image";

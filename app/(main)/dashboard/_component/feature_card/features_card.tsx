@@ -58,28 +58,21 @@ export const FeaturesCard = ({
                 <RiDeleteBin5Line className="text-xl" />
               </button>
               <button
-                onClick={async () => {
-                  try {
-                    setSelectedFeatureToUpdate({
-                      id: feature.id,
-                      projectId: feature.projectId,
-                      order: feature.order,
-                      taskCount: 0,
-                      featureName: feature.featureName,
-                      description: feature.description ?? undefined,
-                      tag: feature.tags?.split(";") ?? undefined,
-                      timePeriod: {
-                        startDate: feature.startDate ?? undefined,
-                        endDate: feature.endDate ?? undefined,
-                      },
-                    });
-                    onOpen();
-                  } catch (error: any) {
-                    setMessageRes({
-                      isError: true,
-                      message: error.response.data.message,
-                    });
-                  }
+                onClick={() => {
+                  setSelectedFeatureToUpdate({
+                    id: feature.id,
+                    projectId: feature.projectId,
+                    order: feature.order,
+                    taskCount: 0,
+                    featureName: feature.featureName,
+                    description: feature.description ?? undefined,
+                    tag: feature.tags?.split(";") ?? undefined,
+                    timePeriod: {
+                      startDate: feature.startDate ?? null,
+                      endDate: feature.endDate ?? null,
+                    },
+                  });
+                  onOpen();
                 }}
                 className="rounded-full border border-transparent bg-transparent p-1 text-warning-600 hover:border-gray-300 hover:text-warning-500"
                 aria-label="Delete feature"
