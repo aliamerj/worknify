@@ -103,12 +103,16 @@ export const KanbanTask = ({
     // Prepare and send the update payload to the backend
     // Assuming a more efficient backend update mechanism
     const updatePayload: ReorderTaskSchema = {
-      taskId: movedTask.id,
-      featureId: featureId,
+ 
       projectId: project.id,
-      newStatus: finishColumnId !== startColumnId ? finishColumnId : null,
+      newStatus: finishColumnId !== startColumnId ? finishColumnId: undefined,
+      items:newColumns[finishColumnId].map((t)=>{
+        return{
+          taskId:t.id,
+          order:t.order +1,
+        }
+      })
 
-      newOrder: destination.index + 1,
     };
     setNewTasksOrder(updatePayload);
   };

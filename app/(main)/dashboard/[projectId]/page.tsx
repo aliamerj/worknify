@@ -18,7 +18,7 @@ interface Props {
 export default async function DashboardPage({ params, searchParams }: Props) {
   const session = await getServerSession(authOptions);
   const id = parseInt(params.projectId);
-
+  const selectedFeatureId = parseInt(searchParams.feature ?? "");
   const project = await databaseDrizzle.query.project.findFirst({
     where: (p, o) => o.eq(p.id, id),
   });
@@ -28,7 +28,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
     where: (f, o) => o.eq(f.projectId, id),
   });
   const tasks = await databaseDrizzle.query.tasks.findMany({
-    where: (t, o) => o.eq(t.projectId, id),
+    where: (t, o) => o.eq(t.featureId, selectedFeatureId),
   });
   const devIds = await databaseDrizzle.query.dev.findMany({
     where: (d, o) => o.eq(d.projectId, id),
@@ -41,7 +41,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
   const devsInfo = await getDevsInfo(contributers);
 
   const isOwner = session?.user.id === project?.owner;
-  const selectedFeatureId = parseInt(searchParams.feature ?? "");
+
 
   return (
     <DashboardProvider

@@ -15,16 +15,22 @@ import { AddFeatureModal } from "../add_feature_modal/add_feature_modal";
 
 import { DroppableIds } from "../task_mangement_page/task_mangement_page";
 import { useDashboardContext } from "../../context/context_dashboard";
+
+
+
 export const Sidebar = ({
   isSidebarOpen,
   onOpenSidebar,
+
 }: {
   isSidebarOpen: boolean;
   onOpenSidebar: () => void;
+  featureId:number
 }) => {
   const { features, isOwner, setSelectedFeatureToUpdate } =
     useDashboardContext();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
 
   const sidebarClasses = isSidebarOpen
     ? "w-96 opacity-100"
@@ -116,7 +122,7 @@ export const Sidebar = ({
                                   <FeaturesCard
                                     onOpen={onOpen}
                                     feature={feature}
-                                  />
+                                                                     />
                                 </li>
                               )}
                             </Draggable>

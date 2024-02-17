@@ -129,6 +129,7 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
           <Sidebar
             isSidebarOpen={isSidebarOpen}
             onOpenSidebar={handleToggleSidebar}
+            featureId={featureId}
           />
           <div
             className={`flex-1 p-5 transition-all duration-300 ease-in-out ${isSidebarOpen ? "ml-96" : "ml-16"}`}

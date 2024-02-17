@@ -18,12 +18,12 @@ export const FeaturesCard = ({
   onOpen: () => void;
   feature: FeatureSelection;
 }) => {
-  const { isOwner, featureActions, setSelectedFeatureToUpdate, tasks } =
+  const { isOwner, featureActions, setSelectedFeatureToUpdate, tasks,taskActions } =
     useDashboardContext();
   const { setMessageRes } = useApiCallContext();
   const getTaskCount = useCallback(
     () => tasks.filter((t) => t.featureId === feature.id).length,
-    [tasks],
+    [tasks,taskActions ],
   );
   return (
     <>
@@ -87,9 +87,9 @@ export const FeaturesCard = ({
           <div className="flex flex-col">
             <div className="flex items-center justify-start">
               <p className="text-lg">{feature.featureName}</p>
-              <span className="ms-3 inline-flex h-3 w-3 items-center justify-center rounded-full bg-blue-100 p-3 text-small font-medium text-blue-800">
+              {getTaskCount() > 0 && (<span className="ms-3 inline-flex h-3 w-3 items-center justify-center rounded-full bg-blue-100 p-3 text-small font-medium text-blue-800">
                 {getTaskCount()}
-              </span>
+              </span>)}
             </div>
             <p className="text-small text-default-500">
               {feature.startDate && formatDate(feature.startDate)}

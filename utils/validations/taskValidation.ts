@@ -64,11 +64,14 @@ export const editTaskSchema = z.object({
   timePeriod: TimePeriod.optional(),
 });
 export const reorderTaskSchema = z.object({
-  featureId: z.number(),
   projectId: z.number(),
-  taskId: z.number(),
-  newStatus: z.enum(statusTypeValid).nullable(),
-  newOrder: z.number(),
+  newStatus: z.enum(statusTypeValid).optional(),
+  items: z.array(
+    z.object({
+      taskId: z.number(),
+      order: z.number(),
+    }),
+  ),
 });
 export type ReorderTaskSchema = z.infer<typeof reorderTaskSchema>;
 export type EditTaskShema = z.infer<typeof editTaskSchema>;

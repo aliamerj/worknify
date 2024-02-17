@@ -22,7 +22,7 @@ export async function PATCH(request: NextRequest) {
       { status: 400 },
     );
   }
-  const { featureId, projectId, taskId, newOrder, newStatus } = validated.data;
+  const { projectId,items, newStatus } = validated.data;
   try {
     const targetProject = await databaseDrizzle
       .select()
@@ -45,24 +45,26 @@ export async function PATCH(request: NextRequest) {
         );
     }
 
-    if (newOrder || newStatus) {
-      const newFeature = await databaseDrizzle
-        .update(tasks)
+
+    items.map(async(t)=>{
+       await databaseDrizzle.update(tasks)
         .set({
-          order: newOrder,
+          order: t.order,
           status: newStatus ?? undefined,
         })
-        .where(and(eq(tasks.id, taskId), eq(tasks.featureId, featureId)));
+        .where(eq(tasks.id,t.taskId));
 
+      })
+     
+     
       return NextResponse.json(
         {
           state: true,
           message: "Task Updated successfully",
-          data: newFeature,
         },
         { status: 200 },
       );
-    }
+    
   } catch (error: any) {
     return NextResponse.json(
       { state: false, message: error.message },
