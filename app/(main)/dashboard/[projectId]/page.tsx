@@ -5,6 +5,7 @@ import { TaskMangementPage } from "../_component/task_mangement_page/task_mangem
 import { parseInt } from "lodash";
 import { notFound } from "next/navigation";
 import { DashboardProvider } from "../context/context_dashboard";
+import { TaskSelection } from "@/db/schemes/taskSchema";
 export interface DevInfo {
   id: string;
   image: string;
@@ -16,20 +17,20 @@ interface Props {
   searchParams: { feature?: string };
 }
 export default async function DashboardPage({ params, searchParams }: Props) {
+  // auth
   const session = await getServerSession(authOptions);
+  // project
   const id = parseInt(params.projectId);
-  const selectedFeatureId = parseInt(searchParams.feature ?? "");
   const project = await databaseDrizzle.query.project.findFirst({
     where: (p, o) => o.eq(p.id, id),
   });
   if (!project) return notFound();
 
+  // feature
   const features = await databaseDrizzle.query.feature.findMany({
     where: (f, o) => o.eq(f.projectId, id),
   });
-  const tasks = await databaseDrizzle.query.tasks.findMany({
-    where: (t, o) => o.eq(t.featureId, selectedFeatureId),
-  });
+  // devs
   const devIds = await databaseDrizzle.query.dev.findMany({
     where: (d, o) => o.eq(d.projectId, id),
     columns: {
@@ -37,11 +38,17 @@ export default async function DashboardPage({ params, searchParams }: Props) {
     },
   });
   const contributers = [project.owner, ...devIds.map((d) => d.devId)];
-
   const devsInfo = await getDevsInfo(contributers);
-
-  const isOwner = session?.user.id === project?.owner;
-
+  const isOwner = session?.user.id === project?.owner ? session?.user.id : null;
+  let isDev;
+  if (session?.user.id) isDev = devIds.find(d=> d.devId === session.user.id)?.devId;
+  // tasks
+  const selectedFeatureId = parseInt(searchParams.feature ?? "");
+  let tasks: TaskSelection[] = [];
+  if (selectedFeatureId)
+    tasks = await databaseDrizzle.query.tasks.findMany({
+      where: (t, o) => o.eq(t.featureId, selectedFeatureId),
+    });
 
   return (
     <DashboardProvider
@@ -51,6 +58,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
         tasks,
         devsInfo,
         isOwner,
+        isDev,
       }}
     >
       <TaskMangementPage featureId={selectedFeatureId} />
@@ -72,11 +80,11 @@ async function getDevsInfo(contributers: string[]): Promise<DevInfo[]> {
         email: true,
       },
     });
-    if (!userInfo || !name) return null;
+    if (!userInfo) return null;
     return {
       id: contributer,
       image: userInfo?.image,
-      name: name.fullName,
+      name: name?.fullName ?? "Alix",
       email: userInfo.email,
     };
   });

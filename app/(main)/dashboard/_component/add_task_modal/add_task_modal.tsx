@@ -39,8 +39,15 @@ export const AddTaskModal = ({
   onOpenChange: () => void;
   featureId: number;
 }) => {
-  const { tasks, project, selectedTaskToUpdate, taskActions, devsInfo } =
-    useDashboardContext();
+  const {
+    tasks,
+    project,
+    selectedTaskToUpdate,
+    taskActions,
+    contributors,
+    isOwner,
+    isDev,
+  } = useDashboardContext();
   const { setMessageRes, setIsLoading, isLoading } = useApiCallContext();
   const getHighestOrder = () =>
     tasks.reduce((max, feature) => Math.max(max, feature.order), 0);
@@ -97,6 +104,7 @@ export const AddTaskModal = ({
       } else {
         res = await axios.post(ApiRouter.tasks, data);
         const newTask: TaskSelection = {
+          creatorId: isOwner ?? isDev ?? "",
           id: res.data.taskId,
           projectId: data.projectId,
           assignedTo: data.assignedTo,
@@ -189,7 +197,7 @@ export const AddTaskModal = ({
                           </p>
                         )}
                         <Autocomplete
-                          defaultItems={devsInfo}
+                          defaultItems={contributors}
                           variant="bordered"
                           label="Assigned to"
                           placeholder="Select a dev"

@@ -2,7 +2,7 @@
 import { Sidebar } from "../left_slider/side_bar";
 import { useEffect, useRef, useState } from "react";
 import { AiOutlineProject } from "react-icons/ai";
-import { Progress, Spinner } from "@nextui-org/react";
+import { Button, Progress, Spinner, useDisclosure } from "@nextui-org/react";
 import Image from "next/image";
 import {
   DragDropContext,
@@ -19,6 +19,8 @@ import { FaLightbulb } from "react-icons/fa";
 import { BoardFeature } from "../board_feature/board_feature";
 import { useDashboardContext } from "../../context/context_dashboard";
 import { useApiCallContext } from "@/utils/context/api_call_context";
+import { FaPeopleGroup } from "react-icons/fa6";
+import { DevsModal } from "../devs_modal/devs_modal";
 
 export enum DroppableIds {
   featuresList = "FEATURE_LIST",
@@ -28,11 +30,14 @@ export enum DroppableIds {
 export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const { features, isOwner, project, featureActions } = useDashboardContext();
+  const { features, isOwner, project, featureActions, contributors } =
+    useDashboardContext();
   const { setMessageRes, message, isLoading, setIsLoading } =
     useApiCallContext();
   const [newFeatureOrder, setNewFeatureOrder] =
     useState<ReorderFeatureSchema>();
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleToggleSidebar = () => setIsSidebarOpen((current) => !current);
 
@@ -41,11 +46,6 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
   };
 
   const handleOnDragEnd: OnDragEndResponder = (result) => {
-    if (!isOwner)
-      return setMessageRes({
-        isError: true,
-        message: "Only The Creator of this project can Reorder the features ",
-      });
     if (!result.destination) return;
     const { droppableId } = result.destination;
     if (droppableId === DroppableIds.featuresDisplayer) {
@@ -56,6 +56,11 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
       droppableId === DroppableIds.featuresList &&
       result.destination.index !== result.source.index
     ) {
+      if (!isOwner)
+        return setMessageRes({
+          isError: true,
+          message: "Only The Creator of this project can Reorder the features ",
+        });
       reorderFeatures(result.source.index, result.destination.index);
       return;
     }
@@ -148,7 +153,21 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
               ) : (
                 <AiOutlineProject className="text-4xl text-primary" />
               )}
-              <h1 className="text-3xl font-semibold">{project.name}</h1>
+              <div className="flex w-full items-center justify-between">
+                <h1 className="text-3xl font-semibold">{project.name}</h1>
+                <Button
+                  variant="faded"
+                  color="primary"
+                  size="md"
+                  onPress={onOpen}
+                  startContent={
+                    <FaPeopleGroup className="text-3xl underline" />
+                  }
+                >
+                  {contributors.length}
+                </Button>
+                <DevsModal onClose={onClose} isOpen={isOpen} />
+              </div>
             </div>
             <div className="flex items-center space-x-4 pl-5">
               <FaLightbulb className="text-2xl text-warning" />

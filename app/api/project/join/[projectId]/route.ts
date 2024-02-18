@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { databaseDrizzle } from "@/db/database";
-import { dev } from "@/db/schemes/projectSchema";
+import { dev, project } from "@/db/schemes/projectSchema";
 import { and, eq } from "drizzle-orm";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { notificationSchema } from "@/utils/validations/notificationsValidation";
@@ -130,7 +130,7 @@ export async function POST(
 }
 
 export async function DELETE(
-  _: NextRequest,
+  req: NextRequest,
   { params }: { params: { projectId: string } },
 ) {
   const session = await getServerSession(authOptions);
@@ -140,14 +140,35 @@ export async function DELETE(
       { state: false, message: "Not authenticated" },
       { status: 401 },
     );
+  const body = await req.json();
 
   try {
-    await databaseDrizzle
-      .delete(dev)
-      .where(and(eq(dev.projectId, projectId), eq(dev.devId, session.user.id)));
+    if (!body.devId) {
+      await databaseDrizzle
+        .delete(dev)
+        .where(
+          and(eq(dev.projectId, projectId), eq(dev.devId, session.user.id)),
+        );
+
+      return NextResponse.json(
+        { state: true, body: "unjoined successfully" },
+        { status: 200 },
+      );
+    }
+    const sqlRes = await databaseDrizzle
+      .select({ owner: project.owner })
+      .from(project)
+      .where(
+        and(eq(project.id, projectId), eq(project.owner, session.user.id)),
+      );
+    if (sqlRes[0].owner) {
+      await databaseDrizzle
+        .delete(dev)
+        .where(and(eq(dev.projectId, projectId), eq(dev.devId, body.devId)));
+    }
 
     return NextResponse.json(
-      { state: true, body: "unjoined successfully" },
+      { state: true, body: "user removed successfully" },
       { status: 200 },
     );
   } catch (error: any) {

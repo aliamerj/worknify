@@ -8,6 +8,7 @@ import {
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlineUser,
+  AiOutlineUserAdd,
 } from "react-icons/ai";
 import { useDashboardContext } from "../../context/context_dashboard";
 import axios from "axios";
@@ -24,10 +25,11 @@ export const TaskCard = ({
   provided: DraggableProvided;
   onOpen: () => void;
 }) => {
-  const { devsInfo, setSelectedTaskToUpdate, taskActions } =
+  const { contributors, setSelectedTaskToUpdate, taskActions, isOwner } =
     useDashboardContext();
   const { setMessageRes, setIsLoading, isLoading } = useApiCallContext();
-  const assignedTo = devsInfo.find((d) => d.id === task.assignedTo);
+  const assignedTo = contributors.find((d) => d.id === task.assignedTo);
+  const creator = contributors.find((d) => d.id === task.creatorId);
   return (
     <div
       ref={provided.innerRef}
@@ -63,63 +65,71 @@ export const TaskCard = ({
           </div>
         )}
       </div>
-      <div className="mt-4 flex justify-end space-x-2">
-        <button
-          type="button"
-          onClick={() => {
-            setSelectedTaskToUpdate({
-              id: task.id,
-              featureId: task.featureId,
-              projectId: task.projectId,
-              name: task.name,
-              status: task.status,
-              order: task.order,
-              assignedTo: task.assignedTo,
-              description: task.description ?? undefined,
-              timePeriod: {
-                startDate: task.startDate ?? null,
-                endDate: task.endDate ?? null,
-              },
-            });
-            onOpen();
-          }}
-          className="flex items-center justify-center rounded-full bg-blue-500 p-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          <AiOutlineEdit />
-        </button>
-        <Button
-          variant="solid"
-          className="rounded-full"
-          color="danger"
-          size="sm"
-          isIconOnly
-          isDisabled={isLoading}
-          onClick={async () => {
-            setIsLoading(true);
-            try {
-              const res = await axios.delete(ApiRouter.tasks, {
-                data: {
-                  projectId: task.projectId,
+      <div className="flex items-end justify-between">
+        <span className="flex items-center rounded py-1 text-xs font-bold text-gray-800">
+          <AiOutlineUserAdd className="mr-1" />
+          {`Created by: ${creator?.name}`} {/* Adjust variable as needed */}
+        </span>
+        {task.creatorId === isOwner && (
+          <div className="mt-4 flex justify-end space-x-2">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedTaskToUpdate({
+                  id: task.id,
                   featureId: task.featureId,
-                  taskId: task.id,
-                },
-              });
-              setMessageRes({
-                isError: false,
-                message: res.data.message,
-              });
-              taskActions.removeTask(task.id, task.status);
-            } catch (error: any) {
-              setMessageRes({
-                isError: true,
-                message: error.response.data.message,
-              });
-            }
-            setIsLoading(false);
-          }}
-        >
-          <AiOutlineDelete className="text-medium font-bold" />
-        </Button>
+                  projectId: task.projectId,
+                  name: task.name,
+                  status: task.status,
+                  order: task.order,
+                  assignedTo: task.assignedTo,
+                  description: task.description ?? undefined,
+                  timePeriod: {
+                    startDate: task.startDate ?? null,
+                    endDate: task.endDate ?? null,
+                  },
+                });
+                onOpen();
+              }}
+              className="flex items-center justify-center rounded-full bg-blue-500 p-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              <AiOutlineEdit />
+            </button>
+            <Button
+              variant="solid"
+              className="rounded-full"
+              color="danger"
+              size="sm"
+              isIconOnly
+              isDisabled={isLoading}
+              onClick={async () => {
+                setIsLoading(true);
+                try {
+                  const res = await axios.delete(ApiRouter.tasks, {
+                    data: {
+                      projectId: task.projectId,
+                      featureId: task.featureId,
+                      taskId: task.id,
+                    },
+                  });
+                  setMessageRes({
+                    isError: false,
+                    message: res.data.message,
+                  });
+                  taskActions.removeTask(task.id, task.status);
+                } catch (error: any) {
+                  setMessageRes({
+                    isError: true,
+                    message: error.response.data.message,
+                  });
+                }
+                setIsLoading(false);
+              }}
+            >
+              <AiOutlineDelete className="text-medium font-bold" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

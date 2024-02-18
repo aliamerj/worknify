@@ -1,5 +1,5 @@
 import { databaseDrizzle } from "@/db/database";
-import { eq } from "drizzle-orm";
+
 import React from "react";
 import ProjectsGrid from "../../_components/projects_grid/projects_grid";
 import { getServerSession } from "next-auth";
@@ -11,8 +11,19 @@ interface Props {
 }
 const MyProjectsPage = async ({ params: { userId } }: Props) => {
   const session = await getServerSession(authOptions);
+
+  const contributors = await databaseDrizzle.query.dev
+    .findMany({
+      where: (d, o) => o.eq(d.devId, userId),
+      columns: {
+        projectId: true,
+      },
+    })
+    .then((res) => res.map((res) => res.projectId));
+
   const projects = await databaseDrizzle.query.project.findMany({
-    where: (p) => eq(p.owner, userId),
+    where: (p, o) =>
+      o.or(o.eq(p.owner, userId), o.inArray(p.id, [...contributors, 10000])),
     columns: {
       id: true,
       name: true,
@@ -28,7 +39,7 @@ const MyProjectsPage = async ({ params: { userId } }: Props) => {
   });
 
   const userName = await databaseDrizzle.query.profile.findFirst({
-    where: (p) => eq(p.userId, userId),
+    where: (p, o) => o.eq(p.userId, userId),
     columns: {
       fullName: true,
     },

@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
     assignedTo: assignedTo,
     projectId: projectId,
     featureId: featureId,
+    creatorId: session.user.id!,
     name: name,
     order: order,
     status: "New",
@@ -104,15 +105,8 @@ export async function PATCH(request: NextRequest) {
       { status: 400 },
     );
   }
-  const {
-    id,
-    featureId,
-    projectId,
-    name,
-    description,
-    timePeriod,
-    assignedTo,
-  } = validated.data;
+  const { id, projectId, name, description, timePeriod, assignedTo } =
+    validated.data;
   try {
     const targetProject = await databaseDrizzle
       .select()
@@ -144,7 +138,7 @@ export async function PATCH(request: NextRequest) {
           startDate: timePeriod?.startDate,
           endDate: timePeriod?.endDate,
         })
-        .where(and(eq(tasks.id, id), eq(tasks.featureId, featureId)))
+        .where(and(eq(tasks.id, id), eq(tasks.creatorId, session.user.id)))
         .returning()
         .then((fea) => fea[0]);
 

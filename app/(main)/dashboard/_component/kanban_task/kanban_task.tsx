@@ -57,11 +57,18 @@ export const KanbanTask = ({
   featureId: number;
   onOpen: () => void;
 }) => {
-  const { taskColumn, taskActions, project } = useDashboardContext();
+  const { taskColumn, taskActions, project, isDev, isOwner } =
+    useDashboardContext();
   const { setIsLoading, setMessageRes } = useApiCallContext();
   const [newTasksOrder, setNewTasksOrder] = useState<ReorderTaskSchema>();
+ 
+  const onDragEnd: OnDragEndResponder = (result) => {   
+    if (!isOwner && !isDev)
+      return setMessageRes({
+        isError: true,
+        message: "Only members of this project can Reorder the tasks ",
+      });
 
-  const onDragEnd: OnDragEndResponder = (result) => {
     const { source, destination } = result;
 
     // Early return if dropped outside a droppable area or no movement
@@ -103,16 +110,14 @@ export const KanbanTask = ({
     // Prepare and send the update payload to the backend
     // Assuming a more efficient backend update mechanism
     const updatePayload: ReorderTaskSchema = {
- 
       projectId: project.id,
-      newStatus: finishColumnId !== startColumnId ? finishColumnId: undefined,
-      items:newColumns[finishColumnId].map((t)=>{
-        return{
-          taskId:t.id,
-          order:t.order +1,
-        }
-      })
-
+      newStatus: finishColumnId !== startColumnId ? finishColumnId : undefined,
+      items: newColumns[finishColumnId].map((t) => {
+        return {
+          taskId: t.id,
+          order: t.order + 1,
+        };
+      }),
     };
     setNewTasksOrder(updatePayload);
   };
@@ -140,6 +145,8 @@ export const KanbanTask = ({
       }
     }
   }, [newTasksOrder, setNewTasksOrder]);
+
+  // console.log(tasks)
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>

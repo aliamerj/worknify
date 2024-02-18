@@ -120,6 +120,13 @@
       "when": 1707996927444,
       "tag": "0016_curly_machine_man",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1708236066265,
+      "tag": "0017_hot_boom_boom",
+      "breakpoints": true
     }
   ]
 }
