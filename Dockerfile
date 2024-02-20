@@ -1,24 +1,34 @@
-ARG NODE_VERSION=20.11.1
+ARG NODE_VERSION=21
 
-FROM node:${NODE_VERSION}-alpine
-
-# Use production node environment by default.
-ENV NODE_ENV production
-
+FROM node:${NODE_VERSION}-alpine as base
 
 WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-
-RUN npm install --verbose
-
-# Copy the rest of the source files into the image.
-COPY . .
-
-# Expose the port that the application listens on.
 EXPOSE 3000
 
-
-# Run the application.
+FROM base as dev
+ENV APP_ENV dev
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci --include=dev
+COPY . .
 CMD npm run dev
+
+FROM base as prod
+ENV APP_ENV prod
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci --omit=dev
+COPY . .
+RUN npm run build
+CMD npm run start 
+
+FROM base as test
+ENV APP_ENV test
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci --include=dev
+COPY . .
+RUN npm run test

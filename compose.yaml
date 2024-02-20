@@ -4,31 +4,45 @@ services:
   server:
     build:
       context: .
-      dockerfile: Dockerfile
+      target: dev
     env_file:
       - .env
     ports:
-      - "3000:3000"
-    volumes:
-      - .:/app
-      - /app/node_modules
+      - 3000:3000
+      - 9229:9229
     depends_on:
-      - db
-
+      db:
+        condition: service_healthy
+    secrets:
+      - db-password
+    volumes:
+      - .:/usr/src/app
+      - /app/node_modules
   db:
     image: postgres:14.11
     restart: always
     environment:
-      POSTGRES_DB: worknify
+      POSTGRES_HOST: postgres
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
+      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+      POSTGRES_DB: worknify
+    user: postgres
+    secrets:
+      - db-password
     volumes:
       - db-data:/var/lib/postgresql/data
-    ports:
-      - "5030:5432"
-
+    expose:
+      - 5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 volumes:
-  db-data: {}
+  db-data:
+secrets:
+  db-password:
+    file: db/password.txt
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
