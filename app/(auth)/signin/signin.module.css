@@ -1,6 +1,7 @@
 .loginPage {
   display: flex;
   height: 100vh;
+  background-color: white;
 }
 
 .loginSection {
