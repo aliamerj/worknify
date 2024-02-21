@@ -8,14 +8,15 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import ShimmerLoading from "@/global-components/ShimmerLoading";
 import ErrorBoundary from "@/global-components/ErrorBoundary";
 import dynamic from "next/dynamic";
-import { Spinner } from "@nextui-org/react";
+import {  Spinner } from "@nextui-org/react";
 import { ProfileSummary } from "../../_components/_view_section/profile_summary/profile_summary";
 import { Experience } from "../../_components/_view_section/experience/experience";
 import { Education } from "../../_components/_view_section/education/education";
 import Sections from "../../_components/_view_section/section/section";
-import { Header } from "../../_components/_view_section/header/header";
 import { Projects } from "../../_components/_view_section/projects/projects";
 import { Noprofile } from "../../_components/_view_section/no_profile/no_profile";
+import { EditProfileBtn } from "../../_components/_view_section/edit_Profile_btn/edit_profile_btn";
+import Header from "../../_components/_view_section/header/header";
 
 const Skills = dynamic(
   () => import("@/app/(main)/profile/_components/_view_section/skills/skills"),
@@ -32,15 +33,25 @@ const Skills = dynamic(
 interface Props {
   params: { id: string };
 }
+/**
+ * Retrieves and displays a user's profile information.
+ * @param params - An object containing the parameters passed to the function, including the user's ID.
+ * @returns The rendered profile information, including the header, summary, experience, skills, projects, education, and sections.
+ */
 async function ViewProfile({ params }: Props) {
   const session = await getServerSession(authOptions);
-  var id = session?.user.id;
-  var image = session?.user.image;
+  let id = session?.user.id;
+  let image = session?.user.image;
+
   if (!session || id !== params.id) {
     const user = await databaseDrizzle.query.users.findFirst({
       where: (u, o) => o.or(o.eq(u.id, params.id), o.eq(u.username, params.id)),
     });
-    if (!user) return notFound();
+
+    if (!user) {
+      return notFound();
+    }
+
     id = user.id;
     image = user.image;
   }
@@ -49,7 +60,9 @@ async function ViewProfile({ params }: Props) {
     where: (p, o) => o.eq(p.userId, id!),
   });
 
-  if (!profile) return <Noprofile isCurrentUser={id === params.id} />;
+  if (!profile) {
+    return <Noprofile isCurrentUser={id === params.id} />;
+  }
 
   const star = await databaseDrizzle.query.star.findMany({
     where: (s, o) => o.eq(s.profileId, profile?.id),
@@ -57,6 +70,7 @@ async function ViewProfile({ params }: Props) {
       userId: true,
     },
   });
+
   const projects = await databaseDrizzle.query.project.findMany({
     where: (p, o) => o.eq(p.owner, params.id),
     columns: {
@@ -68,7 +82,9 @@ async function ViewProfile({ params }: Props) {
       link: true,
     },
   });
-  const isStared = star.findIndex((star) => (star.userId = params.id)) !== -1;
+
+  const isStared = star.some((star) => star.userId === params.id);
+
   return (
     <>
       <Header
@@ -83,6 +99,7 @@ async function ViewProfile({ params }: Props) {
         profileId={profile.id}
         emailUser={profile.email}
       />
+      {profile.userId === session?.user.id && <EditProfileBtn />}
       <ErrorBoundary>
         <Suspense fallback={<ShimmerLoading count={4} />}>
           <ProfileSummary
@@ -98,7 +115,7 @@ async function ViewProfile({ params }: Props) {
         </Suspense>
       </ErrorBoundary>
       {profile.skills && <Skills skills={profile.skills} />}
-      <Projects projects={projects} />
+     {projects.length !== 0 && <Projects projects={projects} />}
       <ErrorBoundary>
         <Suspense fallback={<ShimmerLoading count={4} />}>
           <Education profileId={profile.id} />

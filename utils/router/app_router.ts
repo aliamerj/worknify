@@ -25,4 +25,5 @@ export const ApiRouter = {
   reorderFeatures: "/api/feature/reorder",
   tasks: "/api/task",
   reorderTasks: "/api/task/reorder",
+  profile: "/api/profile"
 };

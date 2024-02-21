@@ -1,9 +1,14 @@
+import React from 'react';
 import { ProfileDisplay } from "../_components/_create_section/_displayer/profile_display";
 import { ProfileForm } from "../_components/_create_section/_form/profile_form";
 import { CreateButtons } from "../_components/_create_section/create_buttons/create_buttons";
 import CreateProfileGate from "./create_profile_gate";
 
-export default async function CreateProfile() {
+/**
+ * Renders a form to create a user profile.
+ * @returns The rendered JSX elements for the CreateProfile component.
+ */
+export default function CreateProfile() {
   return (
     <CreateProfileGate>
       <section className="mt-5 flex flex-col gap-2 lg:flex-row lg:justify-evenly lg:py-5">

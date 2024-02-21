@@ -1,8 +1,13 @@
+import React from 'react';
 import { ProfileDisplay } from "../_components/_create_section/_displayer/profile_display";
 import { ProfileForm } from "../_components/_create_section/_form/profile_form";
 import { UpdateButtons } from "../_components/_update_section/update_buttons/update_buttons";
 import EditProfileGate from "./edit_profile_gate";
 
+/**
+ * Renders a page for editing a user's profile.
+ * @returns The rendered page for editing a user's profile.
+ */
 export default function Page() {
   return (
     <EditProfileGate>

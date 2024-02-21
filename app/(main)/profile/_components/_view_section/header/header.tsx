@@ -17,7 +17,20 @@ interface IHeader {
   emailUser: string;
 }
 
-export const Header = ({
+interface IHeader {
+  fullName: string;
+  username: string;
+  background: string;
+  image: string | null;
+  linkedin: string | null;
+  github: string | null;
+  jobTitle: string;
+  isStared: boolean;
+  profileId: number;
+  emailUser: string;
+}
+
+const Header: React.FC<IHeader> = ({
   fullName,
   username,
   background,
@@ -28,12 +41,46 @@ export const Header = ({
   isStared,
   profileId,
   emailUser,
-}: IHeader) => {
+}) => {
+  const renderLinkedInLink = () => {
+    if (linkedin) {
+      return (
+        <a
+          href={`https://www.linkedin.com/in/${linkedin}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <FaLinkedin
+            className="transform text-[35px] transition-transform hover:scale-125"
+            aria-label="LinkedIn"
+          />
+        </a>
+      );
+    }
+    return null;
+  };
+
+  const renderGithubLink = () => {
+    if (github) {
+      return (
+        <a
+          href={`https://www.github.com/${github}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <FaGithub
+            className="transform text-[35px] transition-transform hover:scale-125"
+            aria-label="GitHub"
+          />
+        </a>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div
-      className={`${styles.bgPattern} flex h-screen justify-center p-5 pt-20 text-white shadow-md`}
-    >
-      <div className="flex flex-col-reverse items-center justify-between pb-14 md:w-4/5 md:flex-row md:items-center md:justify-evenly md:gap-3">
+    <div className={`${styles.bgPattern} flex h-screen justify-center p-5 pt-20 text-white shadow-md`}>
+      <div className="flex flex-col-reverse items-center justify-center pb-14 md:w-4/5 md:flex-row md:items-center md:justify-evenly md:gap-3">
         <section className="mx-5 flex flex-col items-center justify-center px-5 pt-16  md:items-start md:justify-start">
           <h1 className="text-4xl font-bold md:text-5xl">{fullName}</h1>
           <h2 className="text-xs text-gray-300">@{username}</h2>
@@ -63,35 +110,13 @@ export const Header = ({
         </section>
       </div>
       <div className="flex flex-col items-end gap-5">
-        {linkedin && (
-          <a
-            href={`https://www.linkedin.com/in/${linkedin}`}
-            target={"_blank"}
-            rel={"noreferrer"}
-          >
-            <FaLinkedin
-              className="transform text-[35px] transition-transform hover:scale-125"
-              aria-label="LinkedIn"
-            />
-          </a>
-        )}
-        {github && (
-          <a
-            href={`https://www.github.com/${github}`}
-            target={"_blank"}
-            rel={"noreferrer"}
-          >
-            <FaGithub
-              className="transform text-[35px] transition-transform hover:scale-125"
-              aria-label="LinkedIn"
-            />
-          </a>
-        )}
+        {renderLinkedInLink()}
+        {renderGithubLink()}
         <Tooltip content="Download CV" color="primary" placement="left-end">
-          <Link href={"#"} target="_blank" rel="noopener">
+          <Link href="#" target="_blank" rel="noopener">
             <FaFileDownload
               className="transform text-[35px] transition-transform hover:scale-125"
-              aria-label="LinkedIn"
+              aria-label="Download CV"
             />
           </Link>
         </Tooltip>
@@ -99,3 +124,5 @@ export const Header = ({
     </div>
   );
 };
+
+export default Header;

@@ -13,12 +13,13 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import { convertTimeToString } from "@/utils/helper_function";
 
-type ProfileData = ProfileSchema & { edit: boolean; userId: string };
+export type ProfileData = ProfileSchema & { edit: boolean; userId: string };
 type OptionalProfileData = {
   [P in keyof ProfileData]?: ProfileData[P];
 };
@@ -45,6 +46,14 @@ export const useProfileData = () => {
   }
   return context;
 };
+/**
+ * React context provider component for profile data.
+ * @param children - React node representing the components that will be wrapped by the `ProfileDataContext.Provider`.
+ * @param name - A string representing the name of the user.
+ * @param email - A string representing the email of the user.
+ * @param userId - A string representing the ID of the user.
+ * @param allProfileData - An object representing the profile data of the user.
+ */
 export const ProfileDataProvider = ({
   children,
   name,
@@ -61,28 +70,25 @@ export const ProfileDataProvider = ({
   const router = useRouter();
   const [isLoading, setLoading] = useState(false);
   const formRef = useRef<HTMLButtonElement>(null);
-  var defaultProfileData = serializeProfile(
-    allProfileData,
-    name,
-    email,
-    userId,
-  );
+  const defaultProfileData = useMemo(() => {
+    const serializedData = serializeProfile(allProfileData, name, email, userId);
+    if (typeof window !== "undefined" && !serializedData.edit) {
+      const savedData = localStorage?.getItem("formData");
+      return savedData ? JSON.parse(savedData) : serializedData;
+    }
+    return serializedData;
+  }, [allProfileData, name, email, userId]);
 
-  if (typeof window !== "undefined") {
-    const savedData = localStorage?.getItem("formData");
-    defaultProfileData = savedData ? JSON.parse(savedData) : defaultProfileData;
-  }
+  const [profileData, setProfileData] = useState<ProfileData>(defaultProfileData);
 
-  const [profileData, setProfileData] =
-    useState<ProfileData>(defaultProfileData);
-
-  const updateProfileData = (newData: Partial<ProfileData>) => {
+  const updateProfileData = useCallback((newData: Partial<ProfileData>) => {
     setProfileData((prevData) => ({ ...prevData, ...newData }));
-  };
+  }, []);
 
-  const setIsLoading = (state: boolean) => {
+  const setIsLoading = useCallback((state: boolean) => {
     setLoading(state);
-  };
+  }, []);
+
   const triggerSubmit = useCallback(() => {
     formRef.current?.click();
   }, []);
@@ -91,13 +97,13 @@ export const ProfileDataProvider = ({
     localStorage.setItem("formData", JSON.stringify(profileData));
   }, [profileData]);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     const getSavedForm = serializeProfile(allProfileData, name, email, userId);
     setProfileData(getSavedForm);
     router.replace(AppRouter.createProfile);
-  };
+  }, [allProfileData, name, email, userId, router]);
 
-  function findDifferences(): OptionalProfileData {
+  const findDifferences = useCallback((): OptionalProfileData => {
     const source = serializeProfile(allProfileData, name, email, userId);
     const differences: any = {};
 
@@ -128,7 +134,7 @@ export const ProfileDataProvider = ({
     });
 
     return differences;
-  }
+  }, [allProfileData, name, email, userId, profileData]);
 
   const profileId = allProfileData?.profile.id;
 
@@ -174,7 +180,6 @@ const serializeProfile = (
         endDate: convertTimeToString(edu.endDate),
       },
     }));
-
     return {
       jobTitle: profile?.jobTitle ?? "",
       fullName: name,

@@ -69,15 +69,16 @@ export const TechPicker = ({
   }, [selectedOptions]);
 
   return (
-    <div className="relative w-full max-w-full bg-red-100 text-sm">
+    <div className="relative w-full max-w-full bg-transparent text-sm">
       <div
         style={{
           borderStartStartRadius: "10px",
           borderStartEndRadius: "10px",
           borderEndEndRadius: showDropdown ? "0px" : "10px",
           borderEndStartRadius: showDropdown ? "0px" : "10px",
+        
         }}
-        className={`flex flex-wrap gap-1 rounded-t-2xl ${isProject ? "bg-white" : "bg-divider"} ${
+        className={`flex flex-wrap gap-1 p-2 rounded-t-2xl ${isProject ? "bg-white" : "bg-[#f0f0f5] rounded-full hover:bg-[#E4E4E7]"} ${
           !!error ? "bg-red-200" : ""
         } `}
       >

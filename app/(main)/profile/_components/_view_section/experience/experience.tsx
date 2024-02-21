@@ -8,7 +8,8 @@ export const Experience = async ({ profileId }: { profileId: number }) => {
   const jobs = await databaseDrizzle.query.experience.findMany({
     where: (e, o) => o.eq(e.profileId, profileId),
   });
-
+  if(!jobs || jobs.length === 0) return <div/>
+  
   return (
     <section className="mx-12 mt-32">
       <Slide delay={0.16}>

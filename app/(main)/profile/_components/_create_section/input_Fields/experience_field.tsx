@@ -21,6 +21,15 @@ const modules = {
     ["link"],
   ],
 };
+/**
+ * Renders a form field for entering experience details.
+ *
+ * @param {Object} props - The component props.
+ * @param {Control<ProfileSchema>} props.control - The control object from react-hook-form.
+ * @param {UseFieldArrayRemove} props.remove - The remove function from react-hook-form.
+ * @param {number} props.index - The index of the experience field.
+ * @returns {JSX.Element} - The rendered experience field component.
+ */
 const ExperienceField = ({ control, remove, index }: IExperienceField) => {
   const [isCurrent, setIsCurrent] = useState(false);
   return (

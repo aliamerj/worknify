@@ -1,7 +1,8 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ToastContainer, toast } from 'react-toastify';
 import { Button, Input, Textarea } from "@nextui-org/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect} from "react";
 import "react-quill/dist/quill.snow.css";
 import {
   Controller,
@@ -20,6 +21,7 @@ import { TechPicker } from "../input_Fields/tech_picker";
 import ExperienceField from "../input_Fields/experience_field";
 import { EducationField } from "../input_Fields/education_field";
 import { SectionField } from "../input_Fields/section_field";
+import { ApiRouter, AppRouter } from "@/utils/router/app_router";
 
 export const ProfileForm = () => {
   const router = useRouter();
@@ -35,29 +37,24 @@ export const ProfileForm = () => {
     defaultValues: profileData,
     resolver: zodResolver(profileSchemaValidation),
   });
-  type Message = {
-    isError: boolean;
-    message: string;
-  };
 
-  const [message, setMessage] = useState<Message>();
 
   const onSubmit: SubmitHandler<ProfileSchema> = async (data) => {
     try {
       setIsLoading(true);
       if (!profileData.edit) {
-        await axios.post("/api/profile", data);
-        router.push("/");
+        await axios.post(ApiRouter.profile, data);
+        router.push(AppRouter.viewProfile +profileData.userId);
         router.refresh();
       } else {
         const differences = findDifferences();
         if (Object.keys(differences).length !== 0) {
-          const res = await axios.patch("/api/profile", {
+          const res = await axios.patch(ApiRouter.profile, {
             ...differences,
             profileId,
           });
           if (res.status === 200) {
-            setMessage({ isError: false, message: res.data.message });
+            notify(false, res.data.message);
           }
         }
       }
@@ -65,7 +62,14 @@ export const ProfileForm = () => {
       return;
     } catch (error: any) {
       setIsLoading(false);
-      setMessage({ isError: true, message: error.message });
+      notify(true, error.response.data.message);
+    }
+  };
+  const notify = (isError: boolean, message: string) => {
+    if (isError) {
+      toast.error(message);
+    } else {
+      toast.success(message);
     }
   };
   const {
@@ -101,20 +105,13 @@ export const ProfileForm = () => {
 
   return (
     <div className="flex justify-center">
+      <ToastContainer />
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="mx-2 w-full rounded-xl bg-white p-5 drop-shadow-xl lg:max-w-lg"
+        data-testid="submit-button"
       >
-        {message && (
-          <div
-            role="alert"
-            className={`font-regular relative mb-4 block w-full rounded-lg ${
-              message.isError ? "bg-red-500" : "bg-green-500"
-            } p-4 text-base leading-5 text-white opacity-100`}
-          >
-            {message.message}
-          </div>
-        )}
+       
         <Controller
           name="jobTitle"
           control={control}
@@ -263,7 +260,7 @@ export const ProfileForm = () => {
             name="skills"
             control={control}
             render={({ field, fieldState: { error } }) => (
-              <TechPicker field={{ ...field }} error={error} />
+              <TechPicker field={{ ...field }} error={error} isProject={false} />
             )}
           />{" "}
           <div className="flex w-full flex-col gap-3">
@@ -343,7 +340,7 @@ export const ProfileForm = () => {
             </Button>
           </div>
         </div>
-        <button ref={formRef} type="submit" style={{ display: "none" }} />
+        <button  ref={formRef} type="submit" style={{ display: "none" }} />
       </form>
     </div>
   );

@@ -1,4 +1,5 @@
 import "./globals.css";
+import 'react-toastify/dist/ReactToastify.css';
 import { Rubik } from "next/font/google";
 import { Metadata } from "next";
 const rubik = Rubik({
