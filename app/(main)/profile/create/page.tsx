@@ -6,7 +6,7 @@ import CreateProfileGate from "./create_profile_gate";
 
 /**
  * Renders a form to create a user profile.
- * @returns The rendered JSX elements for the CreateProfile component.
+ * returns The rendered JSX elements for the CreateProfile component.
  */
 export default function CreateProfile() {
   return (

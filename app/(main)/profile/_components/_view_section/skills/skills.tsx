@@ -7,8 +7,8 @@ import { MdComputer } from "react-icons/md";
 
 /**
  * Renders a list of skills with corresponding icons.
- * @param skills - A comma-separated string of skill names.
- * @returns The Skills component.
+ * param skills - A comma-separated string of skill names.
+ * returns The Skills component.
  */
 const Skills = ({ skills }: { skills: string }) => {
   const mySkills = skills.split(",").map((skill) => {
@@ -25,7 +25,7 @@ const Skills = ({ skills }: { skills: string }) => {
 
   /**
    * Handles image loading errors for a skill.
-   * @param skill - The skill name.
+   * param skill - The skill name.
    */
   const handleImageError = (skill: string) => {
     setImageErrors((prev) => ({ ...prev, [skill]: true }));

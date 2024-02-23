@@ -133,8 +133,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
 /**
  * Handles a PATCH request to update the user's profile information.
- * @param req - The request object representing the PATCH request.
- * @returns A JSON response indicating the success or failure of the update operation.
+ * param req - The request object representing the PATCH request.
+ * returns A JSON response indicating the success or failure of the update operation.
  */
 export async function PATCH(req: NextRequest) {
   try {

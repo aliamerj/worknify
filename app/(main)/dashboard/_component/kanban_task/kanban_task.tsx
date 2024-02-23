@@ -57,12 +57,12 @@ export const KanbanTask = ({
   featureId: number;
   onOpen: () => void;
 }) => {
-  const { taskColumn, taskActions, project, isDev, isOwner } =
+  const { taskColumn, taskActions, project, isDev, isOwner,updateProjectCompilationBar,allTasks } =
     useDashboardContext();
   const { setIsLoading, setMessageRes } = useApiCallContext();
   const [newTasksOrder, setNewTasksOrder] = useState<ReorderTaskSchema>();
- 
-  const onDragEnd: OnDragEndResponder = (result) => {   
+
+  const onDragEnd: OnDragEndResponder = (result) => {
     if (!isOwner && !isDev)
       return setMessageRes({
         isError: true,
@@ -106,12 +106,14 @@ export const KanbanTask = ({
 
     // Update the local state with the new columns
     taskActions.updateTaskOrder(newColumns);
+    
+
 
     // Prepare and send the update payload to the backend
     // Assuming a more efficient backend update mechanism
-    const updatePayload: ReorderTaskSchema = {
+        const updatePayload: ReorderTaskSchema = {
       projectId: project.id,
-      newStatus: finishColumnId !== startColumnId ? finishColumnId : undefined,
+            newStatus: finishColumnId !== startColumnId ? finishColumnId : undefined,
       items: newColumns[finishColumnId].map((t) => {
         return {
           taskId: t.id,
@@ -120,6 +122,17 @@ export const KanbanTask = ({
       }),
     };
     setNewTasksOrder(updatePayload);
+    
+    if(startColumnId !== finishColumnId){
+      updateProjectCompilationBar({newTasks:allTasks.map(t=> {
+        if(t.id === movedTask.id){
+          t.status =finishColumnId;
+          return t;
+        }
+        return t;
+      })})
+
+    }
   };
 
   const isInitialMount = useRef(true);

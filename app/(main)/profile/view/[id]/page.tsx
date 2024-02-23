@@ -35,8 +35,8 @@ interface Props {
 }
 /**
  * Retrieves and displays a user's profile information.
- * @param params - An object containing the parameters passed to the function, including the user's ID.
- * @returns The rendered profile information, including the header, summary, experience, skills, projects, education, and sections.
+ * param params - An object containing the parameters passed to the function, including the user's ID.
+ * returns The rendered profile information, including the header, summary, experience, skills, projects, education, and sections.
  */
 async function ViewProfile({ params }: Props) {
   const session = await getServerSession(authOptions);

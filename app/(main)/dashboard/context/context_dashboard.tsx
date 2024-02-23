@@ -4,6 +4,7 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -15,8 +16,10 @@ import { useFeatures } from "../hooks/useFeatures";
 import { ColumnsTask, useTaskColumns } from "../hooks/useTasks";
 import { FeatureSchema } from "@/utils/validations/featureValidation";
 import { TaskSchema } from "@/utils/validations/taskValidation";
+import { calculateProjectCompletion } from "@/utils/helper_function";
 
 interface DashboardContextType {
+  projectCmpilation: number,
   project: ProjectSelection;
   isOwner: string | null;
   isDev?: string;
@@ -29,6 +32,7 @@ interface DashboardContextType {
   setSelectedFeatureToUpdate: (feature: FeatureSchema | null) => void;
   selectedTaskToUpdate: TaskSchema | null;
   setSelectedTaskToUpdate: (task: TaskSchema | null) => void;
+  updateProjectCompilationBar:({newFeatures,newTasks}:{newFeatures?:FeatureSelection[], newTasks?:TaskSelection[]})=>void;
   featureActions: {
     pushFeature: (feature: FeatureSelection) => void;
     removeFeature: (id: number) => void;
@@ -41,6 +45,7 @@ interface DashboardContextType {
     updateTask: (newTaskData: TaskSelection) => void;
     updateTaskOrder: (newTasks: Record<ColumnId, TaskSelection[]>) => void;
   };
+  allTasks: TaskSelection[];
 }
 const initialColumns: ColumnsTask = {
   New: [],
@@ -52,14 +57,18 @@ const DashboardContext = createContext<DashboardContextType | undefined>(
   undefined,
 );
 
+/**
+ * Custom hook that allows components to access the context provided by the `DashboardProvider` component.
+ * returns The memoized context value if it exists, otherwise throws an error.
+ */
 export const useDashboardContext = (): DashboardContextType => {
   const context = useContext(DashboardContext);
+
   if (!context) {
-    throw new Error(
-      "useDashboardContext must be used within a DashboardProvider",
-    );
+    throw new Error("Context not found");
   }
-  return context;
+
+  return useMemo(() => context, [context]);
 };
 
 export const DashboardProvider: React.FC<{
@@ -71,10 +80,12 @@ export const DashboardProvider: React.FC<{
     devsInfo: DevInfo[];
     selectedFeatureId?: number;
     features: FeatureSelection[];
-    tasks: TaskSelection[];
+    allTasks: TaskSelection[];
+    featureId: number;
   };
 }> = ({ children, initialData }) => {
-  const { project, isOwner, devsInfo, features, tasks, isDev } = initialData;
+  const { project, isOwner, devsInfo, features, allTasks, isDev, featureId } =
+    initialData;
   const [selectedFeatureToUpdate, setSelectedFeatureToUpdate] =
     useState<FeatureSchema | null>(null);
   const [selectedTaskToUpdate, setSelectedTaskToUpdate] =
@@ -84,6 +95,8 @@ export const DashboardProvider: React.FC<{
     (devs: DevInfo[]) => setContributors(devs),
     [devsInfo],
   );
+  const [projectCmpilation,setProjectCompilation] = useState(calculateProjectCompletion(features,allTasks))
+  
   // feature
   const {
     features: currentFeatures,
@@ -110,8 +123,19 @@ export const DashboardProvider: React.FC<{
     },
     [initialColumns], // Assuming initialColumns is stable and doesn't change often
   );
+
+  const tasks = useCallback(
+    () => allTasks.filter((t) => t.featureId === featureId),
+    [featureId],
+  );
+
   const { taskColumn, pushTask, removeTask, updateTask, updateTaskOrder } =
-    useTaskColumns(getColumns(tasks, initialColumns));
+    useTaskColumns(getColumns(tasks(), initialColumns));
+
+    const updateProjectCompilationBar = useCallback(({newFeatures,newTasks}:{newFeatures?:FeatureSelection[], 
+      newTasks?:TaskSelection[]})=>{
+      setProjectCompilation(calculateProjectCompletion(newFeatures?? features,newTasks?? allTasks))
+    },[pushFeature,removeFeature,pushTask,removeTask,updateTaskOrder])
 
   // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(
@@ -122,8 +146,11 @@ export const DashboardProvider: React.FC<{
       contributors,
       updateContributors,
       features: currentFeatures,
-      tasks,
-      taskColumn: getColumns(tasks, taskColumn),
+      tasks: tasks(),
+      allTasks,
+      projectCmpilation,
+      taskColumn: getColumns(tasks(), taskColumn),
+      updateProjectCompilationBar,
       featureActions: {
         pushFeature,
         removeFeature,
@@ -151,6 +178,7 @@ export const DashboardProvider: React.FC<{
       selectedFeatureToUpdate,
       selectedTaskToUpdate,
       contributors,
+      featureId,
     ],
   );
 

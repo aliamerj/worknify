@@ -25,7 +25,7 @@ export const BoardFeature = ({
   feature: FeatureSelection;
 }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { setSelectedTaskToUpdate } = useDashboardContext();
+  const { setSelectedTaskToUpdate, isDev, isOwner } = useDashboardContext();
 
   return (
     <div
@@ -67,19 +67,22 @@ export const BoardFeature = ({
             {feature.endDate ? formatDate(feature.endDate) : "N/A"}
           </span>
         </div>
-        <div className="mt-5">
-          <Button
-            color="primary"
-            variant="shadow"
-            size="lg"
-            onPress={(_) => {
-              setSelectedTaskToUpdate(null);
-              onOpen();
-            }}
-          >
-            Create New Feature
-          </Button>
-        </div>
+        {isDev ||
+          (isOwner && (
+            <div className="mt-5">
+              <Button
+                color="primary"
+                variant="shadow"
+                size="lg"
+                onPress={(_) => {
+                  setSelectedTaskToUpdate(null);
+                  onOpen();
+                }}
+              >
+                Create New Feature
+              </Button>
+            </div>
+          ))}
       </div>
       <KanbanTask featureId={feature.id} onOpen={onOpen} />
       <AddTaskModal

@@ -1,5 +1,6 @@
 "use client";
 import DatePicker from "react-datepicker";
+import { ToastContainer, toast } from "react-toastify";
 import "react-datepicker/dist/react-datepicker.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input, Tab, Tabs } from "@nextui-org/react";
@@ -41,7 +42,6 @@ const ProjectForm = ({
     type: project?.type ?? "public",
     link: project?.link,
     description: project?.description,
-    compilation: project?.compilation,
     projectGoal: project?.projectGoal,
     techUsed: project?.techUsed,
     timePeriod: {
@@ -53,13 +53,7 @@ const ProjectForm = ({
     defaultValues: initialData,
     resolver: zodResolver(projectSchema),
   });
-  type Message = {
-    isError?: boolean;
-    iswarning?: boolean;
-    message: string;
-  };
   const router = useRouter();
-  const [message, setMessage] = useState<Message>();
   const [image, setImage] = useState<string | null>(project?.logo ?? null);
   const [selectedType, setSelectedType] = useState<ProjectSelection["type"]>(
     project?.type ?? "public",
@@ -77,8 +71,15 @@ const ProjectForm = ({
       setImage(URL.createObjectURL(file));
       field.onChange(file);
     } else {
-      setMessage({ isError: false, message: "Invalid Image type" });
+      notify(false, "Invalid Image Type");
       setImage(null);
+    }
+  };
+  const notify = (isError: boolean, message: string) => {
+    if (isError) {
+      toast.error(message);
+    } else {
+      toast.success(message);
     }
   };
 
@@ -132,7 +133,6 @@ const ProjectForm = ({
       if (!project) {
         const res = await axios.post("/api/project", formData);
         router.push(AppRouter.viewProject + res.data.projectId);
-        router.push(AppRouter.myProject + userId);
         router.refresh();
       } else {
         if (Object.keys(targetData).length > 1) {
@@ -140,39 +140,23 @@ const ProjectForm = ({
           router.push(AppRouter.viewProject + project.id!);
           router.refresh();
         } else {
-          setMessage({
-            iswarning: true,
-            message: "Looks like you haven't made any changes !",
-          });
+          toast.warning("Looks like you haven't made any changes !");
         }
       }
     } catch (error: any) {
-      setMessage({ isError: true, message: error.message });
+      setIsLoading(false);
+      notify(true, error.response.data.message);
     }
-    setIsLoading(false);
   };
 
   return (
     <>
       <div className="flex h-screen items-center justify-center bg-gray-100 px-4">
+        <ToastContainer />
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="w-full max-w-6xl rounded-2xl bg-white p-8 shadow-2xl"
         >
-          {message && (
-            <div
-              role="alert"
-              className={`mb-6 w-full rounded-lg p-5 text-base font-medium leading-6 text-white ${
-                message.isError
-                  ? "bg-red-500"
-                  : message.iswarning
-                    ? "bg-warning"
-                    : "bg-green-500"
-              }`}
-            >
-              {message.message}
-            </div>
-          )}
           <div className="pb-5">
             <Controller
               name="type"

@@ -1,17 +1,17 @@
-import { useState, useCallback } from "react";
+// import { useState, useCallback } from "react";
 
-export type MessageRes = {
-  isError: boolean;
-  message: string;
-};
+// export type MessageRes = {
+//   isError: boolean;
+//   message: string;
+// };
 
-export const useMessage = () => {
-  const [message, setMessage] = useState<MessageRes | null>(null);
+// export const useMessage = () => {
+//   const [message, setMessage] = useState<MessageRes | null>(null);
 
-  const setMessageRes = useCallback((res: MessageRes) => {
-    setMessage(res);
-    setTimeout(() => setMessage(null), 5000);
-  }, []);
+//   const setMessageRes = useCallback((res: MessageRes) => {
+    
+//     setMessage(res);
+//   }, []);
 
-  return { message, setMessageRes };
-};
+//   return { message, setMessageRes };
+// };

@@ -1,10 +1,9 @@
 import { AppRouterContextProviderMock } from "@/__test__/app-router-context-provider-mock";
 import { ProfileForm } from "@/app/(main)/profile/_components/_create_section/_form/profile_form";
-import { ProfileData, ProfileDataProvider, useProfileData } from "../../../app/(main)/profile/_components/context/profile_context";
+import {  ProfileDataProvider} from "../../../app/(main)/profile/_components/context/profile_context";
 import { AllProfileData } from "@/utils/api_handler/profile_handler";
 import { profileSchemaValidation } from "@/utils/validations/profileValidation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { act, fireEvent, render,getByLabelText } from "@testing-library/react";
+import {  render, } from "@testing-library/react";
 import axios from "axios";
 import React from "react";
 
@@ -13,7 +12,6 @@ beforeEach(() => {
     jest.resetAllMocks();
   });
   
-
     // The onSubmit function should be called when the form is submitted with valid data
     it('should call onSubmit function and update profile data when form is submitted with valid data',async () => {
         // Mock dependencies

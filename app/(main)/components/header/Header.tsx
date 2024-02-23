@@ -1,3 +1,4 @@
+import React from "react";
 import Image from "next/image";
 import hero from "@/public/hero.png";
 import styles from "./Header.module.css";
@@ -5,6 +6,10 @@ import { Button } from "@nextui-org/button";
 import Link from "next/link";
 import { ApiRouter } from "@/utils/router/app_router";
 
+/**
+ * Renders the header section of a web page.
+ * returns JSX element representing the header section.
+ */
 export const Header = () => {
   return (
     <main className={styles.container}>
@@ -39,7 +44,7 @@ export const Header = () => {
           >
             Learn More
           </Button>
-        </div>{" "}
+        </div>
       </div>
     </main>
   );

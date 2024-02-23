@@ -48,11 +48,11 @@ export const useProfileData = () => {
 };
 /**
  * React context provider component for profile data.
- * @param children - React node representing the components that will be wrapped by the `ProfileDataContext.Provider`.
- * @param name - A string representing the name of the user.
- * @param email - A string representing the email of the user.
- * @param userId - A string representing the ID of the user.
- * @param allProfileData - An object representing the profile data of the user.
+ * param children - React node representing the components that will be wrapped by the `ProfileDataContext.Provider`.
+ * param name - A string representing the name of the user.
+ * param email - A string representing the email of the user.
+ * param userId - A string representing the ID of the user.
+ * param allProfileData - An object representing the profile data of the user.
  */
 export const ProfileDataProvider = ({
   children,

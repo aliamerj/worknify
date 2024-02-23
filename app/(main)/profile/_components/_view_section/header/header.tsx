@@ -1,9 +1,8 @@
 import Image from "next/image";
 import { ButtonHeader } from "../buttonsHeader/button_header";
 import styles from "./header.module.css";
-import { FaLinkedin, FaGithub, FaFileDownload } from "react-icons/fa";
-import { Tooltip } from "@nextui-org/react";
-import Link from "next/link";
+import { FaLinkedin, FaGithub } from "react-icons/fa";
+
 interface IHeader {
   fullName: string;
   image: string | null;
@@ -79,7 +78,9 @@ const Header: React.FC<IHeader> = ({
   };
 
   return (
-    <div className={`${styles.bgPattern} flex h-screen justify-center p-5 pt-20 text-white shadow-md`}>
+    <div
+      className={`${styles.bgPattern} flex h-screen justify-center p-5 pt-20 text-white shadow-md`}
+    >
       <div className="flex flex-col-reverse items-center justify-center pb-14 md:w-4/5 md:flex-row md:items-center md:justify-evenly md:gap-3">
         <section className="mx-5 flex flex-col items-center justify-center px-5 pt-16  md:items-start md:justify-start">
           <h1 className="text-4xl font-bold md:text-5xl">{fullName}</h1>
@@ -112,17 +113,10 @@ const Header: React.FC<IHeader> = ({
       <div className="flex flex-col items-end gap-5">
         {renderLinkedInLink()}
         {renderGithubLink()}
-        <Tooltip content="Download CV" color="primary" placement="left-end">
-          <Link href="#" target="_blank" rel="noopener">
-            <FaFileDownload
-              className="transform text-[35px] transition-transform hover:scale-125"
-              aria-label="Download CV"
-            />
-          </Link>
-        </Tooltip>
       </div>
     </div>
   );
 };
 
 export default Header;
+

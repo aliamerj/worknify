@@ -5,8 +5,8 @@ import { FaUserPlus } from "react-icons/fa";
 
 /**
  * Renders a message and an action button based on whether the current user has a profile or not.
- * @param {boolean} isCurrentUser - A boolean value indicating whether the current user is the owner of the profile.
- * @returns {JSX.Element} - The rendered component.
+ * param {boolean} isCurrentUser - A boolean value indicating whether the current user is the owner of the profile.
+ * returns {JSX.Element} - The rendered component.
  */
 export const Noprofile = ({ isCurrentUser }: { isCurrentUser: boolean }): JSX.Element => {
   const message = isCurrentUser

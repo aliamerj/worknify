@@ -19,8 +19,8 @@ export const metadata: Metadata = {
  * The `RootLayout` function is a React component that serves as the layout for the root of the application.
  * It wraps the children components with providers and sets up the HTML structure.
  *
- * @param children - React node representing the components to be rendered within the layout.
- * @returns The rendered HTML structure with the wrapped components and providers.
+ * param children - React node representing the components to be rendered within the layout.
+ * returns The rendered HTML structure with the wrapped components and providers.
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

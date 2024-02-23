@@ -47,6 +47,8 @@ export const AddTaskModal = ({
     contributors,
     isOwner,
     isDev,
+    allTasks,
+    updateProjectCompilationBar,
   } = useDashboardContext();
   const { setMessageRes, setIsLoading, isLoading } = useApiCallContext();
   const getHighestOrder = () =>
@@ -117,6 +119,7 @@ export const AddTaskModal = ({
           endDate: data.timePeriod?.endDate ?? null,
         };
         taskActions.pushTask(newTask);
+        updateProjectCompilationBar({newTasks:[...allTasks,newTask]})
       }
       setMessageRes({ isError: false, message: res.data.message });
       onClose();

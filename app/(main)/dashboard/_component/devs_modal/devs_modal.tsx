@@ -11,7 +11,8 @@ import Image from "next/image";
 import { MdOutlinePersonRemove } from "react-icons/md";
 import { useApiCallContext } from "@/utils/context/api_call_context";
 import axios from "axios";
-import { ApiRouter } from "@/utils/router/app_router";
+import { ApiRouter, AppRouter } from "@/utils/router/app_router";
+import Link from "next/link";
 
 export const DevsModal = ({
   isOpen,
@@ -54,26 +55,29 @@ export const DevsModal = ({
                     key={id}
                     className="flex items-center justify-between rounded-lg bg-white p-4 shadow-md"
                   >
-                    <div className="flex items-center">
-                      <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full">
-                        <Image
-                          src={image}
-                          alt="Profile picture"
-                          layout="fill"
-                          objectFit="cover"
-                        />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-lg font-medium text-gray-900">
-                          {name}
+                    {" "}
+                    <Link href={AppRouter.viewProfile + id}>
+                      <div className="flex items-center">
+                        <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full">
+                          <Image
+                            src={image}
+                            alt="Profile picture"
+                            layout="fill"
+                            objectFit="cover"
+                          />
                         </div>
-                        <div className="text-sm text-gray-500">{email}</div>
-                        <div className="text-sm text-indigo-600">
-                          {" "}
-                          {project.owner === id ? "Admin" : "Contributor"}
+                        <div className="ml-4">
+                          <div className="text-lg font-medium text-gray-900">
+                            {name}
+                          </div>
+                          <div className="text-sm text-gray-500">{email}</div>
+                          <div className="text-sm text-indigo-600">
+                            {" "}
+                            {project.owner === id ? "Admin" : "Contributor"}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </Link>
                     {isOwner && id !== project.owner && (
                       <Button
                         isIconOnly

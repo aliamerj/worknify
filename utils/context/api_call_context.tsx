@@ -6,6 +6,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
+import { toast } from "react-toastify";
 export type MessageRes = {
   isError: boolean;
   message: string;
@@ -34,9 +35,11 @@ export const ApiCallProvider: React.FC<{ children: React.ReactNode }> = ({
   const [message, setMessage] = useState<MessageRes | null>(null);
 
   const setMessageRes = useCallback((res: MessageRes) => {
-    setMessage(res);
-    const timer = setTimeout(() => setMessage(null), 5000);
-    return () => clearTimeout(timer);
+    if(res?.isError){
+      return toast.error(res.message)
+    }
+    return toast.success(res.message)
+ 
   }, []);
 
   const contextValue = useMemo(

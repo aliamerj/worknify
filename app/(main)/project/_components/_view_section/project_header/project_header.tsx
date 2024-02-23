@@ -17,6 +17,7 @@ import { NotificationSchema } from "@/utils/validations/notificationsValidation"
 import Link from "next/link";
 
 interface Props {
+  isAuth: boolean;
   projectLogo: string | null;
   projectName: string;
   projectGoal: string;
@@ -45,6 +46,7 @@ const ProjectHeader = ({
   isCreater,
   owner,
   isWaiting,
+  isAuth,
 }: Props) => {
   const [iswaiting, setIsWaiting] = useState(isWaiting);
   const [error, setError] = useState(null);
@@ -70,6 +72,7 @@ const ProjectHeader = ({
   const route = useRouter();
 
   const handleActionBtn = async () => {
+    if (!isAuth) return route.push(AppRouter.signup);
     setLoading({ isLoading: true, on: "JOIN" });
     try {
       if (isCreater) return route.push(AppRouter.editProject + projectId);
@@ -79,6 +82,7 @@ const ProjectHeader = ({
           senderId: owner,
           notificationType: "JOIN_REQUEST",
         };
+
         const res = await axios.post(
           ApiRouter.projectJoin + projectId,
           projectJoin,
@@ -98,6 +102,7 @@ const ProjectHeader = ({
   };
 
   const handleGivenStar = async () => {
+    if (!isAuth) return route.push(AppRouter.signup);
     setLoading({ isLoading: true, on: "STAR" });
     try {
       if (isStared) {

@@ -8,8 +8,8 @@ import { useProfileData } from "../_components/context/profile_context";
  * This component acts as a gatekeeper for accessing the edit profile functionality.
  * It checks if the user has the necessary profile data and redirects them to the create profile page if not.
  *
- * @param children - The child components to be rendered within the EditProfileGate component.
- * @returns The child components wrapped within a <main> element.
+ * param children - The child components to be rendered within the EditProfileGate component.
+ * returns The child components wrapped within a <main> element.
  */
 export default function EditProfileGate({
   children,

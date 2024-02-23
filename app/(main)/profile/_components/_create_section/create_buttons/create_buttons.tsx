@@ -6,7 +6,7 @@ import { useProfileData } from "../../context/profile_context";
 
 /**
  * Renders a set of buttons.
- * @returns JSX element representing a set of buttons.
+ * returns JSX element representing a set of buttons.
  */
 export const CreateButtons = () => {
   const { isLoading, triggerSubmit } = useProfileData();

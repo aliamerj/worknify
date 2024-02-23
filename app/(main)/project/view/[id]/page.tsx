@@ -38,21 +38,25 @@ export default async function ProjectViewPage({ params }: Props) {
       return <NotAllowedPage />;
     }
   }
-  const isWaiting = await databaseDrizzle.query.notification.findFirst({
-    where: (n) =>
-      and(
-        eq(n.senderId, sesstion?.user.id!),
-        eq(n.receiverId, project.owner),
-        eq(n.notificationType, "JOIN_REQUEST"),
-        eq(n.projectId, projectId),
-      ),
-    columns: {
-      id: true,
-    },
-  });
+  let isWaiting: { id: number } | undefined;
+  if (sesstion?.user.id) {
+    isWaiting = await databaseDrizzle.query.notification.findFirst({
+      where: (n) =>
+        and(
+          eq(n.senderId, sesstion?.user.id!),
+          eq(n.receiverId, project.owner),
+          eq(n.notificationType, "JOIN_REQUEST"),
+          eq(n.projectId, projectId),
+        ),
+      columns: {
+        id: true,
+      },
+    });
+  }
   return (
     <>
       <ProjectHeader
+        isAuth={!!sesstion?.user.id}
         isWaiting={!!isWaiting}
         isJoined={project.owner === sesstion?.user.id || !!isDev}
         owner={project.owner}

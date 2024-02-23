@@ -13,10 +13,10 @@ interface IEducationField {
 /**
  * Renders a form field for education details.
  *
- * @param {object} control - The control object from react-hook-form.
- * @param {function} remove - The function to remove the education field from the form.
- * @param {number} index - The index of the education field in the form.
- * @returns {JSX.Element} - The rendered education field component.
+ * param {object} control - The control object from react-hook-form.
+ * param {UseFieldArrayRemove} remove - The function to remove the education field from the form.
+ * param {number} index - The index of the education field in the form.
+ * returns {JSX.Element} - The rendered education field component.
  */
 export const EducationField = ({ control, remove, index }: IEducationField) => {
   const [isCurrent, setIsCurrent] = useState(false);

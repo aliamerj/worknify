@@ -1,6 +1,6 @@
 "use client";
 import { LoaderFullPage } from "@/global-components/loader/loader";
-import { SideErrorMessage } from "@/global-components/side_error_message/side_error_message";
+import { useApiCallContext } from "@/utils/context/api_call_context";
 import {
   Button,
   Modal,
@@ -12,7 +12,7 @@ import {
 } from "@nextui-org/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
 
 export const DeleteProjectBtn = ({
   projectName,
@@ -22,17 +22,23 @@ export const DeleteProjectBtn = ({
   projectId: number;
 }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const {isLoading,setIsLoading,setMessageRes} = useApiCallContext()
+
   const router = useRouter();
   const handleDeleteProject = async () => {
     setIsLoading(true);
     try {
       const res = await axios.delete("/api/project/", { data: { projectId } });
       router.refresh();
-      setError(res.data.message);
+      setMessageRes({
+        isError: false,
+        message: res.data.message,
+      }); 
     } catch (error: any) {
-      setError(error.message);
+      setMessageRes({
+        isError: true,
+        message: error.response.data.message,
+      }); 
     }
     setIsLoading(false);
   };
@@ -77,7 +83,6 @@ export const DeleteProjectBtn = ({
           )}
         </ModalContent>
       </Modal>
-      {error && <SideErrorMessage errorMessage={error} isError={error} />}
       {isLoading && <LoaderFullPage />}
     </div>
   );

@@ -9,8 +9,8 @@ import { useEffect } from "react";
  * It checks if the `profileData` has an `edit` property and if it does,
  * it redirects the user to the edit profile page.
  *
- * @param children - The child components to be rendered within the `CreateProfileGate` component.
- * @returns The child components wrapped within a `<main>` element.
+ * param children - The child components to be rendered within the `CreateProfileGate` component.
+ * returns The child components wrapped within a `<main>` element.
  */
 export default function CreateProfileGate({
   children,

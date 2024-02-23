@@ -1,7 +1,10 @@
 import { Card, CardBody, CardHeader, Divider } from "@nextui-org/react";
 import { SiTask } from "react-icons/si";
 
-import { formatDate } from "@/utils/helper_function";
+import {
+  calculateProjectCompletion,
+  formatDate,
+} from "@/utils/helper_function";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FeatureSelection } from "@/db/schemes/featureSchema";
 import axios from "axios";
@@ -18,12 +21,21 @@ export const FeaturesCard = ({
   onOpen: () => void;
   feature: FeatureSelection;
 }) => {
-  const { isOwner, featureActions, setSelectedFeatureToUpdate, tasks,taskActions } =
-    useDashboardContext();
+  const {
+    isOwner,
+    featureActions,
+    setSelectedFeatureToUpdate,
+    allTasks,
+    taskActions,
+    features,
+    updateProjectCompilationBar,
+  } = useDashboardContext();
   const { setMessageRes } = useApiCallContext();
   const getTaskCount = useCallback(
-    () => tasks.filter((t) => t.featureId === feature.id).length,
-    [tasks,taskActions ],
+    () =>
+      allTasks.filter((t) => t.featureId === feature.id && t.status !== "Done")
+        .length,
+    [taskActions, allTasks],
   );
   return (
     <>
@@ -38,6 +50,10 @@ export const FeaturesCard = ({
                       data: {
                         projectId: feature.projectId,
                         featureId: feature.id,
+                        projectCompletion: calculateProjectCompletion(
+                          features.filter((f) => f.id !== feature.id),
+                          allTasks,
+                        ),
                       },
                     });
                     setMessageRes({
@@ -45,6 +61,7 @@ export const FeaturesCard = ({
                       message: res.data.message,
                     });
                     featureActions.removeFeature(feature.id);
+                    updateProjectCompilationBar({newFeatures:features.filter(f=>f.id !== feature.id)})
                   } catch (error: any) {
                     setMessageRes({
                       isError: true,
@@ -60,10 +77,9 @@ export const FeaturesCard = ({
               <button
                 onClick={() => {
                   setSelectedFeatureToUpdate({
-                    id: feature.id,
+                                        id: feature.id,
                     projectId: feature.projectId,
                     order: feature.order,
-                    taskCount: 0,
                     featureName: feature.featureName,
                     description: feature.description ?? undefined,
                     tag: feature.tags?.split(";") ?? undefined,
@@ -87,9 +103,11 @@ export const FeaturesCard = ({
           <div className="flex flex-col">
             <div className="flex items-center justify-start">
               <p className="text-lg">{feature.featureName}</p>
-              {getTaskCount() > 0 && (<span className="ms-3 inline-flex h-3 w-3 items-center justify-center rounded-full bg-blue-100 p-3 text-small font-medium text-blue-800">
-                {getTaskCount()}
-              </span>)}
+              {getTaskCount() > 0 && (
+                <span className="ms-3 inline-flex h-3 w-3 items-center justify-center rounded-full bg-blue-100 p-3 text-small font-medium text-blue-800">
+                  {getTaskCount()}
+                </span>
+              )}
             </div>
             <p className="text-small text-default-500">
               {feature.startDate && formatDate(feature.startDate)}

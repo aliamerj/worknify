@@ -5,7 +5,6 @@ import { TaskMangementPage } from "../_component/task_mangement_page/task_mangem
 import { parseInt } from "lodash";
 import { notFound } from "next/navigation";
 import { DashboardProvider } from "../context/context_dashboard";
-import { TaskSelection } from "@/db/schemes/taskSchema";
 export interface DevInfo {
   id: string;
   image: string;
@@ -17,48 +16,60 @@ interface Props {
   searchParams: { feature?: string };
 }
 export default async function DashboardPage({ params, searchParams }: Props) {
-  // auth
+  // Retrieve session using authOptions
   const session = await getServerSession(authOptions);
-  // project
-  const id = parseInt(params.projectId);
-  const project = await databaseDrizzle.query.project.findFirst({
-    where: (p, o) => o.eq(p.id, id),
-  });
-  if (!project) return notFound();
 
-  // feature
-  const features = await databaseDrizzle.query.feature.findMany({
-    where: (f, o) => o.eq(f.projectId, id),
+  // Retrieve project from database
+  const projectId = parseInt(params.projectId);
+  const project = await databaseDrizzle.query.project.findFirst({
+    where: (p, o) => o.eq(p.id, projectId),
   });
-  // devs
+
+  // Return 404 error if project is not found
+  if (!project) {
+    return notFound();
+  }
+
+  // Retrieve features associated with the project
+  const features = await databaseDrizzle.query.feature.findMany({
+    where: (f, o) => o.eq(f.projectId, projectId),
+  });
+
+  // Retrieve developer IDs associated with the project
   const devIds = await databaseDrizzle.query.dev.findMany({
-    where: (d, o) => o.eq(d.projectId, id),
+    where: (d, o) => o.eq(d.projectId, projectId),
     columns: {
       devId: true,
     },
   });
+
+  // Retrieve information about the developers
   const contributers = [project.owner, ...devIds.map((d) => d.devId)];
   const devsInfo = await getDevsInfo(contributers);
-  const isOwner = session?.user.id === project?.owner ? session?.user.id : null;
-  let isDev;
-  if (session?.user.id) isDev = devIds.find(d=> d.devId === session.user.id)?.devId;
-  // tasks
-  const selectedFeatureId = parseInt(searchParams.feature ?? "");
-  let tasks: TaskSelection[] = [];
-  if (selectedFeatureId)
-    tasks = await databaseDrizzle.query.tasks.findMany({
-      where: (t, o) => o.eq(t.featureId, selectedFeatureId),
-    });
 
+  // Check if the current user is the owner of the project
+  const isOwner = session?.user.id === project?.owner ? session?.user.id : null;
+
+  // Check if the current user is a developer associated with the project
+  const isDev = session?.user.id && devIds.find((d) => d.devId === session.user.id)?.devId;
+
+  // Retrieve all tasks associated with the project
+  const selectedFeatureId = parseInt(searchParams.feature ?? "");
+  const allTasks = await databaseDrizzle.query.tasks.findMany({
+    where: (t, o) => o.eq(t.projectId, projectId),
+  });
+
+  // Return JSX element rendering TaskMangementPage component wrapped in DashboardProvider component
   return (
     <DashboardProvider
       initialData={{
         project,
         features,
-        tasks,
+        allTasks,
         devsInfo,
         isOwner,
         isDev,
+        featureId: selectedFeatureId,
       }}
     >
       <TaskMangementPage featureId={selectedFeatureId} />

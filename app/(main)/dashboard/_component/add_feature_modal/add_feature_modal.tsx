@@ -39,7 +39,7 @@ export const AddFeatureModal = ({
   isOpen: boolean;
   onOpenChange: () => void;
 }) => {
-  const { features, selectedFeatureToUpdate, project, featureActions } =
+  const {allTasks, features, selectedFeatureToUpdate, project, featureActions,updateProjectCompilationBar } =
     useDashboardContext();
   const { setMessageRes, setIsLoading, isLoading } = useApiCallContext();
   const getHighestOrder = () =>
@@ -110,6 +110,8 @@ export const AddFeatureModal = ({
           endDate: data.timePeriod?.endDate ?? null,
         };
         featureActions.pushFeature(newFeature);
+        updateProjectCompilationBar({newFeatures:[...features,newFeature]})
+
       }
       setMessageRes({ isError: false, message: res.data.message });
       onClose();

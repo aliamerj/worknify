@@ -48,8 +48,8 @@ export async function POST(request: NextRequest) {
     order: order,
     description: description,
     tags: tag?.join(";"),
-    startDate: timePeriod.startDate,
-    endDate: timePeriod.endDate,
+    startDate: timePeriod?.startDate,
+    endDate: timePeriod?.endDate,
   };
   try {
     const featureRes = await databaseDrizzle

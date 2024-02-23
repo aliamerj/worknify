@@ -7,7 +7,7 @@ import { useProfileData } from "../../context/profile_context";
 /**
  * Renders the profile display component.
  *
- * @returns {JSX.Element} The profile display component.
+ * returns {JSX.Element} The profile display component.
  */
 
 export const ProfileDisplay = () => {

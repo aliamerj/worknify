@@ -12,7 +12,6 @@ import {
 import { ReorderFeatureSchema } from "@/utils/validations/featureValidation";
 import axios from "axios";
 import { ApiRouter, AppRouter } from "@/utils/router/app_router";
-import { SideErrorMessage } from "@/global-components/side_error_message/side_error_message";
 import { useRouter } from "next/navigation";
 import { EmptyBoardFeature } from "../empty_board_feature/empty_board_feature";
 import { FaLightbulb } from "react-icons/fa";
@@ -21,6 +20,8 @@ import { useDashboardContext } from "../../context/context_dashboard";
 import { useApiCallContext } from "@/utils/context/api_call_context";
 import { FaPeopleGroup } from "react-icons/fa6";
 import { DevsModal } from "../devs_modal/devs_modal";
+import { calculateProjectCompletion } from "@/utils/helper_function";
+import { ToastContainer } from "react-toastify";
 
 export enum DroppableIds {
   featuresList = "FEATURE_LIST",
@@ -30,14 +31,16 @@ export enum DroppableIds {
 export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const { features, isOwner, project, featureActions, contributors } =
+  const { features, isOwner, project, featureActions, contributors,projectCmpilation: projectoCmpilation } =
     useDashboardContext();
   const { setMessageRes, message, isLoading, setIsLoading } =
     useApiCallContext();
   const [newFeatureOrder, setNewFeatureOrder] =
     useState<ReorderFeatureSchema>();
 
+
   const { isOpen, onOpen, onClose } = useDisclosure();
+
 
   const handleToggleSidebar = () => setIsSidebarOpen((current) => !current);
 
@@ -127,6 +130,7 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
   return (
     <>
       <div className="flex">
+      
         <DragDropContext
           onDragEnd={handleOnDragEnd}
           onDragStart={handleOnDragStart}
@@ -178,7 +182,7 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
                 label="Completion Progress"
                 aria-label="Completion..."
                 size="sm"
-                value={project.compilation}
+                value={projectoCmpilation}
                 color="primary"
                 showValueLabel={true}
                 className="max-w-full"
@@ -200,12 +204,7 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
           </div>
         </DragDropContext>
       </div>
-      {message && (
-        <SideErrorMessage
-          errorMessage={message.message}
-          isError={message.isError}
-        />
-      )}
+      <ToastContainer position="bottom-left" className='z-50' />
       {isLoading && (
         <Spinner
           size="lg"

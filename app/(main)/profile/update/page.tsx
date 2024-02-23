@@ -6,7 +6,7 @@ import EditProfileGate from "./edit_profile_gate";
 
 /**
  * Renders a page for editing a user's profile.
- * @returns The rendered page for editing a user's profile.
+ * returns The rendered page for editing a user's profile.
  */
 export default function Page() {
   return (

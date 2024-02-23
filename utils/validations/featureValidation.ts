@@ -40,13 +40,12 @@ export const featureSchema = z.object({
     )
     .max(5, "No more than 5 tags are allowed")
     .optional(),
-
+  
   description: z
     .string()
     .trim()
     .max(500, "Description must be under 500 characters")
     .optional(),
-  taskCount: z.number().default(0),
   order: z.number().min(0),
   timePeriod: TimePeriod.nullable(),
 });
@@ -54,7 +53,7 @@ export const featureSchema = z.object({
 export const deleteFeatureSchema = z.object({
   projectId: z.number(),
   featureId: z.number(),
-});
+  });
 export const editFeatureSchema = z.object({
   id: z.number(),
   projectId: z.number(),
@@ -86,7 +85,6 @@ export const editFeatureSchema = z.object({
     .trim()
     .max(500, "Description must be under 500 characters")
     .optional(),
-  taskCount: z.number().optional(),
   order: z.number().min(0).optional(),
   timePeriod: TimePeriod.optional(),
 });

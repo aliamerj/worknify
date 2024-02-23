@@ -5,7 +5,7 @@ import axios from "axios";
 import { useState } from "react";
 import { FaTimesCircle } from "react-icons/fa";
 import { AllNotification } from "../notification_item/notification_item";
-import { SideErrorMessage } from "@/global-components/side_error_message/side_error_message";
+import { ToastContainer, toast } from "react-toastify";
 
 export const NotificationBtn = ({
   notific,
@@ -15,7 +15,7 @@ export const NotificationBtn = ({
   handleNotific: (notifId: number) => void;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
+ 
   const handleRequest = ({ isAccept }: { isAccept: boolean }) => {
     setIsLoading(true);
     try {
@@ -25,7 +25,7 @@ export const NotificationBtn = ({
       };
       axios.post(ApiRouter.projectJoin + notific.projectId, notification);
     } catch (err: any) {
-      setIsError(true);
+      toast.error(err.response.data.message)
     }
     handleNotific(notific.id);
     setIsLoading(false);
@@ -35,7 +35,7 @@ export const NotificationBtn = ({
     try {
       axios.delete(ApiRouter.notifications + notific.id);
     } catch (err: any) {
-      setIsError(true);
+      toast.error(err.response.data.message)
     }
     handleNotific(notific.id);
     setIsLoading(false);
@@ -72,12 +72,7 @@ export const NotificationBtn = ({
           <FaTimesCircle className="text-lg" />
         </button>
       )}
-      {isError && (
-        <SideErrorMessage
-          isError={isError}
-          errorMessage="Oops! Something went wrong. Please try again later."
-        />
-      )}
+    <ToastContainer/>
     </div>
   );
 };

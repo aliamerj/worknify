@@ -1,5 +1,8 @@
-import { TaskSelection } from "@/db/schemes/taskSchema";
-import { formatDate } from "@/utils/helper_function";
+import { TaskSelection, tasks } from "@/db/schemes/taskSchema";
+import {
+  calculateProjectCompletion,
+  formatDate,
+} from "@/utils/helper_function";
 import { DraggableProvided } from "@hello-pangea/dnd";
 import React from "react";
 import {
@@ -25,8 +28,15 @@ export const TaskCard = ({
   provided: DraggableProvided;
   onOpen: () => void;
 }) => {
-  const { contributors, setSelectedTaskToUpdate, taskActions, isOwner } =
-    useDashboardContext();
+  const {
+    contributors,
+    setSelectedTaskToUpdate,
+    taskActions,
+    isOwner,
+    features,
+    allTasks,
+    updateProjectCompilationBar,
+  } = useDashboardContext();
   const { setMessageRes, setIsLoading, isLoading } = useApiCallContext();
   const assignedTo = contributors.find((d) => d.id === task.assignedTo);
   const creator = contributors.find((d) => d.id === task.creatorId);
@@ -110,13 +120,14 @@ export const TaskCard = ({
                       projectId: task.projectId,
                       featureId: task.featureId,
                       taskId: task.id,
-                    },
+                                          },
                   });
                   setMessageRes({
                     isError: false,
                     message: res.data.message,
                   });
                   taskActions.removeTask(task.id, task.status);
+                  updateProjectCompilationBar({newTasks:allTasks.filter(t=>t.id !== task.id)})
                 } catch (error: any) {
                   setMessageRes({
                     isError: true,

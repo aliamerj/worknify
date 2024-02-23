@@ -5,9 +5,9 @@ import { notFound } from "next/navigation";
 import { IoSchoolSharp } from "react-icons/io5";
 /**
  * Retrieves education data from a database and displays it in a formatted way on a webpage.
- * @param {Object} props - The props object.
- * @param {number} props.profileId - The ID of the profile for which education data needs to be fetched.
- * @returns {JSX.Element} - JSX code that displays the education data on a webpage.
+ * param {Object} props - The props object.
+ * param {number} props.profileId - The ID of the profile for which education data needs to be fetched.
+ * returns {JSX.Element} - JSX code that displays the education data on a webpage.
  */
 export const Education = async ({ profileId }: { profileId: number }): Promise<JSX.Element> => {
   try {
