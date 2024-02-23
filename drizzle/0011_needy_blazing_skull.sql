@@ -1,1 +1,0 @@
-ALTER TABLE "feature" ADD COLUMN "order" integer NOT NULL;

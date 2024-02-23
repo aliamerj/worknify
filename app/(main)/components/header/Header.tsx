@@ -5,12 +5,15 @@ import styles from "./Header.module.css";
 import { Button } from "@nextui-org/button";
 import Link from "next/link";
 import { ApiRouter } from "@/utils/router/app_router";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 /**
  * Renders the header section of a web page.
  * returns JSX element representing the header section.
  */
-export const Header = () => {
+export const Header =async () => {
+  const sestions =await getServerSession(authOptions)
   return (
     <main className={styles.container}>
       <Image
@@ -30,13 +33,13 @@ export const Header = () => {
           success under one roof.
         </h3>
         <div className={styles.buttonContainer}>
-          <Button
+          {!sestions?.user && <Button
             as={Link}
             href={ApiRouter.signin}
             className={`${styles.button} ${styles.buttonGetStarted}`}
           >
             Get Started
-          </Button>
+          </Button>}
           <Button
             as={Link}
             href="#"

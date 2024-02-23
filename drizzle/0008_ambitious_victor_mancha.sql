@@ -1,1 +1,0 @@
-ALTER TABLE "project" ALTER COLUMN "logo" DROP NOT NULL;

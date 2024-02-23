@@ -1,1 +1,0 @@
-ALTER TABLE "notification" ADD CONSTRAINT "notification_project_id_receiver_id_sender_id_notification_type_unique" UNIQUE("project_id","receiver_id","sender_id","notification_type");
