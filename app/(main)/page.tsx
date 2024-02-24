@@ -2,14 +2,22 @@ import { Features } from "./components/features/features";
 import { Header } from "./components/header/Header";
 import { ProjectsBox } from "./components/projects_box/projects_box";
 
-export default function Home() {
+interface props {
+  searchParams: {
+    visibility: string;
+    page: string;
+  };
+}
 
-
+export default function Home({ searchParams }: props) {
   return (
     <main>
       <Header />
-      <ProjectsBox/>
-      <Features/>
+      <ProjectsBox
+        visibility={searchParams.visibility}
+        currentPage={searchParams.page}
+      />
+      <Features />
     </main>
   );
 }

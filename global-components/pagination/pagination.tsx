@@ -1,16 +1,21 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./pagination.module.css";
+
 interface Ipagination {
   itemCount: number;
   pageSize: number;
-  currentPage: number;
+  currentPageStr: string;
 }
 export const Pagination = ({
   itemCount,
   pageSize,
-  currentPage,
+  currentPageStr,
 }: Ipagination) => {
+  let currentPage = 1;
+  if (parseInt(currentPageStr)) {
+    currentPage = parseInt(currentPageStr);
+  }
   const totalPages = Math.ceil(itemCount / pageSize);
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === totalPages;
@@ -19,7 +24,7 @@ export const Pagination = ({
   const changePage = (page: number) => {
     const param = new URLSearchParams(searchParams);
     param.set("page", page.toString());
-    route.push("?" + param.toString());
+    route.push("?" + param.toString(), { scroll: false });
   };
 
   if (totalPages <= 1) return null;

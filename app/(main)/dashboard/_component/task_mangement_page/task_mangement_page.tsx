@@ -31,16 +31,20 @@ export enum DroppableIds {
 export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const { features, isOwner, project, featureActions, contributors,projectCmpilation: projectoCmpilation } =
-    useDashboardContext();
+  const {
+    features,
+    isOwner,
+    project,
+    featureActions,
+    contributors,
+    projectCmpilation: projectoCmpilation,
+  } = useDashboardContext();
   const { setMessageRes, message, isLoading, setIsLoading } =
     useApiCallContext();
   const [newFeatureOrder, setNewFeatureOrder] =
     useState<ReorderFeatureSchema>();
 
-
   const { isOpen, onOpen, onClose } = useDisclosure();
-
 
   const handleToggleSidebar = () => setIsSidebarOpen((current) => !current);
 
@@ -95,7 +99,6 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
   const handleShowDetailsDrop = (featureId: string) => {
     const query = featureId ? `?feature=${featureId}` : "";
     router.push(AppRouter.dashboardPage + project.id + query);
-    console.log(`Show details for feature ${featureId}`);
   };
 
   const isInitialMount = useRef(true);
@@ -130,7 +133,6 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
   return (
     <>
       <div className="flex">
-      
         <DragDropContext
           onDragEnd={handleOnDragEnd}
           onDragStart={handleOnDragStart}
@@ -204,7 +206,7 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
           </div>
         </DragDropContext>
       </div>
-      <ToastContainer position="bottom-left" className='z-50' />
+      <ToastContainer position="bottom-left" className="z-50" />
       {isLoading && (
         <Spinner
           size="lg"

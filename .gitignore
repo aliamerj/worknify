@@ -6,6 +6,7 @@
 /.pnp
 .pnp.js
 /db/password.txt
+/drizzle/*
 
 # testing
 /coverage

@@ -8,7 +8,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import ShimmerLoading from "@/global-components/ShimmerLoading";
 import ErrorBoundary from "@/global-components/ErrorBoundary";
 import dynamic from "next/dynamic";
-import {  Spinner } from "@nextui-org/react";
+import { Spinner } from "@nextui-org/react";
 import { ProfileSummary } from "../../_components/_view_section/profile_summary/profile_summary";
 import { Experience } from "../../_components/_view_section/experience/experience";
 import { Education } from "../../_components/_view_section/education/education";
@@ -115,7 +115,7 @@ async function ViewProfile({ params }: Props) {
         </Suspense>
       </ErrorBoundary>
       {profile.skills && <Skills skills={profile.skills} />}
-     {projects.length !== 0 && <Projects projects={projects} />}
+      {projects.length !== 0 && <Projects projects={projects} />}
       <ErrorBoundary>
         <Suspense fallback={<ShimmerLoading count={4} />}>
           <Education profileId={profile.id} />
