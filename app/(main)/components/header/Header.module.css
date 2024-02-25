@@ -22,7 +22,7 @@
 .heroImage {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures image covers the container */
+  object-fit: cover;
   position: absolute;
   top: 0;
   left: 0;

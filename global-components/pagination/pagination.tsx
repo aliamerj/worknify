@@ -12,10 +12,7 @@ export const Pagination = ({
   pageSize,
   currentPageStr,
 }: Ipagination) => {
-  let currentPage = 1;
-  if (parseInt(currentPageStr)) {
-    currentPage = parseInt(currentPageStr);
-  }
+  const currentPage = parseInt(currentPageStr) || 1;
   const totalPages = Math.ceil(itemCount / pageSize);
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === totalPages;

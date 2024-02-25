@@ -26,7 +26,7 @@ export const NavBar = async () => {
     <Navbar className={styles.container}>
       <NavbarBrand as={Link} href="/">
         <Image
-          className={styles.logo}
+          className="cursor-pointer"
           src="/worknify_main_logo.svg"
           alt="Worknify"
           width={190}

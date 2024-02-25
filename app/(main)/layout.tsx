@@ -4,6 +4,7 @@ import "../globals.css";
 import { Providers } from "../providers";
 import { NavBar } from "./components/navbar/Navbar";
 import { ApiCallProvider } from "@/utils/context/api_call_context";
+import Footer from "./components/footer/footer";
 
 const rubik = Rubik({
   subsets: ["latin"],
@@ -22,7 +23,11 @@ export const metadata: Metadata = {
  * param children - React node representing the components to be rendered within the layout.
  * returns The rendered HTML structure with the wrapped components and providers.
  */
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className="light">
       <body className={rubik.className}>
@@ -30,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ApiCallProvider>
             <NavBar />
             {children}
+            <Footer />
           </ApiCallProvider>
         </Providers>
       </body>
