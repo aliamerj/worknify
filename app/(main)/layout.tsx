@@ -30,7 +30,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="light">
-      <body className={rubik.className}>
+      <body suppressHydrationWarning={true} className={rubik.className}>
         <Providers>
           <ApiCallProvider>
             <NavBar />

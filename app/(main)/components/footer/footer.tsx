@@ -1,4 +1,6 @@
+import { AppRouter } from "@/utils/router/app_router";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import { FaFacebookF, FaLinkedinIn, FaGithub } from "react-icons/fa";
 
@@ -10,9 +12,10 @@ const Footer = () => {
           <Image
             src="/worknify_main_logo.svg"
             alt="Worknify"
-            className="h-8 w-auto fill-current text-white"
-            width={190}
-            height={50}
+            className="h-auto w-auto  fill-current text-white"
+            width={100}
+            height={20}
+            priority={true}
           />
 
           <p className="mt-2 text-sm">
@@ -22,30 +25,30 @@ const Footer = () => {
         </div>
         <div className="flex flex-col space-y-4">
           <h3 className="text-sm uppercase text-gray-900">Explore</h3>
-          <a
-            href="/about"
+          <Link
+            href={AppRouter.about}
             className="text-sm transition-colors duration-300 hover:text-primary"
           >
-            About Me
-          </a>
-          <a
-            href="/services"
+            About Us
+          </Link>
+          <Link
+            href={AppRouter.service}
             className="text-sm transition-colors duration-300 hover:text-primary"
           >
             Services
-          </a>
-          <a
-            href="/blog"
+          </Link>
+          <Link
+            href={AppRouter.privacyPolicy}
             className="text-sm transition-colors duration-300 hover:text-primary"
           >
-            Blog
-          </a>
-          <a
-            href="/contact"
+            Privacy Policy
+          </Link>
+          <Link
+            href={AppRouter.contact}
             className="text-sm transition-colors duration-300 hover:text-primary"
           >
             Contact
-          </a>
+          </Link>
         </div>
         <div className="flex flex-col space-y-4">
           <h3 className="text-sm uppercase text-gray-900">Follow Me</h3>

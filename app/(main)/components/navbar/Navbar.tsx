@@ -26,11 +26,12 @@ export const NavBar = async () => {
     <Navbar className={styles.container}>
       <NavbarBrand as={Link} href="/">
         <Image
-          className="cursor-pointer"
+          className="h-auto w-auto cursor-pointer"
           src="/worknify_main_logo.svg"
           alt="Worknify"
-          width={190}
-          height={50}
+          width={130}
+          height={20}
+          priority={true}
         />
       </NavbarBrand>
 

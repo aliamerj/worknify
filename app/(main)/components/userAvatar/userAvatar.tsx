@@ -48,7 +48,11 @@ export const UserAvatar = ({
           />
         </DropdownTrigger>
         <DropdownMenu aria-label="Profile Actions" variant="flat">
-          <DropdownItem key="settings" className="h-14 gap-2">
+          <DropdownItem
+            key="settings"
+            className="h-14 gap-2"
+            textValue="Settings"
+          >
             <p className="font-semibold">Signed in as</p>
             <p className="font-semibold">{email}</p>
           </DropdownItem>
@@ -63,6 +67,7 @@ export const UserAvatar = ({
             key="profile"
             as={Link}
             href={AppRouter.myProject + userId}
+            textValue="Profile"
           >
             My Projects
           </DropdownItem>
@@ -70,6 +75,7 @@ export const UserAvatar = ({
             key="notifications"
             as={Link}
             href={AppRouter.notification}
+            textValue="Notifications"
           >
             <div className="flex justify-between">
               <p>Notifications</p>
@@ -81,7 +87,12 @@ export const UserAvatar = ({
             </div>
           </DropdownItem>
 
-          <DropdownItem key="logout" color="danger" onClick={() => signOut()}>
+          <DropdownItem
+            key="logout"
+            color="danger"
+            onClick={() => signOut()}
+            textValue="Logout"
+          >
             Log Out
           </DropdownItem>
         </DropdownMenu>

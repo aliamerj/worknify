@@ -13,6 +13,11 @@ export const AppRouter = {
   myProject: "/project/owner/",
   // dashboard
   dashboardPage: "/dashboard/",
+  //utilties
+  about: "/about",
+  service: "/services",
+  privacyPolicy: "/privacy_policy",
+  contact: "/contact",
 };
 export const ApiRouter = {
   signin: "/api/auth/signin",
@@ -25,5 +30,5 @@ export const ApiRouter = {
   reorderFeatures: "/api/feature/reorder",
   tasks: "/api/task",
   reorderTasks: "/api/task/reorder",
-  profile: "/api/profile"
+  profile: "/api/profile",
 };

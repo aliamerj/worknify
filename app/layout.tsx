@@ -1,5 +1,5 @@
 import "./globals.css";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 import { Rubik } from "next/font/google";
 import { Metadata } from "next";
 const rubik = Rubik({
@@ -19,7 +19,9 @@ export default function MainLayout({
 }) {
   return (
     <html lang="en">
-      <body className={rubik.className}>{children}</body>
+      <body suppressHydrationWarning={true} className={rubik.className}>
+        {children}
+      </body>
     </html>
   );
 }
