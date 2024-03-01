@@ -2,10 +2,55 @@
 import { Button } from "@nextui-org/react";
 
 import Link from "next/link";
-import { useProfileData } from "../../context/profile_context";
+import {
+  useFindDifferences,
+  useLoading,
+  useProfileId,
+  useResetForm,
+  useSetLoading,
+} from "../../context/hooks";
+import { SubmitHandler, useFormContext } from "react-hook-form";
+import { ProfileSchema } from "@/utils/validations/profileValidation";
+import { ApiRouter } from "@/utils/router/app_router";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export const UpdateButtons = () => {
-  const { isLoading, triggerSubmit, resetForm } = useProfileData();
+  const { reset, handleSubmit } = useFormContext<ProfileSchema>();
+  const isLoading = useLoading();
+  const resetForm = useResetForm();
+  const setIsLoading = useSetLoading();
+  const profileId = useProfileId();
+  const findDifferences = useFindDifferences();
+
+  const onSubmit: SubmitHandler<ProfileSchema> = async (_: ProfileSchema) => {
+    try {
+      setIsLoading(true);
+      const differences = findDifferences();
+      if (Object.keys(differences).length !== 0) {
+        const res = await axios.patch(ApiRouter.profile, {
+          ...differences,
+          profileId,
+        });
+        if (res.status === 200) {
+          notify(false, res.data.message);
+        }
+      }
+      setIsLoading(false);
+      return;
+    } catch (error: any) {
+      setIsLoading(false);
+      notify(true, error.response.data.message);
+    }
+  };
+  const notify = (isError: boolean, message: string) => {
+    if (isError) {
+      toast.error(message);
+    } else {
+      toast.success(message);
+    }
+  };
+
   return (
     <div className="fixed inset-x-0 bottom-0 mb-4 flex justify-center">
       <div className="mx-auto flex gap-4 rounded-md bg-content4 px-5 py-4">
@@ -15,7 +60,7 @@ export const UpdateButtons = () => {
           variant="shadow"
           color="primary"
           size="lg"
-          onClick={triggerSubmit}
+          onClick={handleSubmit(onSubmit)}
         >
           Update
         </Button>
@@ -25,7 +70,10 @@ export const UpdateButtons = () => {
           variant="shadow"
           color="danger"
           size="lg"
-          onClick={resetForm}
+          onClick={() => {
+            resetForm();
+            reset();
+          }}
         >
           reset
         </Button>

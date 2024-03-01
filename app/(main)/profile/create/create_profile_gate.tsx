@@ -2,7 +2,7 @@
 
 import { AppRouter } from "@/utils/router/app_router";
 import { redirect } from "next/navigation";
-import { useProfileData } from "../_components/context/profile_context";
+import { useProfileData } from "../_components/context/hooks";
 import { useEffect } from "react";
 /**
  * This component acts as a gatekeeper for rendering its child components.
@@ -17,7 +17,7 @@ export default function CreateProfileGate({
 }: {
   children: React.ReactNode;
 }): JSX.Element {
-  const { profileData } = useProfileData();
+  const profileData = useProfileData();
 
   useEffect(() => {
     if (profileData.edit) {

@@ -2,14 +2,14 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-quill/dist/quill.snow.css";
 import { Control, Controller, UseFieldArrayRemove } from "react-hook-form";
-import { Checkbox, Input } from "@nextui-org/react";
+import { Input } from "@nextui-org/react";
 import { ProfileSchema } from "@/utils/validations/profileValidation";
-import { useState } from "react";
 import ReactQuill from "react-quill";
+import { CustomCheckbox } from "./customs/custom_checkbox";
 
 interface IExperienceField {
   control: Control<ProfileSchema>;
-  remove: UseFieldArrayRemove;
+  children: React.ReactNode;
   index: number;
 }
 const modules = {
@@ -21,28 +21,14 @@ const modules = {
     ["link"],
   ],
 };
-/**
- * Renders a form field for entering experience details.
- *
- * param {Object} props - The component props.
- * param {Control<ProfileSchema>} props.control - The control object from react-hook-form.
- * param {UseFieldArrayRemove} props.remove - The remove function from react-hook-form.
- * param {number} props.index - The index of the experience field.
- * returns {JSX.Element} - The rendered experience field component.
- */
-const ExperienceField = ({ control, remove, index }: IExperienceField) => {
-  const [isCurrent, setIsCurrent] = useState(false);
+
+const ExperienceField = ({ control, index, children }: IExperienceField) => {
   return (
     <div
       key={index}
       className="relative mb-5 w-full rounded-xl border bg-white  p-4"
     >
-      <button
-        className="absolute right-0 top-0 -translate-y-1/2 translate-x-1/2 transform rounded-full bg-white p-1 pl-2 pr-2 text-sm text-gray-700 shadow-sm hover:bg-danger hover:text-white"
-        onClick={() => remove(index)}
-      >
-        X
-      </button>
+      {children}
       <div className="flex flex-col gap-2">
         <Controller
           name={`experiences.${index}.company`}
@@ -104,26 +90,7 @@ const ExperienceField = ({ control, remove, index }: IExperienceField) => {
           render={({ field, fieldState: { error } }) => (
             <>
               {error && <p className="text-red-500">{error.message}</p>}
-              <div className="flex justify-between gap-2">
-                <DatePicker
-                  disabled={isCurrent}
-                  showIcon
-                  placeholderText="End Date"
-                  maxDate={new Date()}
-                  onChange={(date) => field.onChange(date?.toISOString())}
-                  selected={field.value ? new Date(field.value) : null}
-                  className="z-30 w-full rounded-lg border bg-divider p-2 outline-none disabled:bg-gray-300 disabled:line-through"
-                />
-                <Checkbox
-                  radius="sm"
-                  onValueChange={(is) => {
-                    setIsCurrent(is);
-                    field.onChange(null);
-                  }}
-                >
-                  Present
-                </Checkbox>
-              </div>
+              <CustomCheckbox field={field} />
             </>
           )}
         />

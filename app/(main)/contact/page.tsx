@@ -14,7 +14,6 @@ export default function ContactUs() {
     if (!form.current) return;
 
     setLoading(true);
-
     emailjs
       .sendForm(
         "service_o7dmsmk",

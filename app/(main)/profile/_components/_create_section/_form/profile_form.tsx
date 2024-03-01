@@ -1,117 +1,25 @@
 "use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ToastContainer, toast } from 'react-toastify';
-import { Button, Input, Textarea } from "@nextui-org/react";
-import React, { useEffect} from "react";
+import { ToastContainer } from "react-toastify";
+import { Input, Textarea } from "@nextui-org/react";
 import "react-quill/dist/quill.snow.css";
-import {
-  Controller,
-  SubmitHandler,
-  useFieldArray,
-  useForm,
-} from "react-hook-form";
-import {
-  ProfileSchema,
-  profileSchemaValidation,
-} from "@/utils/validations/profileValidation";
-import { useRouter } from "next/navigation";
-import axios from "axios";
-import { useProfileData } from "../../context/profile_context";
+import { Controller, useFormContext } from "react-hook-form";
+import { ProfileSchema } from "@/utils/validations/profileValidation";
 import { TechPicker } from "../input_Fields/tech_picker";
-import ExperienceField from "../input_Fields/experience_field";
-import { EducationField } from "../input_Fields/education_field";
-import { SectionField } from "../input_Fields/section_field";
-import { ApiRouter, AppRouter } from "@/utils/router/app_router";
+import { Experiences } from "../input_Fields/experiences/experiences";
+import { Educations } from "../input_Fields/educations/educations";
+import { Sections } from "../input_Fields/sections/sections";
 
 export const ProfileForm = () => {
-  const router = useRouter();
-  const {
-    profileData,
-    updateProfileData,
-    setIsLoading,
-    formRef,
-    profileId,
-    findDifferences,
-  } = useProfileData();
-  const { control, handleSubmit, watch } = useForm<ProfileSchema>({
-    defaultValues: profileData,
-    resolver: zodResolver(profileSchemaValidation),
-  });
-
-
-  const onSubmit: SubmitHandler<ProfileSchema> = async (data) => {
-    try {
-      setIsLoading(true);
-      if (!profileData.edit) {
-        await axios.post(ApiRouter.profile, data);
-        router.push(AppRouter.viewProfile +profileData.userId);
-        router.refresh();
-      } else {
-        const differences = findDifferences();
-        if (Object.keys(differences).length !== 0) {
-          const res = await axios.patch(ApiRouter.profile, {
-            ...differences,
-            profileId,
-          });
-          if (res.status === 200) {
-            notify(false, res.data.message);
-          }
-        }
-      }
-      setIsLoading(false);
-      return;
-    } catch (error: any) {
-      setIsLoading(false);
-      notify(true, error.response.data.message);
-    }
-  };
-  const notify = (isError: boolean, message: string) => {
-    if (isError) {
-      toast.error(message);
-    } else {
-      toast.success(message);
-    }
-  };
-  const {
-    fields: experiences,
-    append: appendExperiences,
-    remove: removeExperiences,
-  } = useFieldArray({
-    control,
-    name: "experiences",
-  });
-  const {
-    fields: educations,
-    append: appendEducations,
-    remove: removeEducations,
-  } = useFieldArray({
-    control,
-    name: "educations",
-  });
-  const {
-    fields: sections,
-    append: appendSections,
-    remove: removeSections,
-  } = useFieldArray({
-    control,
-    name: "sections",
-  });
-  useEffect(() => {
-    const subscription = watch((value, _) => {
-      updateProfileData(value as Partial<ProfileSchema>);
-    });
-    return () => subscription.unsubscribe();
-  }, [watch, updateProfileData]);
+  const { control } = useFormContext<ProfileSchema>();
 
   return (
     <div className="flex justify-center">
       <ToastContainer />
+
       <form
-        onSubmit={handleSubmit(onSubmit)}
         className="mx-2 w-full rounded-xl bg-white p-5 drop-shadow-xl lg:max-w-lg"
         data-testid="submit-button"
       >
-       
         <Controller
           name="jobTitle"
           control={control}
@@ -260,87 +168,19 @@ export const ProfileForm = () => {
             name="skills"
             control={control}
             render={({ field, fieldState: { error } }) => (
-              <TechPicker field={{ ...field }} error={error} isProject={false} />
+              <TechPicker
+                field={{ ...field }}
+                error={error}
+                isProject={false}
+              />
             )}
           />{" "}
           <div className="flex w-full flex-col gap-3">
-            {experiences.map((field, index) => (
-              <ExperienceField
-                key={field.id}
-                control={control}
-                remove={removeExperiences}
-                index={index}
-              />
-            ))}
-            <Button
-              color="primary"
-              variant="shadow"
-              type="button"
-              size="md"
-              onClick={() =>
-                appendExperiences({
-                  role: "",
-                  company: "",
-                  timePeriod: {
-                    startDate: new Date().toISOString(),
-                    endDate: null,
-                  },
-                })
-              }
-            >
-              Add Experience
-            </Button>
-            {educations.map((field, index) => (
-              <EducationField
-                key={field.id}
-                control={control}
-                remove={removeEducations}
-                index={index}
-              />
-            ))}
-            <Button
-              color="success"
-              variant="shadow"
-              type="button"
-              size="md"
-              onClick={() =>
-                appendEducations({
-                  degree: "",
-                  school: "",
-                  timePeriod: {
-                    startDate: new Date().toISOString(),
-                    endDate: null,
-                  },
-                })
-              }
-            >
-              Add Education
-            </Button>
-            {sections.map((field, index) => (
-              <SectionField
-                key={field.id}
-                control={control}
-                remove={removeSections}
-                index={index}
-              />
-            ))}
-            <Button
-              color="secondary"
-              variant="shadow"
-              type="button"
-              size="md"
-              onClick={() =>
-                appendSections({
-                  title: "",
-                  description: "",
-                })
-              }
-            >
-              Add New Section
-            </Button>
+            <Experiences control={control} />
+            <Educations control={control} />
+            <Sections control={control} />
           </div>
         </div>
-        <button  ref={formRef} type="submit" style={{ display: "none" }} />
       </form>
     </div>
   );

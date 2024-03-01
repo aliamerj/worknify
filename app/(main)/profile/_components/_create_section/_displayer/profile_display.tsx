@@ -2,16 +2,18 @@
 import Link from "next/link";
 
 import DOMPurify from "dompurify";
-import { useProfileData } from "../../context/profile_context";
-
-/**
- * Renders the profile display component.
- *
- * returns {JSX.Element} The profile display component.
- */
+import { useProfileData } from "../../context/hooks";
+import { useFormContext, useWatch } from "react-hook-form";
+import { ProfileSchema } from "@/utils/validations/profileValidation";
 
 export const ProfileDisplay = () => {
-  const { profileData } = useProfileData();
+  const defaultValue = useProfileData();
+  const { control } = useFormContext<ProfileSchema>();
+  const profileData = useWatch({
+    control,
+    defaultValue,
+  });
+
   const createMarkup = (htmlContent: string) => {
     return { __html: DOMPurify.sanitize(htmlContent) };
   };
@@ -41,7 +43,7 @@ export const ProfileDisplay = () => {
   };
 
   const renderWorknifyLink = () => {
-    const worknifyLink = `/user/${profileData.userId}`;
+    const worknifyLink = `/user/${defaultValue.userId}`;
     return (
       <Link href={worknifyLink} target="_blank">
         My Worknify
@@ -68,7 +70,7 @@ export const ProfileDisplay = () => {
   };
 
   const renderWorkExperience = () => {
-    if (profileData.experiences.length > 0) {
+    if (profileData.experiences && profileData.experiences?.length > 0) {
       return (
         <>
           <h1 className="pl-1 text-base font-bold md:text-lg">
@@ -81,8 +83,8 @@ export const ProfileDisplay = () => {
                 {exp.company} - <span className="font-normal">{exp.role}</span>
               </h1>
               <h3 className="text-small text-gray-500">
-                {new Date(exp.timePeriod.startDate).toLocaleDateString()} -{" "}
-                {exp.timePeriod.endDate
+                {exp.timePeriod?.startDate && new Date(exp.timePeriod.startDate).toLocaleDateString()} -{" "}
+                {exp.timePeriod?.endDate
                   ? new Date(exp.timePeriod.endDate).toLocaleDateString()
                   : "Current"}
               </h3>
@@ -99,7 +101,7 @@ export const ProfileDisplay = () => {
   };
 
   const renderEducation = () => {
-    if (profileData.educations.length > 0) {
+    if (profileData.educations && profileData.educations.length > 0) {
       return (
         <>
           <h1 className="pl-1 text-base font-bold md:text-lg">EDUCATION</h1>
@@ -110,8 +112,8 @@ export const ProfileDisplay = () => {
                 {ed.school} - <span className="font-normal">{ed.degree}</span>
               </h1>
               <h3 className="text-small text-gray-500">
-                {new Date(ed.timePeriod.startDate).toLocaleDateString()} -{" "}
-                {ed.timePeriod.endDate
+                {ed.timePeriod?.startDate && new Date(ed.timePeriod.startDate).toLocaleDateString()} -{" "}
+                {ed.timePeriod?.endDate
                   ? new Date(ed.timePeriod.endDate).toLocaleDateString()
                   : "Current"}
               </h3>
@@ -124,7 +126,7 @@ export const ProfileDisplay = () => {
   };
 
   const renderSkills = () => {
-    if (profileData.skills.length > 0) {
+    if (profileData.skills && profileData.skills.length > 0) {
       return (
         <>
           <h1 className="pl-1 text-base font-bold md:text-lg">SKILLS</h1>
@@ -146,7 +148,7 @@ export const ProfileDisplay = () => {
   };
 
   const renderCustomSections = () => {
-    if (profileData.sections?.length > 0) {
+    if (profileData.sections && profileData.sections?.length > 0) {
       return profileData.sections.map((section, index) => (
         <div key={index} className="px-2 pb-3 md:pb-5">
           <h1 className="pl-1 text-base font-bold md:text-lg">
@@ -155,7 +157,7 @@ export const ProfileDisplay = () => {
           <hr className="border-black" />
           <div
             className="ql-editor m-0 mb-2 p-0"
-            dangerouslySetInnerHTML={createMarkup(section.description)}
+            dangerouslySetInnerHTML={section.description ? createMarkup(section.description):createMarkup('') }
           />
         </div>
       ));
@@ -167,7 +169,7 @@ export const ProfileDisplay = () => {
     <div className="mx-auto max-w-4xl bg-white py-3 shadow-lg">
       <section
         className={`relative mx-2 p-2 pt-3 md:mx-4 ${
-          profileData.jobTitle.trim().length === 0 ? "pb-10" : ""
+          profileData.jobTitle?.trim().length === 0 ? "pb-10" : ""
         }`}
       >
         <h1 className="text-center text-lg font-bold sm:text-3xl lg:text-4xl xl:text-5xl">

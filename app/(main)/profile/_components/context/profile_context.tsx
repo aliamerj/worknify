@@ -1,59 +1,46 @@
 "use client";
 import _ from "lodash";
 import { AllProfileData } from "@/utils/api_handler/profile_handler";
-import { AppRouter } from "@/utils/router/app_router";
 import {
   EducationSchema,
   ExperienceSchema,
   ProfileSchema,
 } from "@/utils/validations/profileValidation";
-import { useRouter } from "next/navigation";
 import React, {
   createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
 } from "react";
 import { convertTimeToString } from "@/utils/helper_function";
+import { profileDataReducer } from "./profile_data_reducer";
 
 export type ProfileData = ProfileSchema & { edit: boolean; userId: string };
 type OptionalProfileData = {
   [P in keyof ProfileData]?: ProfileData[P];
 };
-interface ProfileContextValue {
-  profileData: ProfileData;
-  updateProfileData: (newData: Partial<ProfileSchema>) => void;
-  isLoading: boolean;
-  setIsLoading: (state: boolean) => void;
-  triggerSubmit: () => void;
-  formRef: React.Ref<HTMLButtonElement>;
-  resetForm: () => void;
-  profileId?: number;
-  findDifferences: () => OptionalProfileData;
-}
-
-const ProfileDataContext = createContext<ProfileContextValue | undefined>(
+export const ProfileDataContext = createContext<ProfileData | undefined>(
   undefined,
 );
+export const UpdateProfileDataContext = createContext<
+  ((newData: Partial<ProfileSchema>) => void) | undefined
+>(undefined);
+export const LoadingContext = createContext<boolean | undefined>(undefined);
+export const SetLoadingContext = createContext<
+  ((state: boolean) => void) | undefined
+>(undefined);
 
-export const useProfileData = () => {
-  const context = useContext(ProfileDataContext);
-  if (context === undefined) {
-    throw new Error("useProfileData must be used within a ProfileDataProvider");
-  }
-  return context;
-};
-/**
- * React context provider component for profile data.
- * param children - React node representing the components that will be wrapped by the `ProfileDataContext.Provider`.
- * param name - A string representing the name of the user.
- * param email - A string representing the email of the user.
- * param userId - A string representing the ID of the user.
- * param allProfileData - An object representing the profile data of the user.
- */
+export const ResetFormContext = createContext<(() => void) | undefined>(
+  undefined,
+);
+export const ProfileIdContext = createContext<number | undefined>(undefined);
+export const FindDifferencesContext = createContext<
+  (() => OptionalProfileData) | undefined
+>(undefined);
+
 export const ProfileDataProvider = ({
   children,
   name,
@@ -67,41 +54,45 @@ export const ProfileDataProvider = ({
   userId: string;
   allProfileData: AllProfileData | null;
 }) => {
-  const router = useRouter();
   const [isLoading, setLoading] = useState(false);
-  const formRef = useRef<HTMLButtonElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const defaultProfileData = useMemo(() => {
-    const serializedData = serializeProfile(allProfileData, name, email, userId);
+    const serializedData = serializeProfile(
+      allProfileData,
+      name,
+      email,
+      userId,
+    );
     if (typeof window !== "undefined" && !serializedData.edit) {
       const savedData = localStorage?.getItem("formData");
       return savedData ? JSON.parse(savedData) : serializedData;
     }
     return serializedData;
   }, [allProfileData, name, email, userId]);
-
-  const [profileData, setProfileData] = useState<ProfileData>(defaultProfileData);
+  const [profileData, dispatch] = useReducer(
+    profileDataReducer,
+    defaultProfileData,
+  );
 
   const updateProfileData = useCallback((newData: Partial<ProfileData>) => {
-    setProfileData((prevData) => ({ ...prevData, ...newData }));
+    dispatch({ type: "UPDATE_PROFILE_DATA", newData });
   }, []);
+
+  const resetForm = useCallback(() => {
+    dispatch({
+      type: "RESET_FORM",
+      defaultProfileData: serializeProfile(allProfileData, name, email, userId),
+    });
+    formRef.current?.click();
+  }, [allProfileData, name, email, userId]);
 
   const setIsLoading = useCallback((state: boolean) => {
     setLoading(state);
   }, []);
 
-  const triggerSubmit = useCallback(() => {
-    formRef.current?.click();
-  }, []);
-
   useEffect(() => {
     localStorage.setItem("formData", JSON.stringify(profileData));
   }, [profileData]);
-
-  const resetForm = useCallback(() => {
-    const getSavedForm = serializeProfile(allProfileData, name, email, userId);
-    setProfileData(getSavedForm);
-    router.replace(AppRouter.createProfile);
-  }, [allProfileData, name, email, userId, router]);
 
   const findDifferences = useCallback((): OptionalProfileData => {
     const source = serializeProfile(allProfileData, name, email, userId);
@@ -139,21 +130,21 @@ export const ProfileDataProvider = ({
   const profileId = allProfileData?.profile.id;
 
   return (
-    <ProfileDataContext.Provider
-      value={{
-        profileData,
-        updateProfileData,
-        isLoading,
-        setIsLoading,
-        triggerSubmit,
-        formRef,
-        resetForm,
-        profileId,
-        findDifferences,
-      }}
-    >
-      {children}
-    </ProfileDataContext.Provider>
+    <UpdateProfileDataContext.Provider value={updateProfileData}>
+      <SetLoadingContext.Provider value={setIsLoading}>
+        <ResetFormContext.Provider value={resetForm}>
+          <FindDifferencesContext.Provider value={findDifferences}>
+            <ProfileIdContext.Provider value={profileId}>
+              <LoadingContext.Provider value={isLoading}>
+                <ProfileDataContext.Provider value={profileData}>
+                  {children}
+                </ProfileDataContext.Provider>
+              </LoadingContext.Provider>
+            </ProfileIdContext.Provider>
+          </FindDifferencesContext.Provider>
+        </ResetFormContext.Provider>
+      </SetLoadingContext.Provider>
+    </UpdateProfileDataContext.Provider>
   );
 };
 

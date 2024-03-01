@@ -1,12 +1,12 @@
 import { ProfileSchema } from "@/utils/validations/profileValidation";
 import { Input } from "@nextui-org/react";
-import { Control, Controller, UseFieldArrayRemove } from "react-hook-form";
+import { Control, Controller } from "react-hook-form";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
 interface ISectionField {
   control: Control<ProfileSchema>;
-  remove: UseFieldArrayRemove;
+  children: React.ReactNode;
   index: number;
 }
 const modules = {
@@ -19,15 +19,10 @@ const modules = {
   ],
 };
 
-export const SectionField = ({ control, remove, index }: ISectionField) => {
+export const SectionField = ({ control, children, index }: ISectionField) => {
   return (
     <div key={index} className="relative mb-5 rounded-xl border bg-white  p-4">
-      <button
-        className="absolute right-0 top-0 -translate-y-1/2 translate-x-1/2 transform rounded-full bg-white p-1 pl-2 pr-2 text-sm text-gray-700 shadow-sm hover:bg-danger hover:text-white"
-        onClick={() => remove(index)}
-      >
-        X
-      </button>
+      {children}
       <div className="flex flex-col gap-2">
         <Controller
           name={`sections.${index}.title`}

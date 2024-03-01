@@ -1,33 +1,24 @@
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Control, Controller, UseFieldArrayRemove } from "react-hook-form";
-import { Checkbox, Input } from "@nextui-org/react";
+import { Control, Controller } from "react-hook-form";
+import { Input } from "@nextui-org/react";
 import { ProfileSchema } from "@/utils/validations/profileValidation";
-import { useState } from "react";
+import { CustomCheckbox } from "./customs/custom_checkbox";
 
 interface IEducationField {
   control: Control<ProfileSchema>;
-  remove: UseFieldArrayRemove;
   index: number;
+  children: React.ReactNode;
 }
-/**
- * Renders a form field for education details.
- *
- * param {object} control - The control object from react-hook-form.
- * param {UseFieldArrayRemove} remove - The function to remove the education field from the form.
- * param {number} index - The index of the education field in the form.
- * returns {JSX.Element} - The rendered education field component.
- */
-export const EducationField = ({ control, remove, index }: IEducationField) => {
-  const [isCurrent, setIsCurrent] = useState(false);
+
+export const EducationField = ({
+  control,
+  children,
+  index,
+}: IEducationField) => {
   return (
     <div key={index} className="relative mb-5 rounded-xl border bg-white  p-4">
-      <button
-        className="absolute right-0 top-0 -translate-y-1/2 translate-x-1/2 transform rounded-full bg-white p-1 pl-2 pr-2 text-sm text-gray-700 shadow-sm hover:bg-danger hover:text-white"
-        onClick={() => remove(index)}
-      >
-        X
-      </button>
+      {children}
       <div className="flex flex-col gap-2">
         <Controller
           name={`educations.${index}.school`}
@@ -90,24 +81,7 @@ export const EducationField = ({ control, remove, index }: IEducationField) => {
             <>
               {error && <p className="text-red-500">{error.message}</p>}
               <div className="flex justify-between gap-2">
-                <DatePicker
-                  disabled={isCurrent}
-                  showIcon
-                  placeholderText="End Date"
-                  maxDate={new Date()}
-                  onChange={(date) => field.onChange(date?.toISOString())}
-                  selected={field.value ? new Date(field.value) : null}
-                  className="z-30 w-full rounded-lg border bg-divider p-2 outline-none disabled:bg-gray-300 disabled:line-through"
-                />
-                <Checkbox
-                  radius="sm"
-                  onValueChange={(is) => {
-                    setIsCurrent(is);
-                    field.onChange(null);
-                  }}
-                >
-                  Present
-                </Checkbox>
+                <CustomCheckbox field={field} />
               </div>
             </>
           )}
