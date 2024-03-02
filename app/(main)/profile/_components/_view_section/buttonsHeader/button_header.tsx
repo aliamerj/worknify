@@ -1,12 +1,13 @@
 "use client";
 import { StarIcon } from "@/global-components/icon/star_icon";
-import { ApiRouter } from "@/utils/router/app_router";
+import { ApiRouter, AppRouter } from "@/utils/router/app_router";
 import { Button, useDisclosure } from "@nextui-org/react";
 import axios from "axios";
 import { useState } from "react";
 import { EmailModal } from "../email_modal/email_modal";
 import { useApiCallContext } from "@/utils/context/api_call_context";
 import { ToastContainer } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 /**
  * Renders a header with two buttons: a "Contact" button and a "Star" button.
@@ -23,13 +24,16 @@ export const ButtonHeader = ({
   profileId,
   emailUser,
   fullName,
+  authId,
 }: {
   isStared: boolean;
   profileId: number;
   emailUser: string;
   fullName: string;
+  authId?: string;
 }) => {
-  const {setIsLoading,isLoading,setMessageRes} = useApiCallContext()
+  const { setIsLoading, isLoading, setMessageRes } = useApiCallContext();
+  const router = useRouter();
 
   const [star, setStar] = useState(isStared);
 
@@ -37,6 +41,8 @@ export const ButtonHeader = ({
    * Handles the logic for starring/unstarring a profile.
    */
   const handleStar = async () => {
+    if (!authId) return router.push(AppRouter.signup);
+
     setIsLoading(true);
     try {
       if (star) {
@@ -50,7 +56,7 @@ export const ButtonHeader = ({
       setMessageRes({
         isError: true,
         message: error.response.data.message,
-      }); 
+      });
     }
   };
 
@@ -82,7 +88,7 @@ export const ButtonHeader = ({
       >
         Star
       </Button>
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 };

@@ -14,7 +14,7 @@ const schema = {
   ...allProject,
   ...allNotification,
   ...allFeatures,
-  ...allTasks
+  ...allTasks,
 };
 const connection = process.env.DATABASE_URL as string;
 

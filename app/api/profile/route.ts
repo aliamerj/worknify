@@ -17,7 +17,7 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { and, eq } from "drizzle-orm";
-
+import { users } from "@/db/schemes/userSchema";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (!session || !session.user.id) {
       return NextResponse.json(
         { state: false, message: "Not authorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (!validation.success) {
       return NextResponse.json(
         { state: false, message: validation.error.format() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -69,7 +69,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       github,
       linkedin,
       skills,
-      userId: session.user.id,
     };
 
     // Start a database transaction
@@ -110,23 +109,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           endDate: experience.timePeriod.endDate,
           profileId,
           company: experience.company,
-        })
+        }),
       );
       if (newExperiences.length > 0) {
         await trx.insert(experience).values(newExperiences);
       }
+      await trx
+        .update(users)
+        .set({ profileId: profileId })
+        .where(eq(users.id, session.user.id!));
     });
 
     // Return a success response
     return NextResponse.json(
       { state: true, message: "Profile created successfully" },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: any) {
     // Return an error response
     return NextResponse.json(
       { state: false, message: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -143,7 +146,7 @@ export async function PATCH(req: NextRequest) {
     if (!session) {
       return NextResponse.json(
         { state: false, message: "Not authorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -155,7 +158,7 @@ export async function PATCH(req: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         { state: false, message: validation.error.format() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -176,6 +179,19 @@ export async function PATCH(req: NextRequest) {
       profileId,
     } = validation.data;
 
+    const owner = await databaseDrizzle
+      .select({ ownerId: users.id })
+      .from(users)
+      .where(
+        and((eq(users.id, session.user.id!), eq(users.profileId, profileId))),
+      );
+    if (!owner) {
+      return NextResponse.json(
+        { state: false, message: "Not authorized" },
+        { status: 401 },
+      );
+    }
+
     // Update the profile table if any profile fields are present
     const profileFields = {
       fullName,
@@ -189,39 +205,62 @@ export async function PATCH(req: NextRequest) {
       phoneNumber,
     };
     const hasProfileFields = Object.values(profileFields).some(
-      (value) => value !== undefined
+      (value) => value !== undefined,
     );
     if (hasProfileFields) {
       await databaseDrizzle
         .update(profile)
         .set(profileFields)
-        .where(eq(profile.userId, session.user.id!));
+        .where(eq(profile.id, profileId));
     }
 
     // Update the sections table
     if (sections) {
       for (const { title, description, id } of sections) {
-        await databaseDrizzle
-          .update(section)
-          .set({ title, description })
-          .where(and(eq(section.profileId, profileId), eq(section.id, id!)));
+        try {
+          await databaseDrizzle
+            .update(section)
+            .set({ title, description })
+            .where(and(eq(section.profileId, profileId), eq(section.id, id!)));
+        } catch (err: any) {
+          // Insert sections into the section table with the retrieved profile ID
+          const newSections: SectionInsertion = {
+            id,
+            description,
+            title,
+            profileId,
+          };
+          await databaseDrizzle.insert(section).values(newSections);
+        }
       }
     }
 
     // Update the educations table
     if (educations) {
       for (const { school, degree, timePeriod, id } of educations) {
-        await databaseDrizzle
-          .update(education)
-          .set({
+        try {
+          await databaseDrizzle
+            .update(education)
+            .set({
+              school,
+              degree,
+              startDate: timePeriod.startDate,
+              endDate: timePeriod.endDate,
+            })
+            .where(
+              and(eq(education.profileId, profileId), eq(education.id, id!)),
+            );
+        } catch (err: any) {
+          const newEducation: EducationInsertion = {
+            id,
             school,
             degree,
             startDate: timePeriod.startDate,
             endDate: timePeriod.endDate,
-          })
-          .where(
-            and(eq(education.profileId, profileId), eq(education.id, id!))
-          );
+            profileId,
+          };
+          await databaseDrizzle.insert(education).values(newEducation);
+        }
       }
     }
 
@@ -234,29 +273,41 @@ export async function PATCH(req: NextRequest) {
         description,
         id,
       } of experiences) {
-        await databaseDrizzle
-          .update(experience)
-          .set({
+        try {
+          await databaseDrizzle
+            .update(experience)
+            .set({
+              company,
+              role,
+              description,
+              startDate: timePeriod.startDate,
+              endDate: timePeriod.endDate,
+            })
+            .where(
+              and(eq(experience.profileId, profileId), eq(experience.id, id!)),
+            );
+        } catch (err: any) {
+          const newExperience: ExperienceInsertion = {
+            id,
             company,
             role,
-            description,
             startDate: timePeriod.startDate,
             endDate: timePeriod.endDate,
-          })
-          .where(
-            and(eq(experience.profileId, profileId), eq(experience.id, id!))
-          );
+            profileId,
+          };
+          await databaseDrizzle.insert(experience).values(newExperience);
+        }
       }
     }
 
     return NextResponse.json(
       { state: true, message: "Profile Updated successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     return NextResponse.json(
       { state: false, message: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

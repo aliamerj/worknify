@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { databaseDrizzle } from "@/db/database";
-import { star } from "@/db/schemes/profileSchema";
+import { profileStar } from "@/db/schemes/profileSchema";
 import { and, eq } from "drizzle-orm";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
@@ -23,7 +23,7 @@ export async function POST(
       return NextResponse.json({}, { status: 401 });
     }
 
-    await databaseDrizzle.insert(star).values({
+    await databaseDrizzle.insert(profileStar).values({
       userId: session.user.id,
       profileId,
     });
@@ -59,12 +59,15 @@ export async function DELETE(
 
   try {
     await databaseDrizzle
-      .delete(star)
+      .delete(profileStar)
       .where(
-        and(eq(star.profileId, profileId), eq(star.userId, session.user.id)),
+        and(
+          eq(profileStar.profileId, profileId),
+          eq(profileStar.userId, session.user.id),
+        ),
       );
 
-    return  NextResponse.json(
+    return NextResponse.json(
       { state: true, body: "Star deleted successfully" },
       { status: 200 },
     );

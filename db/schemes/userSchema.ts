@@ -6,9 +6,15 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "@auth/core/adapters";
+import { relations } from "drizzle-orm";
+import { project } from "./projectSchema";
+import { profile } from "./profileSchema";
 
 export const users = pgTable("user", {
   id: text("id").notNull().primaryKey(),
+  profileId: integer("profile_id").references(() => profile.id, {
+    onDelete: "cascade",
+  }),
   name: text("name"),
   username: text("username").unique(),
   email: text("email").notNull().unique(),
@@ -58,5 +64,11 @@ export const verificationTokens = pgTable(
     compoundKey: primaryKey(vt.identifier, vt.token),
   }),
 );
-
+export const userRelations = relations(users, ({ one, many }) => ({
+  projects: many(project),
+  profile: one(profile, {
+    fields: [users.profileId],
+    references: [profile.id],
+  }),
+}));
 export type UserInsertion = typeof users.$inferInsert;

@@ -1,9 +1,12 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import getProfileData from "@/utils/api_handler/profile_handler";
 import { getServerSession } from "next-auth";
-import { ProfileDataProvider } from "./_components/context/profile_context";
+import {
+  AllProfileData,
+  ProfileDataProvider,
+} from "./_components/context/profile_context";
 import { headers } from "next/headers";
 import { AppRouter } from "@/utils/router/app_router";
+import { databaseDrizzle } from "@/db/database";
 /**
  * The `ProfileLayout` function is an asynchronous function that serves as a layout component for the profile page.
  * It retrieves the user's session and profile data, and provides it to the `ProfileDataProvider` component.
@@ -19,12 +22,26 @@ export default async function ProfileLayout({
   const headersList = headers();
   const pathname = headersList.get("x-pathname");
 
-  let session = null;
-  let allProfileData = null;
+  let session: any = null;
+  let allProfileData: AllProfileData | undefined;
 
   if (!pathname?.includes(AppRouter.viewProfile)) {
     session = await getServerSession(authOptions);
-    allProfileData = session ? await getProfileData(session.user.id!) : null;
+    if (session) {
+      allProfileData = await databaseDrizzle.query.users.findFirst({
+        where: (u, o) => o.eq(u.id, session.user.id!),
+        columns: {},
+        with: {
+          profile: {
+            with: {
+              experiences: true,
+              educations: true,
+              sections: true,
+            },
+          },
+        },
+      });
+    }
   }
 
   return (

@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   useFindDifferences,
   useLoading,
-  useProfileId,
+  useProfileData,
   useResetForm,
   useSetLoading,
 } from "../../context/hooks";
@@ -20,14 +20,17 @@ export const UpdateButtons = () => {
   const isLoading = useLoading();
   const resetForm = useResetForm();
   const setIsLoading = useSetLoading();
-  const profileId = useProfileId();
   const findDifferences = useFindDifferences();
+  const { profileId, userId, edit } = useProfileData();
 
-  const onSubmit: SubmitHandler<ProfileSchema> = async (_: ProfileSchema) => {
+  const onSubmit: SubmitHandler<ProfileSchema> = async (
+    data: ProfileSchema,
+  ) => {
     try {
       setIsLoading(true);
-      const differences = findDifferences();
-      if (Object.keys(differences).length !== 0) {
+      const differences = findDifferences({ ...data, edit, userId, profileId });
+      console.log({ differences });
+      if (profileId && Object.keys(differences).length !== 0) {
         const res = await axios.patch(ApiRouter.profile, {
           ...differences,
           profileId,
@@ -57,6 +60,7 @@ export const UpdateButtons = () => {
         {/* Button 1 */}
         <Button
           isLoading={isLoading}
+          disabled={!!!profileId}
           variant="shadow"
           color="primary"
           size="lg"

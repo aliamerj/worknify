@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { ButtonHeader } from "../buttonsHeader/button_header";
 import styles from "./header.module.css";
 import { FaLinkedin, FaGithub } from "react-icons/fa";
+import { ReactNode } from "react";
 
 interface IHeader {
   fullName: string;
@@ -24,9 +24,8 @@ interface IHeader {
   linkedin: string | null;
   github: string | null;
   jobTitle: string;
-  isStared: boolean;
-  profileId: number;
-  emailUser: string;
+
+  children: ReactNode;
 }
 
 const Header: React.FC<IHeader> = ({
@@ -37,9 +36,7 @@ const Header: React.FC<IHeader> = ({
   linkedin,
   github,
   jobTitle,
-  isStared,
-  profileId,
-  emailUser,
+  children,
 }) => {
   const renderLinkedInLink = () => {
     if (linkedin) {
@@ -88,12 +85,7 @@ const Header: React.FC<IHeader> = ({
           <p className="my-4 text-center text-lg md:w-96 md:text-start md:text-xl">
             {background}
           </p>
-          <ButtonHeader
-            isStared={isStared}
-            profileId={profileId}
-            fullName={fullName}
-            emailUser={emailUser}
-          />
+          {children}
         </section>
         <section className="mb-3 flex h-40 w-40 flex-col items-center justify-center gap-5 rounded-full md:h-64 md:w-64">
           <Image
@@ -119,4 +111,3 @@ const Header: React.FC<IHeader> = ({
 };
 
 export default Header;
-

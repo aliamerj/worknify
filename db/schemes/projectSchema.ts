@@ -9,6 +9,7 @@ import {
   pgEnum,
 } from "drizzle-orm/pg-core";
 import { users } from "./userSchema";
+import { relations } from "drizzle-orm";
 export const projectTypeVaild: Readonly<[string, string, string]> = [
   "private",
   "public",
@@ -54,6 +55,19 @@ export const starProject = pgTable("star_project", {
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
 });
+export const projectRelations = relations(project, ({ one, many }) => ({
+  profile: one(users, {
+    fields: [project.owner],
+    references: [users.id],
+  }),
+  stars: many(starProject),
+}));
+export const starRelations = relations(starProject, ({ one }) => ({
+  project: one(project, {
+    fields: [starProject.projectId],
+    references: [project.id],
+  }),
+}));
 
 // star
 export type StarProjectSelection = typeof starProject.$inferSelect;

@@ -4,6 +4,12 @@ import { AppRouter } from "@/utils/router/app_router";
 import { redirect } from "next/navigation";
 import { useProfileData } from "../_components/context/hooks";
 import { useEffect } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import {
+  ProfileSchema,
+  profileSchemaValidation,
+} from "@/utils/validations/profileValidation";
+import { zodResolver } from "@hookform/resolvers/zod";
 /**
  * This component acts as a gatekeeper for rendering its child components.
  * It checks if the `profileData` has an `edit` property and if it does,
@@ -25,5 +31,15 @@ export default function CreateProfileGate({
     }
   }, [profileData.edit]);
 
-  return <main>{children}</main>;
+  const methods = useForm<ProfileSchema>({
+    defaultValues: profileData,
+    resolver: zodResolver(profileSchemaValidation),
+  });
+
+  return (
+    <FormProvider {...methods}>
+      {" "}
+      <main>{children}</main>
+    </FormProvider>
+  );
 }

@@ -6,22 +6,12 @@ import {
   ProfileIdContext,
   ResetFormContext,
   SetLoadingContext,
-  UpdateProfileDataContext,
 } from "./profile_context";
 
 export const useProfileData = () => {
   const context = useContext(ProfileDataContext);
   if (context === undefined) {
     throw new Error("useProfileData must be used within a ProfileDataProvider");
-  }
-  return context;
-};
-export const useUpdateProfileData = () => {
-  const context = useContext(UpdateProfileDataContext);
-  if (context === undefined) {
-    throw new Error(
-      "useUpdateProfileData must be used within a ProfileDataProvider",
-    );
   }
   return context;
 };
@@ -46,14 +36,6 @@ export const useResetForm = () => {
   const context = useContext(ResetFormContext);
   if (context === undefined) {
     throw new Error("useResetForm must be used within a ProfileDataProvider");
-  }
-  return context;
-};
-
-export const useProfileId = () => {
-  const context = useContext(ProfileIdContext);
-  if (context === undefined) {
-    throw new Error("useProfileId must be used within a ProfileDataProvider");
   }
   return context;
 };

@@ -17,6 +17,8 @@ import { Projects } from "../../_components/_view_section/projects/projects";
 import { Noprofile } from "../../_components/_view_section/no_profile/no_profile";
 import { EditProfileBtn } from "../../_components/_view_section/edit_Profile_btn/edit_profile_btn";
 import Header from "../../_components/_view_section/header/header";
+import getTableCount from "@/utils/api_handler/get_table_count";
+import { ButtonHeader } from "../../_components/_view_section/buttonsHeader/button_header";
 
 const Skills = dynamic(
   () => import("@/app/(main)/profile/_components/_view_section/skills/skills"),
@@ -40,50 +42,50 @@ interface Props {
  */
 async function ViewProfile({ params }: Props) {
   const session = await getServerSession(authOptions);
-  let id = session?.user.id;
-  let image = session?.user.image;
 
-  if (!session || id !== params.id) {
-    const user = await databaseDrizzle.query.users.findFirst({
-      where: (u, o) => o.or(o.eq(u.id, params.id), o.eq(u.username, params.id)),
-    });
-
-    if (!user) {
-      return notFound();
-    }
-
-    id = user.id;
-    image = user.image;
-  }
-
-  const profile = await databaseDrizzle.query.profile.findFirst({
-    where: (p, o) => o.eq(p.userId, id!),
-  });
-
-  if (!profile) {
-    return <Noprofile isCurrentUser={id === params.id} />;
-  }
-
-  const star = await databaseDrizzle.query.star.findMany({
-    where: (s, o) => o.eq(s.profileId, profile?.id),
-    columns: {
-      userId: true,
-    },
-  });
-
-  const projects = await databaseDrizzle.query.project.findMany({
-    where: (p, o) => o.eq(p.owner, params.id),
+  const user = await databaseDrizzle.query.users.findFirst({
+    where: (u, o) => o.eq(u.id, params.id),
     columns: {
       id: true,
-      logo: true,
-      name: true,
-      projectGoal: true,
-      techUsed: true,
-      link: true,
+      image: true,
+    },
+    with: {
+      profile: {
+        with: {
+          experiences: true,
+          educations: true,
+          sections: true,
+          stars: {
+            columns: {
+              userId: true,
+            },
+          },
+        },
+      },
+      projects: {
+        columns: {
+          id: true,
+          logo: true,
+          name: true,
+          projectGoal: true,
+          techUsed: true,
+          link: true,
+        },
+      },
     },
   });
 
-  const isStared = star.some((star) => star.userId === params.id);
+  if (!user) {
+    return notFound();
+  }
+  if (!user.profile) {
+    return <Noprofile isCurrentUser={session?.user.id === params.id} />;
+  }
+  const { profile, projects } = user;
+  const starCount = await getTableCount("profile_star");
+  const isStared = user.profile.stars.some(
+    (star) => star.userId === session?.user.id,
+  );
 
   return (
     <>
@@ -91,19 +93,27 @@ async function ViewProfile({ params }: Props) {
         fullName={profile.fullName}
         username={params.id}
         background={profile.background}
-        image={image ?? null}
+        image={user.image}
         linkedin={profile.linkedin}
         github={profile.github}
         jobTitle={profile.jobTitle}
         isStared={isStared}
         profileId={profile.id}
         emailUser={profile.email}
-      />
-      {profile.userId === session?.user.id && <EditProfileBtn />}
+      >
+        <ButtonHeader
+          isStared={isStared}
+          profileId={profile.id}
+          fullName={profile.fullName}
+          emailUser={profile.email}
+          authId={session?.user.id}
+        />
+      </Header>
+      {user.id === session?.user.id && <EditProfileBtn />}
       <ErrorBoundary>
         <Suspense fallback={<ShimmerLoading count={4} />}>
           <ProfileSummary
-            stars={star.length}
+            stars={starCount}
             projects={projects.length}
             userId={params.id}
           />

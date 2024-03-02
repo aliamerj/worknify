@@ -8,6 +8,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { users } from "./userSchema";
+import { relations } from "drizzle-orm";
 
 export const profile = pgTable("profile", {
   id: serial("id").primaryKey(),
@@ -20,10 +21,6 @@ export const profile = pgTable("profile", {
   github: varchar("github", { length: 100 }),
   linkedin: varchar("linkedin", { length: 100 }),
   skills: text("skills"),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" })
-    .unique(),
 });
 
 export const section = pgTable("section", {
@@ -35,7 +32,7 @@ export const section = pgTable("section", {
     .notNull(),
 });
 
-export const star = pgTable(
+export const profileStar = pgTable(
   "profile_star",
   {
     profileId: integer("profile_id")
@@ -72,6 +69,40 @@ export const education = pgTable("education", {
     .references(() => profile.id, { onDelete: "cascade" })
     .notNull(),
 });
+export const profileRelations = relations(profile, ({ many }) => ({
+  experiences: many(experience),
+  educations: many(education),
+  sections: many(section),
+  stars: many(profileStar, {
+    relationName: "profile_star",
+  }),
+}));
+export const experienceRelations = relations(experience, ({ one }) => ({
+  profile: one(profile, {
+    fields: [experience.profileId],
+    references: [profile.id],
+  }),
+}));
+export const educationsRelations = relations(education, ({ one }) => ({
+  profile: one(profile, {
+    fields: [education.profileId],
+    references: [profile.id],
+  }),
+}));
+export const sectionsRelations = relations(section, ({ one }) => ({
+  profile: one(profile, {
+    fields: [section.profileId],
+    references: [profile.id],
+  }),
+}));
+
+export const starsRelations = relations(profileStar, ({ one }) => ({
+  profile: one(profile, {
+    fields: [profileStar.profileId],
+    references: [profile.id],
+    relationName: "profile_star",
+  }),
+}));
 
 export type ProfileInsertion = typeof profile.$inferInsert;
 export type SectionInsertion = typeof section.$inferInsert;
@@ -83,4 +114,4 @@ export type ProfileSelection = typeof profile.$inferSelect;
 export type SectionSelection = typeof section.$inferSelect;
 export type EducationSelection = typeof education.$inferSelect;
 export type ExperienceSelection = typeof experience.$inferSelect;
-export type StarSelection = typeof star.$inferSelect;
+export type StarSelection = typeof profileStar.$inferSelect;

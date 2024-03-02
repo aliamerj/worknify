@@ -10,6 +10,7 @@ import {
   profileSchemaValidation,
 } from "@/utils/validations/profileValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 /**
  * This component acts as a gatekeeper for accessing the edit profile functionality.
  * It checks if the user has the necessary profile data and redirects them to the create profile page if not.
@@ -23,10 +24,11 @@ export default function EditProfileGate({
   children: React.ReactNode;
 }) {
   const profileData = useProfileData();
-  // Redirect the user to the create profile page if they don't have the necessary profile data
-  if (!profileData.edit) {
-    redirect(AppRouter.createProfile);
-  }
+  useEffect(() => {
+    if (!profileData.edit) {
+      redirect(AppRouter.createProfile);
+    }
+  }, [profileData.edit]);
   const methods = useForm<ProfileSchema>({
     defaultValues: profileData,
     resolver: zodResolver(profileSchemaValidation),
