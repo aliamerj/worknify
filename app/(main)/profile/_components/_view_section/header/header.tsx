@@ -91,9 +91,10 @@ const Header: React.FC<IHeader> = ({
           <Image
             src={image ?? "/user_image.png"}
             alt="user Image"
-            layout="responsive"
-            width={140}
-            height={140}
+            priority
+            width={200}
+            height={200}
+            style={{ objectFit: "cover" }}
             className="rounded-full bg-foreground p-2"
           />
 

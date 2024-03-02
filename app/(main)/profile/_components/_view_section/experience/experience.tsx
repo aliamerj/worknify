@@ -1,14 +1,11 @@
 import { Slide } from "@/animation/Slide";
-import { databaseDrizzle } from "@/db/database";
+import { ExperienceSelection } from "@/db/schemes/profileSchema";
 import { formatDate } from "@/utils/helper_function";
 import DOMPurify from "isomorphic-dompurify";
 import { MdWork } from "react-icons/md";
 
-export const Experience = async ({ profileId }: { profileId: number }) => {
-  const jobs = await databaseDrizzle.query.experience.findMany({
-    where: (e, o) => o.eq(e.profileId, profileId),
-  });
-  if(!jobs || jobs.length === 0) return <div/>
+export const Experience = async ({ experiences }: { experiences: ExperienceSelection[]}) => {
+
   
   return (
     <section className="mx-12 mt-32">
@@ -22,7 +19,7 @@ export const Experience = async ({ profileId }: { profileId: number }) => {
 
       <Slide delay={0.18}>
         <div className="grid grid-cols-1 gap-x-12 gap-y-10 lg:grid-cols-2">
-          {jobs.map((data) => (
+          {experiences.map((data) => (
             <div
               key={data.id}
               className="relative flex max-w-2xl items-start gap-x-4 before:absolute before:bottom-0 before:left-9 before:top-[5rem] before:w-[1px] before:bg-secondary dark:before:bg-primary lg:gap-x-6"

@@ -20,7 +20,7 @@ const Skills = ({ skills }: { skills: string }) => {
   });
 
   const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>(
-    {}
+    {},
   );
 
   /**
@@ -53,7 +53,8 @@ const Skills = ({ skills }: { skills: string }) => {
                 ) : (
                   <Image
                     src={iconURL}
-                    className="mb-2 h-12 w-12 object-contain"
+                    style={{ objectFit: "contain" }}
+                    className="max-h-full max-w-full"
                     alt={skill}
                     width={48}
                     height={48}
@@ -71,3 +72,4 @@ const Skills = ({ skills }: { skills: string }) => {
 };
 
 export default Skills;
+

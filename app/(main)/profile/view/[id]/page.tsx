@@ -1,12 +1,10 @@
 import { databaseDrizzle } from "@/db/database";
 import { notFound } from "next/navigation";
-import React, { Suspense } from "react";
+import React from "react";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-import ShimmerLoading from "@/global-components/ShimmerLoading";
-import ErrorBoundary from "@/global-components/ErrorBoundary";
 import dynamic from "next/dynamic";
 import { Spinner } from "@nextui-org/react";
 import { ProfileSummary } from "../../_components/_view_section/profile_summary/profile_summary";
@@ -110,32 +108,17 @@ async function ViewProfile({ params }: Props) {
         />
       </Header>
       {user.id === session?.user.id && <EditProfileBtn />}
-      <ErrorBoundary>
-        <Suspense fallback={<ShimmerLoading count={4} />}>
-          <ProfileSummary
-            stars={starCount}
-            projects={projects.length}
-            userId={params.id}
-          />
-        </Suspense>
-      </ErrorBoundary>
-      <ErrorBoundary>
-        <Suspense fallback={<ShimmerLoading count={4} />}>
-          <Experience profileId={profile.id} />
-        </Suspense>
-      </ErrorBoundary>
+
+      <ProfileSummary
+        stars={starCount}
+        projects={projects.length}
+        userId={params.id}
+      />
+      <Experience experiences={profile.experiences} />
       {profile.skills && <Skills skills={profile.skills} />}
       {projects.length !== 0 && <Projects projects={projects} />}
-      <ErrorBoundary>
-        <Suspense fallback={<ShimmerLoading count={4} />}>
-          <Education profileId={profile.id} />
-        </Suspense>
-      </ErrorBoundary>
-      <ErrorBoundary>
-        <Suspense fallback={<ShimmerLoading count={4} />}>
-          <Sections profileId={profile.id} />
-        </Suspense>
-      </ErrorBoundary>
+      <Education educations={profile.educations} />
+      <Sections sections={profile.sections} />
     </>
   );
 }

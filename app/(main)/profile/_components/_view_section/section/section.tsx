@@ -1,10 +1,8 @@
-import { databaseDrizzle } from "@/db/database";
+import { SectionSelection } from "@/db/schemes/profileSchema";
 import { FaPen } from "react-icons/fa";
 
-const Sections = async ({ profileId }: { profileId: number }) => {
-  const sections = await databaseDrizzle.query.section.findMany({
-    where: (s, o) => o.eq(s.profileId, profileId),
-  });
+const Sections = async ({ sections }: { sections: SectionSelection[] }) => {
+
   return (
     <section className="my-32 px-4 md:px-12">
       {sections.map((section) => (
