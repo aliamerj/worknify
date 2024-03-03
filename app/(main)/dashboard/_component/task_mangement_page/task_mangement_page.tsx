@@ -20,7 +20,6 @@ import { useDashboardContext } from "../../context/context_dashboard";
 import { useApiCallContext } from "@/utils/context/api_call_context";
 import { FaPeopleGroup } from "react-icons/fa6";
 import { DevsModal } from "../devs_modal/devs_modal";
-import { calculateProjectCompletion } from "@/utils/helper_function";
 import { ToastContainer } from "react-toastify";
 
 export enum DroppableIds {
@@ -39,8 +38,7 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
     contributors,
     projectCmpilation: projectoCmpilation,
   } = useDashboardContext();
-  const { setMessageRes, message, isLoading, setIsLoading } =
-    useApiCallContext();
+  const { setMessageRes, isLoading, setIsLoading } = useApiCallContext();
   const [newFeatureOrder, setNewFeatureOrder] =
     useState<ReorderFeatureSchema>();
 

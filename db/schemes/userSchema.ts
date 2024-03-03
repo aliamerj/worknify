@@ -7,8 +7,9 @@ import {
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "@auth/core/adapters";
 import { relations } from "drizzle-orm";
-import { project } from "./projectSchema";
+import { dev, project } from "./projectSchema";
 import { profile } from "./profileSchema";
+import { notification } from "./notificationSchema";
 
 export const users = pgTable("user", {
   id: text("id").notNull().primaryKey(),
@@ -70,5 +71,7 @@ export const userRelations = relations(users, ({ one, many }) => ({
     fields: [users.profileId],
     references: [profile.id],
   }),
+  contributions: many(dev),
+  notifications: many(notification),
 }));
 export type UserInsertion = typeof users.$inferInsert;

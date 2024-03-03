@@ -1,15 +1,20 @@
 "use client";
-import { DevSelection, ProjectSelection } from "@/db/schemes/projectSchema";
+import { ProjectSelection } from "@/db/schemes/projectSchema";
 import { Tab, Tabs } from "@nextui-org/react";
 import AboutProject from "../../about_project/about_project";
 import ReactMarkdown from "react-markdown";
+import ProjectFeatures, { FeatureData } from "./main_feature";
 
 export const ProjectBody = ({
   project,
-  devs,
+  devCount,
+  completion,
+  features,
 }: {
   project: ProjectSelection;
-  devs: DevSelection[];
+  devCount: number;
+  completion: number;
+  features: FeatureData[];
 }) => {
   let tabs = [
     {
@@ -20,10 +25,16 @@ export const ProjectBody = ({
     {
       id: "about",
       label: "About",
-      devs: devs,
+      devs: devCount,
       owner: project.owner,
     },
+    {
+      id: "main_feature",
+      label: "Main Feature",
+      features: features,
+    },
   ];
+
   return (
     <div className="flex w-full flex-col pt-5">
       <Tabs
@@ -50,16 +61,22 @@ export const ProjectBody = ({
                   </article>
                 </div>
               </div>
-            ) : (
+            ) : item.id === "about" ? (
               <AboutProject
                 owner={project.owner}
-                compilation={project.compilation}
-                developersCount={devs.length}
+                compilation={completion}
+                developersCount={devCount + 1}
                 startDate={project.startDate}
                 endDate={project.endDate}
                 projectLink={project.link}
                 projectType={project.type}
               />
+            ) : (
+              <div className="mx-2 mt-6 rounded-lg bg-gray-50 p-6 shadow-sm md:mx-20">
+                <div className="container mx-auto space-y-4">
+                  <ProjectFeatures features={features} />
+                </div>
+              </div>
             )}
           </Tab>
         )}

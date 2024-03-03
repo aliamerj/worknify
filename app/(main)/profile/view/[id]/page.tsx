@@ -53,11 +53,14 @@ async function ViewProfile({ params }: Props) {
           experiences: true,
           educations: true,
           sections: true,
-          stars: {
-            columns: {
-              userId: true,
-            },
-          },
+          stars: session?.user.id
+            ? {
+                where: (s, o) => o.eq(s.userId, session?.user.id!),
+                columns: {
+                  userId: true,
+                },
+              }
+            : undefined,
         },
       },
       projects: {
@@ -81,9 +84,7 @@ async function ViewProfile({ params }: Props) {
   }
   const { profile, projects } = user;
   const starCount = await getTableCount("profile_star");
-  const isStared = user.profile.stars.some(
-    (star) => star.userId === session?.user.id,
-  );
+  const isStared = user.profile?.stars ? user.profile.stars[0]?.userId : null;
 
   return (
     <>
@@ -95,12 +96,12 @@ async function ViewProfile({ params }: Props) {
         linkedin={profile.linkedin}
         github={profile.github}
         jobTitle={profile.jobTitle}
-        isStared={isStared}
+        isStared={!!isStared}
         profileId={profile.id}
         emailUser={profile.email}
       >
         <ButtonHeader
-          isStared={isStared}
+          isStared={!!isStared}
           profileId={profile.id}
           fullName={profile.fullName}
           emailUser={profile.email}

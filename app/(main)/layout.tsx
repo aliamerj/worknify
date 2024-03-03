@@ -33,9 +33,13 @@ export default function RootLayout({
       <body suppressHydrationWarning={true} className={rubik.className}>
         <Providers>
           <ApiCallProvider>
-            <NavBar />
-            {children}
-            <Footer />
+            <div className="flex min-h-screen flex-col justify-between">
+              <main className="mb-auto">
+                <NavBar />
+                {children}
+              </main>
+              <Footer />
+            </div>
           </ApiCallProvider>
         </Providers>
       </body>

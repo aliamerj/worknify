@@ -15,7 +15,8 @@ import RequestPendingBox from "../../request_pending_box/request_pending_box";
 import { LiaLaptopCodeSolid } from "react-icons/lia";
 import { NotificationSchema } from "@/utils/validations/notificationsValidation";
 import Link from "next/link";
-
+// it should be splitting the code into starGiving and Join
+// TODO
 interface Props {
   isAuth: boolean;
   projectLogo: string | null;

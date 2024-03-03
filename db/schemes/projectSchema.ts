@@ -10,6 +10,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { users } from "./userSchema";
 import { relations } from "drizzle-orm";
+import { notification } from "./notificationSchema";
+import { feature } from "./featureSchema";
 export const projectTypeVaild: Readonly<[string, string, string]> = [
   "private",
   "public",
@@ -55,17 +57,30 @@ export const starProject = pgTable("star_project", {
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
 });
-export const projectRelations = relations(project, ({ one, many }) => ({
+export const projectsRelations = relations(project, ({ one, many }) => ({
   profile: one(users, {
     fields: [project.owner],
     references: [users.id],
   }),
   stars: many(starProject),
+  devs: many(dev),
+  notifications: many(notification),
+  features: many(feature),
 }));
-export const starRelations = relations(starProject, ({ one }) => ({
+export const starProjectRelations = relations(starProject, ({ one }) => ({
   project: one(project, {
     fields: [starProject.projectId],
     references: [project.id],
+  }),
+}));
+export const devsRelations = relations(dev, ({ one }) => ({
+  project: one(project, {
+    fields: [dev.projectId],
+    references: [project.id],
+  }),
+  contributor: one(users, {
+    fields: [dev.devId],
+    references: [users.id],
   }),
 }));
 

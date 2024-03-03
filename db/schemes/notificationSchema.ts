@@ -8,6 +8,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { users } from "./userSchema";
 import { project } from "./projectSchema";
+import { relations } from "drizzle-orm";
 export const notificationTypeVaild: Readonly<[string, string, string]> = [
   "JOIN_REQUEST",
   "ACCEPT_REQUEST",
@@ -42,5 +43,19 @@ export const notification = pgTable(
     ),
   }),
 );
+export const notificationsRelations = relations(notification, ({ one }) => ({
+  sender: one(users, {
+    fields: [notification.senderId],
+    references: [users.id],
+  }),
+  receiver: one(users, {
+    fields: [notification.receiverId],
+    references: [users.id],
+  }),
+  project: one(project, {
+    fields: [notification.projectId],
+    references: [project.id],
+  }),
+}));
 export type NotificationSelection = typeof notification.$inferSelect;
 export type NotificationsInsertion = typeof notification.$inferInsert;

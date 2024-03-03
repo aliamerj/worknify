@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { DeleteProjectBtn } from "../delete_modal.tsx/delete_modal";
 import { Progress } from "@nextui-org/react";
-import { AboutProjectProps } from "../projects_grid/projects_grid";
+import { ProjectProps } from "../projects_grid/projects_grid";
 import { LiaLaptopCodeSolid } from "react-icons/lia";
 import {
   FaUserFriends,
@@ -14,28 +14,25 @@ import {
   FaGlobe,
   FaUnlock,
 } from "react-icons/fa";
-import { databaseDrizzle } from "@/db/database";
-import { eq } from "drizzle-orm";
+import getTableCount from "@/utils/api_handler/get_table_count";
+import { calculateProjectCompletion } from "@/utils/helper_function";
+
 export const ProjectCard = async ({
   owner,
   id,
   logo,
   name,
   projectGoal,
-  compilation,
   type,
   fullName,
-}: AboutProjectProps & { fullName: string }) => {
-  const devs = await databaseDrizzle.query.dev.findMany({
-    where: (d) => eq(d.projectId, id),
-    columns: {
-      devId: true,
-    },
-  });
+  features,
+}: ProjectProps & { fullName: string }) => {
+  const devsCount = await getTableCount("dev", "project_id", id);
 
   const session = await getServerSession(authOptions);
+  const compilation = calculateProjectCompletion(features);
   const isCreator = owner === session?.user.id;
-  //const githubLink = `https://github.com/${link}`;
+  // const githubLink = `https://github.com/${link}`;
 
   const projectTypeIcon =
     type === "private" ? (
@@ -91,7 +88,7 @@ export const ProjectCard = async ({
                 </div>
                 <div className="mt-2 flex items-center space-x-2">
                   <FaUserFriends />
-                  <span>Developers: {devs.length + 1}</span>
+                  <span>Developers: {devsCount + 1}</span>
                 </div>
 
                 {/*  <div className="mt-2 flex items-center space-x-2">

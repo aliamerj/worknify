@@ -7,6 +7,8 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 import { project } from "./projectSchema";
+import { relations } from "drizzle-orm";
+import { tasks } from "./taskSchema";
 
 export const feature = pgTable("feature", {
   id: serial("id").primaryKey(),
@@ -21,5 +23,12 @@ export const feature = pgTable("feature", {
   startDate: date("start_date"),
   endDate: date("end_date"),
 });
+export const featuresRelations = relations(feature, ({ one, many }) => ({
+  project: one(project, {
+    fields: [feature.projectId],
+    references: [project.id],
+  }),
+  tasks: many(tasks),
+}));
 export type FeatureSelection = typeof feature.$inferSelect;
 export type FeatureInsertion = typeof feature.$inferInsert;

@@ -6,53 +6,56 @@ import { FaFacebookF, FaLinkedinIn, FaGithub } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className="mt-10 bg-gray-50 p-10 text-gray-900">
-      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 md:grid-cols-4">
-        <div className="col-span-1 md:col-span-2">
+    <footer className="relative mt-10 w-full bg-gray-50 p-4 text-gray-900 md:p-10">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+        <div className="col-span-1 sm:col-span-2">
           <Image
             src="/worknify_main_logo.svg"
             alt="Worknify"
-            className="h-auto w-auto  fill-current text-white"
+            className="h-auto w-auto"
             width={100}
             height={20}
             priority={true}
           />
-
-          <p className="mt-2 text-sm">
+          <p className="mt-2 text-xs sm:text-sm">
             Empowering your project management with unmatched collaboration and
             productivity tools.
           </p>
         </div>
-        <div className="flex flex-col space-y-4">
-          <h3 className="text-sm uppercase text-gray-900">Explore</h3>
+        <div className="flex flex-col space-y-2 sm:space-y-4">
+          <h3 className="text-xs uppercase text-gray-900 sm:text-sm">
+            Explore
+          </h3>
           <Link
             href={AppRouter.about}
-            className="text-sm transition-colors duration-300 hover:text-primary"
+            className="text-xs transition-colors duration-300 hover:text-primary sm:text-sm"
           >
             About Us
           </Link>
           <Link
             href={AppRouter.service}
-            className="text-sm transition-colors duration-300 hover:text-primary"
+            className="text-xs transition-colors duration-300 hover:text-primary sm:text-sm"
           >
             Services
           </Link>
           <Link
             href={AppRouter.privacyPolicy}
-            className="text-sm transition-colors duration-300 hover:text-primary"
+            className="text-xs transition-colors duration-300 hover:text-primary sm:text-sm"
           >
             Privacy Policy
           </Link>
           <Link
             href={AppRouter.contact}
-            className="text-sm transition-colors duration-300 hover:text-primary"
+            className="text-xs transition-colors duration-300 hover:text-primary sm:text-sm"
           >
             Contact
           </Link>
         </div>
-        <div className="flex flex-col space-y-4">
-          <h3 className="text-sm uppercase text-gray-900">Follow Me</h3>
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-col space-y-2 sm:space-y-4">
+          <h3 className="text-xs uppercase text-gray-900 sm:text-sm">
+            Follow Me
+          </h3>
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <a
               href="https://github.com/aliamerj"
               target="_blank"
@@ -77,7 +80,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <div className="mt-8 border-t border-gray-800 pt-6 text-center text-xs">
+      <div className="mt-4 border-t border-gray-800 pt-4 text-center text-xs sm:mt-8 sm:pt-6">
         <p>&copy; {new Date().getFullYear()} worknify. All rights reserved.</p>
       </div>
     </footer>

@@ -1,9 +1,9 @@
 import { ProjectSelection } from "@/db/schemes/projectSchema";
 import { ProjectCard } from "../project_card/project_card";
-export type AboutProjectProps = {
+import { FeatureWithTasks } from "@/utils/helper_function";
+export type ProjectProps = {
   id: ProjectSelection["id"];
   owner: ProjectSelection["owner"];
-  compilation: ProjectSelection["compilation"];
   startDate: ProjectSelection["startDate"];
   endDate: ProjectSelection["endDate"];
   type: ProjectSelection["type"];
@@ -11,13 +11,14 @@ export type AboutProjectProps = {
   projectGoal: ProjectSelection["projectGoal"];
   logo: ProjectSelection["logo"];
   name: ProjectSelection["name"];
+  features: FeatureWithTasks[];
 };
 
 const ProjectsGrid = ({
   projects,
   userName,
 }: {
-  projects: AboutProjectProps[];
+  projects: ProjectProps[];
   userName: string;
 }) => {
   return (

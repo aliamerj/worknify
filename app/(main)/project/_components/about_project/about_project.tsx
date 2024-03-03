@@ -46,7 +46,7 @@ const AboutProject = ({
         {/* Developers Count */}
         <div className="space-y-2">
           <h2 className="text-lg font-semibold text-gray-700">Developers</h2>
-          <p className="text-gray-600">{developersCount + 1}</p>
+          <p className="text-gray-600">{developersCount}</p>
         </div>
 
         {/* Compilation */}

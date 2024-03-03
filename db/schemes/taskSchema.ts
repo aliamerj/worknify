@@ -10,6 +10,7 @@ import {
 import { feature } from "./featureSchema";
 import { users } from "./userSchema";
 import { project } from "./projectSchema";
+import { relations } from "drizzle-orm";
 
 export const statusTypeValid = [
   "New",
@@ -31,9 +32,6 @@ export const tasks = pgTable("tasks", {
   creatorId: text("creator_id")
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
-  projectId: integer("project_id")
-    .references(() => project.id, { onDelete: "cascade" })
-    .notNull(),
   status: statusType("status").notNull(),
   name: varchar("feature_name", { length: 255 }).notNull(),
   order: integer("order").notNull(),
@@ -41,5 +39,19 @@ export const tasks = pgTable("tasks", {
   startDate: date("start_date"),
   endDate: date("end_date"),
 });
+export const tasksRelations = relations(tasks, ({ one }) => ({
+  feature: one(feature, {
+    fields: [tasks.featureId],
+    references: [feature.id],
+  }),
+  assignedTo: one(users, {
+    fields: [tasks.assignedTo],
+    references: [users.id],
+  }),
+  creator: one(users, {
+    fields: [tasks.creatorId],
+    references: [users.id],
+  }),
+}));
 export type TaskSelection = typeof tasks.$inferSelect;
 export type TaskInsertion = typeof tasks.$inferInsert;
