@@ -20,7 +20,6 @@ const TimePeriod = z
 export const taskSchema = z.object({
   id: z.number().optional(),
   featureId: z.number(),
-  projectId: z.number(),
   name: z
     .string()
     .trim()
