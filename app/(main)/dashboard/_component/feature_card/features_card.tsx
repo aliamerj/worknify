@@ -1,18 +1,20 @@
 import { Card, CardBody, CardHeader, Divider } from "@nextui-org/react";
 import { SiTask } from "react-icons/si";
-
-import {
-  calculateProjectCompletion,
-  formatDate,
-} from "@/utils/helper_function";
+import { formatDate } from "@/utils/helper_function";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FeatureSelection } from "@/db/schemes/featureSchema";
 import axios from "axios";
 import { ApiRouter } from "@/utils/router/app_router";
 import { FaPencilAlt } from "react-icons/fa";
-import { useDashboardContext } from "../../context/context_dashboard";
 import { useApiCallContext } from "@/utils/context/api_call_context";
+import {
+  useCurrentProject,
+  useRemoveFeature,
+  useSetFeatureToUpdate,
+  useTasksInfo,
+} from "../../context/hooks";
 import { useCallback } from "react";
+import { ColumnsTask } from "../../context/tasks/reducer";
 
 export const FeaturesCard = ({
   onOpen,
@@ -21,22 +23,28 @@ export const FeaturesCard = ({
   onOpen: () => void;
   feature: FeatureSelection;
 }) => {
-  const {
-    isOwner,
-    featureActions,
-    setSelectedFeatureToUpdate,
-    allTasks,
-    taskActions,
-    features,
-    updateProjectCompilationBar,
-  } = useDashboardContext();
   const { setMessageRes } = useApiCallContext();
-  const getTaskCount = useCallback(
-    () =>
-      allTasks.filter((t) => t.featureId === feature.id && t.status !== "Done")
-        .length,
-    [taskActions, allTasks],
-  );
+  const setSelectedFeatureToUpdate = useSetFeatureToUpdate();
+  const removeFeature = useRemoveFeature();
+  const { isOwner } = useCurrentProject();
+  const tasks = useTasksInfo();
+  const taskCount = useCallback(() => {
+    const taskStatuses: (keyof ColumnsTask)[] = [
+      "New",
+      "In Progress",
+      "Ready to Test",
+    ];
+    let taskCount = 0;
+
+    taskStatuses.forEach((status) => {
+      taskCount += tasks[status].reduce(
+        (count, task) => count + (task.featureId === feature.id ? 1 : 0),
+        0,
+      );
+    });
+
+    return taskCount;
+  }, [tasks]);
   return (
     <>
       <Card className="group relative flex max-h-44 w-80 items-center rounded-lg bg-background p-2">
@@ -50,18 +58,13 @@ export const FeaturesCard = ({
                       data: {
                         projectId: feature.projectId,
                         featureId: feature.id,
-                        projectCompletion: calculateProjectCompletion(
-                          features.filter((f) => f.id !== feature.id),
-                          allTasks,
-                        ),
                       },
                     });
                     setMessageRes({
                       isError: false,
                       message: res.data.message,
                     });
-                    featureActions.removeFeature(feature.id);
-                    updateProjectCompilationBar({newFeatures:features.filter(f=>f.id !== feature.id)})
+                    removeFeature(feature.id);
                   } catch (error: any) {
                     setMessageRes({
                       isError: true,
@@ -77,7 +80,7 @@ export const FeaturesCard = ({
               <button
                 onClick={() => {
                   setSelectedFeatureToUpdate({
-                                        id: feature.id,
+                    id: feature.id,
                     projectId: feature.projectId,
                     order: feature.order,
                     featureName: feature.featureName,
@@ -103,9 +106,9 @@ export const FeaturesCard = ({
           <div className="flex flex-col">
             <div className="flex items-center justify-start">
               <p className="text-lg">{feature.featureName}</p>
-              {getTaskCount() > 0 && (
+              {taskCount() > 0 && (
                 <span className="ms-3 inline-flex h-3 w-3 items-center justify-center rounded-full bg-blue-100 p-3 text-small font-medium text-blue-800">
-                  {getTaskCount()}
+                  {taskCount()}
                 </span>
               )}
             </div>

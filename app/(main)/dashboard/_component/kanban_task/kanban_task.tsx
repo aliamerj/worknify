@@ -13,12 +13,16 @@ import {
 } from "react-icons/ai";
 import { TaskCard } from "../task_card/task_card";
 import { ColumnId } from "@/db/schemes/taskSchema";
-import { useDashboardContext } from "../../context/context_dashboard";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useApiCallContext } from "@/utils/context/api_call_context";
 import { ReorderTaskSchema } from "@/utils/validations/taskValidation";
 import { ApiRouter } from "@/utils/router/app_router";
+import {
+  useCurrentProject,
+  useTasksInfo,
+  useUpdateTaskOrder,
+} from "../../context/hooks";
 
 type ColumnStyles = {
   [key in ColumnId]: {
@@ -57,8 +61,9 @@ export const KanbanTask = ({
   featureId: number;
   onOpen: () => void;
 }) => {
-  const { taskColumn, taskActions, project, isDev, isOwner,updateProjectCompilationBar,allTasks } =
-    useDashboardContext();
+  const { isOwner, isDev } = useCurrentProject();
+  const taskColumn = useTasksInfo();
+  const updateTaskOrder = useUpdateTaskOrder();
   const { setIsLoading, setMessageRes } = useApiCallContext();
   const [newTasksOrder, setNewTasksOrder] = useState<ReorderTaskSchema>();
 
@@ -92,47 +97,43 @@ export const KanbanTask = ({
     startTasks.splice(source.index, 1);
 
     if (startColumnId === finishColumnId) {
-      // Insert the task at its new position within the same column
+      // Update task order within the same column
       startTasks.splice(destination.index, 0, movedTask);
-      newColumns[startColumnId] = startTasks;
+      newColumns[startColumnId] = startTasks.map((task, index) => ({
+        ...task,
+        order: index,
+      }));
     } else {
-      // Handle moving between columns
+      // Handle moving between columns and update task order accordingly
       const finishTasks = Array.from(newColumns[finishColumnId]);
-      movedTask.status = finishColumnId; // Update the task's status
+      movedTask.status = finishColumnId;
       finishTasks.splice(destination.index, 0, movedTask);
-      newColumns[startColumnId] = startTasks;
-      newColumns[finishColumnId] = finishTasks;
+      newColumns[startColumnId] = startTasks.map((task, index) => ({
+        ...task,
+        order: index,
+      }));
+      newColumns[finishColumnId] = finishTasks.map((task, index) => ({
+        ...task,
+        order: index,
+      }));
     }
 
-    // Update the local state with the new columns
-    taskActions.updateTaskOrder(newColumns);
-    
+    // Update the local state and prepare the payload considering all affected columns
+    updateTaskOrder(newColumns);
 
-
-    // Prepare and send the update payload to the backend
-    // Assuming a more efficient backend update mechanism
-        const updatePayload: ReorderTaskSchema = {
-      projectId: project.id,
-            newStatus: finishColumnId !== startColumnId ? finishColumnId : undefined,
-      items: newColumns[finishColumnId].map((t) => {
-        return {
-          taskId: t.id,
-          order: t.order + 1,
-        };
-      }),
+    const updatedTasks = [
+      ...newColumns[startColumnId],
+      ...(startColumnId !== finishColumnId ? newColumns[finishColumnId] : []),
+    ];
+    const updatePayload: ReorderTaskSchema = {
+      newStatus: finishColumnId,
+      items: updatedTasks.map((task) => ({
+        taskId: task.id,
+        order: task.order,
+      })),
     };
-    setNewTasksOrder(updatePayload);
-    
-    if(startColumnId !== finishColumnId){
-      updateProjectCompilationBar({newTasks:allTasks.map(t=> {
-        if(t.id === movedTask.id){
-          t.status =finishColumnId;
-          return t;
-        }
-        return t;
-      })})
 
-    }
+    setNewTasksOrder(updatePayload);
   };
 
   const isInitialMount = useRef(true);
@@ -158,8 +159,6 @@ export const KanbanTask = ({
       }
     }
   }, [newTasksOrder, setNewTasksOrder]);
-
-  // console.log(tasks)
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>

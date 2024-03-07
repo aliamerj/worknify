@@ -23,7 +23,7 @@ export const featureSchema = z.object({
     .string()
     .trim()
     .min(1, "Feature name must be at least 1 characters")
-    .max(30, "Role must be under 30 characters"),
+    .max(20, "Feature must be under 20 characters"),
   tag: z
     .array(
       z
@@ -40,7 +40,7 @@ export const featureSchema = z.object({
     )
     .max(5, "No more than 5 tags are allowed")
     .optional(),
-  
+
   description: z
     .string()
     .trim()
@@ -53,7 +53,7 @@ export const featureSchema = z.object({
 export const deleteFeatureSchema = z.object({
   projectId: z.number(),
   featureId: z.number(),
-  });
+});
 export const editFeatureSchema = z.object({
   id: z.number(),
   projectId: z.number(),

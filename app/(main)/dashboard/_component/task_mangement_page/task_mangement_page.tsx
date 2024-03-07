@@ -1,6 +1,6 @@
 "use client";
 import { Sidebar } from "../left_slider/side_bar";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AiOutlineProject } from "react-icons/ai";
 import { Button, Progress, Spinner, useDisclosure } from "@nextui-org/react";
 import Image from "next/image";
@@ -16,31 +16,47 @@ import { useRouter } from "next/navigation";
 import { EmptyBoardFeature } from "../empty_board_feature/empty_board_feature";
 import { FaLightbulb } from "react-icons/fa";
 import { BoardFeature } from "../board_feature/board_feature";
-import { useDashboardContext } from "../../context/context_dashboard";
 import { useApiCallContext } from "@/utils/context/api_call_context";
 import { FaPeopleGroup } from "react-icons/fa6";
 import { DevsModal } from "../devs_modal/devs_modal";
 import { ToastContainer } from "react-toastify";
+import { ProjectQuery } from "../../context/dashboard_context";
+import {
+  useContributorsInfo,
+  useFeatureInfo,
+  useTasksInfo,
+  useUpdateFeatureOrder,
+} from "../../context/hooks";
+import { calcCompletionSeparated } from "@/utils/helper_function";
 
 export enum DroppableIds {
   featuresList = "FEATURE_LIST",
   featuresDisplayer = "FEATURE_DISPLAYER",
 }
 
-export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
+export const TaskMangementPage = ({
+  project,
+  isOwner,
+  featureId,
+}: {
+  project: ProjectQuery;
+  isOwner?: string;
+  featureId?: number;
+}) => {
   const router = useRouter();
+  const features = useFeatureInfo();
+  const contributors = useContributorsInfo();
+  const tasks = useTasksInfo();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const {
-    features,
-    isOwner,
-    project,
-    featureActions,
-    contributors,
-    projectCmpilation: projectoCmpilation,
-  } = useDashboardContext();
   const { setMessageRes, isLoading, setIsLoading } = useApiCallContext();
   const [newFeatureOrder, setNewFeatureOrder] =
     useState<ReorderFeatureSchema>();
+  const updateFeatureOrder = useUpdateFeatureOrder();
+
+  const projectCmpilation = useCallback(
+    () => calcCompletionSeparated(features, tasks),
+    [features, tasks],
+  );
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -83,7 +99,7 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
       order: index + 1,
     }));
     // Update the state with the newly ordered features
-    featureActions.updateFeatureOrder(updatedFeatures);
+    updateFeatureOrder(updatedFeatures);
     // Prepare the order data for the backend update
     setNewFeatureOrder({
       projectId: project.id,
@@ -138,7 +154,7 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
           <Sidebar
             isSidebarOpen={isSidebarOpen}
             onOpenSidebar={handleToggleSidebar}
-            featureId={featureId}
+            features={features}
           />
           <div
             className={`flex-1 p-5 transition-all duration-300 ease-in-out ${isSidebarOpen ? "ml-96" : "ml-16"}`}
@@ -182,7 +198,7 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
                 label="Completion Progress"
                 aria-label="Completion..."
                 size="sm"
-                value={projectoCmpilation}
+                value={projectCmpilation()}
                 color="primary"
                 showValueLabel={true}
                 className="max-w-full"
@@ -195,6 +211,7 @@ export const TaskMangementPage = ({ featureId }: { featureId: number }) => {
                 ) : (
                   <BoardFeature
                     provided={provided}
+                    isOwner={isOwner}
                     isDraggingOver={snap.isDraggingOver}
                     feature={feature}
                   />

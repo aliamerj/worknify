@@ -9,7 +9,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { feature } from "./featureSchema";
 import { users } from "./userSchema";
-import { project } from "./projectSchema";
 import { relations } from "drizzle-orm";
 
 export const statusTypeValid = [

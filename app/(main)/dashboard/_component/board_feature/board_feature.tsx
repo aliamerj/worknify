@@ -12,20 +12,24 @@ import { DroppableArea } from "../droppable_area/droppable_area";
 import { KanbanTask } from "../kanban_task/kanban_task";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { AddTaskModal } from "../add_task_modal/add_task_modal";
-import { useDashboardContext } from "../../context/context_dashboard";
+import { useSetTasksToUpdate } from "../../context/hooks";
 import { FeatureSelection } from "@/db/schemes/featureSchema";
 
 export const BoardFeature = ({
   provided,
   isDraggingOver,
+  isDev,
+  isOwner,
   feature,
 }: {
   provided: DroppableProvided;
   isDraggingOver: boolean;
+  isOwner?: string;
+  isDev?: string;
   feature: FeatureSelection;
 }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { setSelectedTaskToUpdate, isDev, isOwner } = useDashboardContext();
+  const setSelectedTaskToUpdate = useSetTasksToUpdate();
 
   return (
     <div
@@ -75,11 +79,11 @@ export const BoardFeature = ({
                 variant="shadow"
                 size="lg"
                 onPress={(_) => {
-                  setSelectedTaskToUpdate(null);
+                  setSelectedTaskToUpdate(undefined);
                   onOpen();
                 }}
               >
-                Create New Feature
+                Create New Task
               </Button>
             </div>
           ))}

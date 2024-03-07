@@ -20,6 +20,14 @@ export default async function DashboardPage({ params, searchParams }: Props) {
   const project = await databaseDrizzle.query.project.findFirst({
     where: (p, o) => o.eq(p.id, projectId),
     with: {
+      creator: {
+        columns: {
+          id: true,
+          image: true,
+          email: true,
+          name: true,
+        },
+      },
       features: {
         with: {
           tasks: true,
@@ -56,13 +64,12 @@ export default async function DashboardPage({ params, searchParams }: Props) {
 
   // Return JSX element rendering TaskMangementPage component wrapped in DashboardProvider component
   return (
-    <DashboardProvider
-      project={project}
-      isDev={isDev}
-      isOwner={isOwner}
-      selectedFeatureId={selectedFeatureId}
-    >
-      <TaskMangementPage featureId={selectedFeatureId} />
+    <DashboardProvider project={project} isDev={isDev} isOwner={isOwner}>
+      <TaskMangementPage
+        project={project}
+        isOwner={isOwner}
+        featureId={selectedFeatureId}
+      />
     </DashboardProvider>
   );
 }

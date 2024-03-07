@@ -29,8 +29,14 @@ import {
 } from "react-hook-form";
 import axios from "axios";
 import { ApiRouter } from "@/utils/router/app_router";
-import { useDashboardContext } from "../../context/context_dashboard";
 import { useApiCallContext } from "@/utils/context/api_call_context";
+import {
+  useCurrentProject,
+  useFeatureInfo,
+  useFeatureToUpdate,
+  usePushFeature,
+  useUpdateFeature,
+} from "../../context/hooks";
 
 export const AddFeatureModal = ({
   isOpen,
@@ -39,8 +45,11 @@ export const AddFeatureModal = ({
   isOpen: boolean;
   onOpenChange: () => void;
 }) => {
-  const {allTasks, features, selectedFeatureToUpdate, project, featureActions,updateProjectCompilationBar } =
-    useDashboardContext();
+  const features = useFeatureInfo();
+  const selectedFeatureToUpdate = useFeatureToUpdate();
+  const updateFeature = useUpdateFeature();
+  const pushFeature = usePushFeature();
+  const { project } = useCurrentProject();
   const { setMessageRes, setIsLoading, isLoading } = useApiCallContext();
   const getHighestOrder = () =>
     features.reduce((max, feature) => Math.max(max, feature.order), 0);
@@ -96,7 +105,7 @@ export const AddFeatureModal = ({
       if (selectedFeatureToUpdate) {
         const diff = findDifferences(data, selectedFeatureToUpdate);
         res = await axios.patch(ApiRouter.features, diff);
-        featureActions.updateFeature({ ...res.data.data });
+        updateFeature({ ...res.data.data });
       } else {
         res = await axios.post(ApiRouter.features, data);
         const newFeature: FeatureSelection = {
@@ -109,9 +118,7 @@ export const AddFeatureModal = ({
           startDate: data.timePeriod?.startDate ?? null,
           endDate: data.timePeriod?.endDate ?? null,
         };
-        featureActions.pushFeature(newFeature);
-        updateProjectCompilationBar({newFeatures:[...features,newFeature]})
-
+        pushFeature(newFeature);
       }
       setMessageRes({ isError: false, message: res.data.message });
       onClose();
@@ -151,7 +158,7 @@ export const AddFeatureModal = ({
                     render={({ field, fieldState: { error } }) => (
                       <Input
                         size="sm"
-                        maxLength={30}
+                        maxLength={20}
                         minLength={1}
                         isInvalid={!!error}
                         errorMessage={error?.message}

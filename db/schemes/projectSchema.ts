@@ -58,7 +58,7 @@ export const starProject = pgTable("star_project", {
     .notNull(),
 });
 export const projectsRelations = relations(project, ({ one, many }) => ({
-  profile: one(users, {
+  creator: one(users, {
     fields: [project.owner],
     references: [users.id],
   }),

@@ -8,7 +8,7 @@ import NotAllowedPage from "../../_components/not_allowed/not_allowed";
 import { ProjectBody } from "../../_components/_view_section/project_body/project_body";
 import { ProjectSchema } from "@/utils/validations/projectValidation";
 import getTableCount from "@/utils/api_handler/get_table_count";
-import { calculateProjectCompletion } from "@/utils/helper_function";
+import { calcCompletionWithTasks } from "@/utils/helper_function";
 
 interface Props {
   params: { id: string };
@@ -70,7 +70,7 @@ export default async function ProjectViewPage({ params }: Props) {
   const devCount = await getTableCount("dev");
   const isDev = project?.devs ? project.devs[0]?.devId : null;
   const isStared = project?.stars ? project.stars[0]?.userId : null;
-  const completion = calculateProjectCompletion(project.features);
+  const completion = calcCompletionWithTasks(project.features);
 
   if (project.type === "private") {
     if (!session || !session.user.id) return notFound();

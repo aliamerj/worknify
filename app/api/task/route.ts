@@ -26,26 +26,17 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   }
-  const {
-    featureId,
-    name,
-    timePeriod,
-    description,
-    assignedTo,
-    projectId,
-    order,
-  } = validation.data;
+  const { featureId, name, timePeriod, description, assignedTo, order } =
+    validation.data;
   const targetProject = await databaseDrizzle
     .select()
     .from(project)
-    .where((p) => and(eq(p.owner, session.user.id!), eq(p.id, projectId)));
+    .where((p) => and(eq(p.owner, session.user.id!)));
   if (!targetProject) {
     const isDev = await databaseDrizzle
       .select()
       .from(dev)
-      .where((d) =>
-        and(eq(d.projectId, projectId), eq(d.devId, session.user.id!)),
-      );
+      .where((d) => and(eq(d.devId, session.user.id!)));
     if (!isDev)
       return NextResponse.json(
         {
@@ -58,7 +49,6 @@ export async function POST(request: NextRequest) {
 
   const newTask: TaskInsertion = {
     assignedTo: assignedTo,
-    projectId: projectId,
     featureId: featureId,
     creatorId: session.user.id!,
     name: name,
@@ -105,20 +95,17 @@ export async function PATCH(request: NextRequest) {
       { status: 400 },
     );
   }
-  const { id, projectId, name, description, timePeriod, assignedTo } =
-    validated.data;
+  const { id, name, description, timePeriod, assignedTo } = validated.data;
   try {
     const targetProject = await databaseDrizzle
       .select()
       .from(project)
-      .where((p) => and(eq(p.owner, session.user.id!), eq(p.id, projectId)));
+      .where((p) => and(eq(p.owner, session.user.id!)));
     if (!targetProject) {
       const isDev = await databaseDrizzle
         .select()
         .from(dev)
-        .where((d) =>
-          and(eq(d.projectId, projectId), eq(d.devId, session.user.id!)),
-        );
+        .where((d) => and(eq(d.devId, session.user.id!)));
       if (!isDev)
         return NextResponse.json(
           {
@@ -174,20 +161,18 @@ export async function DELETE(request: NextResponse) {
       { status: 400 },
     );
   }
-  const { featureId, taskId, projectId } = validation.data;
+  const { featureId, taskId } = validation.data;
   try {
     const targetProject = await databaseDrizzle
       .select()
       .from(project)
-      .where((p) => and(eq(p.id, projectId), eq(p.owner, session.user.id!)))
+      .where((p) => eq(p.owner, session.user.id!))
       .limit(1);
     if (!targetProject) {
       const isDev = await databaseDrizzle
         .select()
         .from(dev)
-        .where((d) =>
-          and(eq(d.projectId, projectId), eq(d.devId, session.user.id!)),
-        );
+        .where((d) => and(eq(d.devId, session.user.id!)));
       if (!isDev)
         return NextResponse.json(
           {

@@ -27,8 +27,15 @@ import {
   TaskSchema,
   taskSchema,
 } from "@/utils/validations/taskValidation";
-import { useDashboardContext } from "../../context/context_dashboard";
 import { useApiCallContext } from "@/utils/context/api_call_context";
+import {
+  useContributorsInfo,
+  useCurrentProject,
+  usePushTask,
+  useTasksInfo,
+  useTasksToUpdate,
+  useUpdateTask,
+} from "../../context/hooks";
 
 export const AddTaskModal = ({
   isOpen,
@@ -39,27 +46,28 @@ export const AddTaskModal = ({
   onOpenChange: () => void;
   featureId: number;
 }) => {
-  const {
-    tasks,
-    project,
-    selectedTaskToUpdate,
-    taskActions,
-    contributors,
-    isOwner,
-    isDev,
-    allTasks,
-    updateProjectCompilationBar,
-  } = useDashboardContext();
   const { setMessageRes, setIsLoading, isLoading } = useApiCallContext();
+  const { isDev, isOwner } = useCurrentProject();
+  const tasks = useTasksInfo();
+  const selectedTaskToUpdate = useTasksToUpdate();
+  const updateTask = useUpdateTask();
+  const pushTask = usePushTask();
+  const contributors = useContributorsInfo();
   const getHighestOrder = () =>
-    tasks.reduce((max, feature) => Math.max(max, feature.order), 0);
+    Object.values(tasks)
+      .flat()
+      .reduce(
+        (max, task) =>
+          task.featureId === featureId ? Math.max(max, task.order) : max,
+        0,
+      );
+  console.log({ selectedTaskToUpdate });
 
   const { control, handleSubmit, reset } = useForm<TaskSchema>({
     defaultValues: {
       status: "New",
       assignedTo: null,
       featureId: featureId,
-      projectId: project.id,
     },
     resolver: zodResolver(taskSchema),
   });
@@ -72,7 +80,6 @@ export const AddTaskModal = ({
       timePeriod: null,
       status: "New",
       assignedTo: null,
-      projectId: project.id,
     };
     reset(formDefaultValues);
   }, [isOpen, selectedTaskToUpdate, reset]);
@@ -90,7 +97,6 @@ export const AddTaskModal = ({
       }
       differences["id"] = initalValues.id!;
       differences["featureId"] = initalValues.featureId!;
-      differences["projectId"] = initalValues.projectId!;
     });
     return differences;
   }
@@ -102,13 +108,12 @@ export const AddTaskModal = ({
       if (selectedTaskToUpdate) {
         const diff = findDifferences(data, selectedTaskToUpdate);
         res = await axios.patch(ApiRouter.tasks, diff);
-        taskActions.updateTask({ ...res.data.data });
+        updateTask({ ...res.data.data });
       } else {
         res = await axios.post(ApiRouter.tasks, data);
         const newTask: TaskSelection = {
           creatorId: isOwner ?? isDev ?? "",
           id: res.data.taskId,
-          projectId: data.projectId,
           assignedTo: data.assignedTo,
           featureId: data.featureId,
           order: data.order,
@@ -118,8 +123,7 @@ export const AddTaskModal = ({
           startDate: data.timePeriod?.startDate ?? null,
           endDate: data.timePeriod?.endDate ?? null,
         };
-        taskActions.pushTask(newTask);
-        updateProjectCompilationBar({newTasks:[...allTasks,newTask]})
+        pushTask(newTask);
       }
       setMessageRes({ isError: false, message: res.data.message });
       onClose();
@@ -213,15 +217,15 @@ export const AddTaskModal = ({
                           {(devInfo) => (
                             <AutocompleteItem
                               key={devInfo.id}
-                              textValue={devInfo.name}
+                              textValue={devInfo.name ?? undefined}
                               color="primary"
                             >
                               <div className="flex items-center gap-2">
                                 <Avatar
-                                  alt={devInfo.name}
+                                  alt={devInfo.name ?? "contributor"}
                                   className="flex-shrink-0"
                                   size="sm"
-                                  src={devInfo.image}
+                                  src={devInfo.image ?? undefined}
                                 />
                                 <div className="flex flex-col">
                                   <span className="text-small">

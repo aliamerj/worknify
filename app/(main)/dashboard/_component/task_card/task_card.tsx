@@ -1,8 +1,5 @@
-import { TaskSelection, tasks } from "@/db/schemes/taskSchema";
-import {
-  calculateProjectCompletion,
-  formatDate,
-} from "@/utils/helper_function";
+import { TaskSelection } from "@/db/schemes/taskSchema";
+import { formatDate } from "@/utils/helper_function";
 import { DraggableProvided } from "@hello-pangea/dnd";
 import React from "react";
 import {
@@ -13,11 +10,16 @@ import {
   AiOutlineUser,
   AiOutlineUserAdd,
 } from "react-icons/ai";
-import { useDashboardContext } from "../../context/context_dashboard";
 import axios from "axios";
 import { ApiRouter } from "@/utils/router/app_router";
 import { useApiCallContext } from "@/utils/context/api_call_context";
 import { Button } from "@nextui-org/react";
+import {
+  useContributorsInfo,
+  useCurrentProject,
+  useRemoveTask,
+  useSetTasksToUpdate,
+} from "../../context/hooks";
 
 export const TaskCard = ({
   task,
@@ -28,16 +30,11 @@ export const TaskCard = ({
   provided: DraggableProvided;
   onOpen: () => void;
 }) => {
-  const {
-    contributors,
-    setSelectedTaskToUpdate,
-    taskActions,
-    isOwner,
-    features,
-    allTasks,
-    updateProjectCompilationBar,
-  } = useDashboardContext();
+  const contributors = useContributorsInfo();
+  const { isOwner } = useCurrentProject();
   const { setMessageRes, setIsLoading, isLoading } = useApiCallContext();
+  const removeTask = useRemoveTask();
+  const setSelectedTaskToUpdate = useSetTasksToUpdate();
   const assignedTo = contributors.find((d) => d.id === task.assignedTo);
   const creator = contributors.find((d) => d.id === task.creatorId);
   return (
@@ -88,7 +85,6 @@ export const TaskCard = ({
                 setSelectedTaskToUpdate({
                   id: task.id,
                   featureId: task.featureId,
-                  projectId: task.projectId,
                   name: task.name,
                   status: task.status,
                   order: task.order,
@@ -117,17 +113,15 @@ export const TaskCard = ({
                 try {
                   const res = await axios.delete(ApiRouter.tasks, {
                     data: {
-                      projectId: task.projectId,
                       featureId: task.featureId,
                       taskId: task.id,
-                                          },
+                    },
                   });
                   setMessageRes({
                     isError: false,
                     message: res.data.message,
                   });
-                  taskActions.removeTask(task.id, task.status);
-                  updateProjectCompilationBar({newTasks:allTasks.filter(t=>t.id !== task.id)})
+                  removeTask(task.id, task.status);
                 } catch (error: any) {
                   setMessageRes({
                     isError: true,

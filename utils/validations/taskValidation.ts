@@ -39,12 +39,10 @@ export const taskSchema = z.object({
 export const deleteTaskSchema = z.object({
   taskId: z.number(),
   featureId: z.number(),
-  projectId: z.number(),
 });
 export const editTaskSchema = z.object({
   id: z.number(),
   featureId: z.number(),
-  projectId: z.number(),
   name: z
     .string()
     .trim()
@@ -63,7 +61,6 @@ export const editTaskSchema = z.object({
   timePeriod: TimePeriod.optional(),
 });
 export const reorderTaskSchema = z.object({
-  projectId: z.number(),
   newStatus: z.enum(statusTypeValid).optional(),
   items: z.array(
     z.object({

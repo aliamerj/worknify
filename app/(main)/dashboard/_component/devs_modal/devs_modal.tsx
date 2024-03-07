@@ -5,14 +5,18 @@ import {
   ModalBody,
   ModalFooter,
   Button,
+  Avatar,
 } from "@nextui-org/react";
-import { useDashboardContext } from "../../context/context_dashboard";
-import Image from "next/image";
 import { MdOutlinePersonRemove } from "react-icons/md";
 import { useApiCallContext } from "@/utils/context/api_call_context";
 import axios from "axios";
 import { ApiRouter, AppRouter } from "@/utils/router/app_router";
 import Link from "next/link";
+import {
+  useContributorsInfo,
+  useCurrentProject,
+  useRemoveContributor,
+} from "../../context/hooks";
 
 export const DevsModal = ({
   isOpen,
@@ -21,8 +25,10 @@ export const DevsModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  const { contributors, project, isOwner, updateContributors } =
-    useDashboardContext();
+  const { project, isOwner } = useCurrentProject();
+  const removeContributor = useRemoveContributor();
+  const contributors = useContributorsInfo();
+
   const { setIsLoading, setMessageRes, isLoading } = useApiCallContext();
   const removeDev = async (devId: string) => {
     setIsLoading(true);
@@ -30,7 +36,7 @@ export const DevsModal = ({
       const res = await axios.delete(ApiRouter.projectJoin + project.id, {
         data: { devId },
       });
-      updateContributors(contributors.filter((c) => c.id !== devId));
+      removeContributor(devId);
       setMessageRes({ isError: false, message: res.data.message });
     } catch (error: any) {
       setMessageRes({
@@ -59,11 +65,9 @@ export const DevsModal = ({
                     <Link href={AppRouter.viewProfile + id}>
                       <div className="flex items-center">
                         <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full">
-                          <Image
-                            src={image}
+                          <Avatar
+                            src={image ?? undefined}
                             alt="Profile picture"
-                            layout="fill"
-                            objectFit="cover"
                           />
                         </div>
                         <div className="ml-4">
