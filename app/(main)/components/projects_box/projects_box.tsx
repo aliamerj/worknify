@@ -3,7 +3,6 @@ import { IProjectCard, ProjectCard } from "../project_card/project_card";
 import { ProjectTypeOptions } from "../project_type_options/project_type_options";
 import { Pagination } from "@/global-components/pagination/pagination";
 import { databaseDrizzle } from "@/db/database";
-import { projectType } from "@/db/schemes/projectSchema";
 import getTableCount from "@/utils/api_handler/get_table_count";
 import NoProjectsFound from "./no_project_found";
 import { ProjectSearch } from "./project_search";
@@ -18,7 +17,8 @@ export const ProjectsBox = async ({
   currentPage: string;
   search: string;
 }) => {
-  const types = Object.values(projectType["enumValues"]);
+
+  const types = ["public","permission"];
   const projectsCount = await getTableCount("project");
   const page = parseInt(currentPage) || 1;
   const projects: IProjectCard[] = await databaseDrizzle.query.project.findMany(
@@ -32,7 +32,7 @@ export const ProjectsBox = async ({
             )
         : visibility && types.includes(visibility.toLowerCase())
           ? (p, o) => o.eq(p.type, visibility.toLowerCase())
-          : undefined,
+          : (p,o)=> o.not(o.eq(p.type, 'private')),
       columns: {
         id: true,
         logo: true,

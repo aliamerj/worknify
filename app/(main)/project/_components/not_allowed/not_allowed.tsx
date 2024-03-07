@@ -16,12 +16,12 @@ const NotAllowedPage = () => {
         </p>
         <Link
           href={AppRouter.signup}
-          className="inline-block w-full rounded-lg bg-blue-500 px-6 py-3 text-lg text-white transition duration-300 hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50"
+          className="inline-block w-full rounded-lg bg-primary px-6 py-3 text-lg text-white transition duration-300 hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50"
         >
           Login
         </Link>
         <Link
-          href="/" // Replace with your home route
+          href="/"
           className="mt-4 inline-block text-sm text-gray-500 transition duration-300 hover:text-gray-600"
         >
           Or return to homepage

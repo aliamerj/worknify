@@ -5,6 +5,7 @@ import { TaskMangementPage } from "../_component/task_mangement_page/task_mangem
 import { parseInt } from "lodash";
 import { notFound } from "next/navigation";
 import { DashboardProvider } from "../context/dashboard_context";
+import NotAllowedPage from "../../project/_components/not_allowed/not_allowed";
 
 interface Props {
   params: { projectId: string };
@@ -18,7 +19,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
   // Retrieve project from database
   const projectId = parseInt(params.projectId);
   const project = await databaseDrizzle.query.project.findFirst({
-    where: (p, o) => o.eq(p.id, projectId),
+    where: (p, o) => o.eq(p.id, projectId,),
     with: {
       creator: {
         columns: {
@@ -52,6 +53,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
   if (!project) {
     return notFound();
   }
+    if(project.type === 'private' && project.owner === session?.user || project.devs.find(d =>d.contributor.id === session?.user.id)) return <NotAllowedPage/>
   // Check if the current user is the owner of the project
   const isOwner =
     session?.user.id === project?.owner ? session?.user.id : undefined;

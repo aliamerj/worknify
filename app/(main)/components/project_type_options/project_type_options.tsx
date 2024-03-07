@@ -3,7 +3,6 @@ import Link from "next/link";
 import {
   IoAppsOutline,
   IoEyeOutline,
-  IoLockClosedOutline,
   IoLockOpenOutline,
 } from "react-icons/io5";
 
@@ -12,7 +11,7 @@ export const ProjectTypeOptions = ({
 }: {
   selectedOption: string;
 }) => {
-  const visibilityOptions = ["All", "Public", "Permission", "Private"];
+  const visibilityOptions = ["All", "Public", "Permission"];
   return (
     <div className="flex space-x-2 p-4">
       {visibilityOptions.map((option) => (
@@ -39,7 +38,6 @@ const VisibilityOption = ({
     All: <IoAppsOutline className="mr-2" />,
     Public: <IoEyeOutline className="mr-2" />,
     Permission: <IoLockOpenOutline className="mr-2" />,
-    Private: <IoLockClosedOutline className="mr-2" />,
   };
 
   return (

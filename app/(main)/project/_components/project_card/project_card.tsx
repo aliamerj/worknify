@@ -15,7 +15,7 @@ import {
   FaUnlock,
 } from "react-icons/fa";
 import getTableCount from "@/utils/api_handler/get_table_count";
-import { calcCompletionWithTasks } from "@/utils/helper_function";
+import { calcCompletionUnified } from "@/utils/helper_function";
 
 export const ProjectCard = async ({
   owner,
@@ -30,7 +30,7 @@ export const ProjectCard = async ({
   const devsCount = await getTableCount("dev", "project_id", id);
 
   const session = await getServerSession(authOptions);
-  const compilation = calcCompletionWithTasks(features);
+  const compilation = calcCompletionUnified(features);
   const isCreator = owner === session?.user.id;
   // const githubLink = `https://github.com/${link}`;
 

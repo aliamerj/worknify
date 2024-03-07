@@ -8,7 +8,7 @@ import NotAllowedPage from "../../_components/not_allowed/not_allowed";
 import { ProjectBody } from "../../_components/_view_section/project_body/project_body";
 import { ProjectSchema } from "@/utils/validations/projectValidation";
 import getTableCount from "@/utils/api_handler/get_table_count";
-import { calcCompletionWithTasks } from "@/utils/helper_function";
+import { calcCompletionUnified } from "@/utils/helper_function";
 
 interface Props {
   params: { id: string };
@@ -66,11 +66,12 @@ export default async function ProjectViewPage({ params }: Props) {
     },
   });
   if (!project) return notFound();
+  if(project.type === 'private' && project.owner === session?.user || project.devs.find(d=> d.devId=== session?.user.id)) return <NotAllowedPage/>
   const starCount = await getTableCount("star_project");
   const devCount = await getTableCount("dev");
   const isDev = project?.devs ? project.devs[0]?.devId : null;
   const isStared = project?.stars ? project.stars[0]?.userId : null;
-  const completion = calcCompletionWithTasks(project.features);
+  const completion = calcCompletionUnified(project.features);
 
   if (project.type === "private") {
     if (!session || !session.user.id) return notFound();
