@@ -18,6 +18,7 @@ import {
   project,
 } from "@/db/schemes/projectSchema";
 import { and, eq } from "drizzle-orm";
+import { users } from "@/db/schemes/userSchema";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -36,6 +37,19 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   }
+  const profileId = await databaseDrizzle
+    .select({ profileId: users.profileId, id: users.id })
+    .from(users)
+    .where((u) => eq(u.id, session.user.id!))
+    .then((res) => res[0].profileId);
+  if (!profileId)
+    return NextResponse.json(
+      {
+        state: false,
+        message: "Please,Create profile first",
+      },
+      { status: 401 },
+    );
   const {
     logo,
     name,
@@ -114,7 +128,19 @@ export async function PATCH(request: NextRequest) {
     projectGoal,
     techUsed,
   } = validated.data;
+
   try {
+    const targetProject = await databaseDrizzle
+      .select({ owner: project.owner, id: project.id })
+      .from(project)
+      .where((p) => and(eq(p.owner, session.user.id!), eq(p.id, id)))
+      .then((res) => res[0].owner);
+    if (!targetProject)
+      return NextResponse.json(
+        { state: false, message: "Not authorized" },
+        { status: 401 },
+      );
+
     if (body.logoKey && body.logo instanceof File) {
       await setImageInBucket(session.user.id!, body.logoKey, body.logo);
     }
@@ -170,6 +196,16 @@ export async function DELETE(request: NextResponse) {
       { status: 400 },
     );
   try {
+    const myProject = await databaseDrizzle
+      .select({ owner: project.owner, id: project.id })
+      .from(project)
+      .where((p) => and(eq(p.owner, session.user.id!), eq(p.id, projectId)))
+      .then((res) => res[0].owner);
+    if (!myProject)
+      return NextResponse.json(
+        { state: false, message: "Not authorized" },
+        { status: 401 },
+      );
     const targetProject = await databaseDrizzle
       .delete(project)
       .where(and(eq(project.id, projectId), eq(project.owner, session.user.id)))

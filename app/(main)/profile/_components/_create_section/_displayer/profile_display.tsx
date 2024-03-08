@@ -5,6 +5,7 @@ import DOMPurify from "dompurify";
 import { useProfileData } from "../../context/hooks";
 import { useFormContext, useWatch } from "react-hook-form";
 import { ProfileSchema } from "@/utils/validations/profileValidation";
+import { useMemo } from "react";
 
 export const ProfileDisplay = () => {
   const defaultValue = useProfileData();
@@ -17,6 +18,9 @@ export const ProfileDisplay = () => {
   const createMarkup = (htmlContent: string) => {
     return { __html: DOMPurify.sanitize(htmlContent) };
   };
+  useMemo(() => {
+    localStorage.setItem("formData", JSON.stringify(profileData));
+  }, [profileData]);
 
   const renderGitHubLink = () => {
     if (profileData.github) {
@@ -83,7 +87,9 @@ export const ProfileDisplay = () => {
                 {exp.company} - <span className="font-normal">{exp.role}</span>
               </h1>
               <h3 className="text-small text-gray-500">
-                {exp.timePeriod?.startDate && new Date(exp.timePeriod.startDate).toLocaleDateString()} -{" "}
+                {exp.timePeriod?.startDate &&
+                  new Date(exp.timePeriod.startDate).toLocaleDateString()}{" "}
+                -{" "}
                 {exp.timePeriod?.endDate
                   ? new Date(exp.timePeriod.endDate).toLocaleDateString()
                   : "Current"}
@@ -112,7 +118,9 @@ export const ProfileDisplay = () => {
                 {ed.school} - <span className="font-normal">{ed.degree}</span>
               </h1>
               <h3 className="text-small text-gray-500">
-                {ed.timePeriod?.startDate && new Date(ed.timePeriod.startDate).toLocaleDateString()} -{" "}
+                {ed.timePeriod?.startDate &&
+                  new Date(ed.timePeriod.startDate).toLocaleDateString()}{" "}
+                -{" "}
                 {ed.timePeriod?.endDate
                   ? new Date(ed.timePeriod.endDate).toLocaleDateString()
                   : "Current"}
@@ -157,7 +165,11 @@ export const ProfileDisplay = () => {
           <hr className="border-black" />
           <div
             className="ql-editor m-0 mb-2 p-0"
-            dangerouslySetInnerHTML={section.description ? createMarkup(section.description):createMarkup('') }
+            dangerouslySetInnerHTML={
+              section.description
+                ? createMarkup(section.description)
+                : createMarkup("")
+            }
           />
         </div>
       ));

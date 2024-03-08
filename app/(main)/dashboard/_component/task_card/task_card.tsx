@@ -1,7 +1,6 @@
 import { TaskSelection } from "@/db/schemes/taskSchema";
 import { formatDate } from "@/utils/helper_function";
 import { DraggableProvided } from "@hello-pangea/dnd";
-import React from "react";
 import {
   AiOutlineCheckSquare,
   AiOutlineClockCircle,
@@ -31,7 +30,7 @@ export const TaskCard = ({
   onOpen: () => void;
 }) => {
   const contributors = useContributorsInfo();
-  const { isOwner } = useCurrentProject();
+  const { isOwner, project, isDev } = useCurrentProject();
   const { setMessageRes, setIsLoading, isLoading } = useApiCallContext();
   const removeTask = useRemoveTask();
   const setSelectedTaskToUpdate = useSetTasksToUpdate();
@@ -64,8 +63,8 @@ export const TaskCard = ({
           )}
         </div>
         {task.assignedTo && (
-          <div className="mt-2 flex items-center justify-end">
-            <span className="flex items-center rounded bg-green-100 px-3 py-1 text-xs text-green-800">
+          <div className="flex items-center justify-start">
+            <span className="flex items-center rounded bg-green-100 py-1 pl-2 pr-2 text-xs text-green-800">
               <AiOutlineUser className="mr-1" />
               {`Assigned to: ${assignedTo?.name}`}
             </span>
@@ -73,11 +72,13 @@ export const TaskCard = ({
         )}
       </div>
       <div className="flex items-end justify-between">
-        <span className="flex items-center rounded py-1 text-xs font-bold text-gray-800">
+        <span className="flex items-center rounded py-1 pl-2 pr-3 text-xs font-bold text-gray-800">
           <AiOutlineUserAdd className="mr-1" />
-          {`Created by: ${creator?.name}`} {/* Adjust variable as needed */}
+          {`Created by: ${creator?.name}`}{" "}
         </span>
-        {task.creatorId === isOwner && (
+        {(task.creatorId === isOwner ||
+          task.creatorId === isDev ||
+          project.owner === isOwner) && (
           <div className="mt-4 flex justify-end space-x-2">
             <button
               type="button"

@@ -1,6 +1,6 @@
 "use client";
 import { Sidebar } from "../left_slider/side_bar";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AiOutlineProject } from "react-icons/ai";
 import { Button, Progress, Spinner, useDisclosure } from "@nextui-org/react";
 import Image from "next/image";
@@ -20,15 +20,27 @@ import { useApiCallContext } from "@/utils/context/api_call_context";
 import { FaPeopleGroup } from "react-icons/fa6";
 import { DevsModal } from "../devs_modal/devs_modal";
 import { ToastContainer } from "react-toastify";
-import { ProjectQuery } from "../../context/dashboard_context";
 import {
   useContributorsInfo,
   useFeatureInfo,
-  useTasksInfo,
   useUpdateFeatureOrder,
 } from "../../context/hooks";
-import { calcCompletionSeparated } from "@/utils/helper_function";
-
+import { ProjectQuery } from "../../[projectId]/page";
+import dynamic from "next/dynamic";
+const CompletionBar = dynamic(() => import("./completion_bar"), {
+  ssr: false,
+  loading: () => (
+    <Progress
+      label="Completion Progress"
+      aria-label="Completion..."
+      size="sm"
+      value={0}
+      color="primary"
+      showValueLabel={true}
+      className="max-w-full"
+    />
+  ),
+});
 export enum DroppableIds {
   featuresList = "FEATURE_LIST",
   featuresDisplayer = "FEATURE_DISPLAYER",
@@ -46,17 +58,11 @@ export const TaskMangementPage = ({
   const router = useRouter();
   const features = useFeatureInfo();
   const contributors = useContributorsInfo();
-  const tasks = useTasksInfo();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { setMessageRes, isLoading, setIsLoading } = useApiCallContext();
   const [newFeatureOrder, setNewFeatureOrder] =
     useState<ReorderFeatureSchema>();
   const updateFeatureOrder = useUpdateFeatureOrder();
-
-  const projectCmpilation = useCallback(
-    () => calcCompletionSeparated(features, tasks),
-    [features, tasks],
-  );
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -194,15 +200,7 @@ export const TaskMangementPage = ({
               <p className="text-xl text-gray-600">{project.projectGoal}</p>
             </div>
             <div className="py-4">
-              <Progress
-                label="Completion Progress"
-                aria-label="Completion..."
-                size="sm"
-                value={projectCmpilation()}
-                color="primary"
-                showValueLabel={true}
-                className="max-w-full"
-              />
+              <CompletionBar />
             </div>
             <Droppable droppableId={DroppableIds.featuresDisplayer}>
               {(provided, snap) =>
@@ -211,7 +209,6 @@ export const TaskMangementPage = ({
                 ) : (
                   <BoardFeature
                     provided={provided}
-                    isOwner={isOwner}
                     isDraggingOver={snap.isDraggingOver}
                     feature={feature}
                   />

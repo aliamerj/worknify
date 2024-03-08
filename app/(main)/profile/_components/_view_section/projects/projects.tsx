@@ -23,7 +23,7 @@ export const Projects: React.FC<ProjectsProps> = ({ projects }) => {
       <Slide delay={0.18}>
         <div className="grid grid-cols-1 gap-x-12 gap-y-10 lg:grid-cols-2">
           {projects.map((project) => (
-            <ProjectCard {...project} />
+            <ProjectCard {...project} key={project.id} />
           ))}
         </div>
       </Slide>

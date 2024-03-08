@@ -1,34 +1,25 @@
 "use client";
-import { NotificationSelection } from "@/db/schemes/notificationSchema";
 import { AppRouter } from "@/utils/router/app_router";
 import Link from "next/link";
 import { FaCheck, FaTimes, FaUserPlus } from "react-icons/fa";
 import { NotificationBtn } from "../notifications_btn/notification_btn";
 import { useState } from "react";
-export type AllNotification = NotificationSelection & {
-  projectName?: string;
-  requesterName?: string;
-};
+import { NotificationQuery } from "../../notifications/page";
 
 export const NotificationItem = ({
   notifications,
 }: {
-  notifications: AllNotification[];
+  notifications: NotificationQuery[];
 }) => {
   const [notific, setNotific] = useState(notifications);
   const handleClientNotific = (notifId: number) =>
     setNotific((current) => current.filter((n) => n.id !== notifId));
 
-  const getMessage = (notification: AllNotification) => {
+  const getMessage = (notification: NotificationQuery) => {
     let message;
     let icon;
-    const {
-      notificationType,
-      senderId,
-      requesterName,
-      projectName,
-      projectId,
-    } = notification;
+    const { notificationType, senderId, sender, projectId, project } =
+      notification;
 
     switch (notificationType) {
       case "JOIN_REQUEST":
@@ -38,14 +29,14 @@ export const NotificationItem = ({
               href={AppRouter.viewProfile + senderId}
               className="text-blue-500 hover:underline"
             >
-              {requesterName}
+              {sender.name}
             </Link>{" "}
             has requested to join the development team for your project{" "}
             <Link
               href={AppRouter.viewProject + projectId}
               className="text-blue-500 hover:underline"
             >
-              {projectName}
+              {project.name}
             </Link>
             .
           </>
@@ -60,7 +51,7 @@ export const NotificationItem = ({
               href={AppRouter.viewProject + projectId}
               className="text-blue-500 hover:underline"
             >
-              {projectName}
+              {project.name}
             </Link>{" "}
             has been accepted.
           </>
@@ -75,7 +66,7 @@ export const NotificationItem = ({
               href={AppRouter.viewProject + projectId}
               className="text-blue-500 hover:underline"
             >
-              {projectName}
+              {project.name}
             </Link>{" "}
             has been rejected.
           </>

@@ -1,33 +1,13 @@
 "use client";
 import _ from "lodash";
 import React, { useMemo } from "react";
-import { FeatureSelection } from "@/db/schemes/featureSchema";
-import { TaskSelection } from "@/db/schemes/taskSchema";
-import { ProjectSelection } from "@/db/schemes/projectSchema";
-
 import * as Contexts from "./dashboardContextDefinitions";
 import { useProjectValue } from "./ProjectValues/hook";
 import { useFeatures } from "./features/hook";
 import { useTasks } from "./tasks/hook";
 import { useContributors } from "./contributors/hook";
 import { useUpdateEntities } from "./updateEntities/hook";
-
-export interface DevInfo {
-  id: string;
-  image: string | null;
-  name: string | null;
-  email: string;
-}
-export interface FeatureQuery extends FeatureSelection {
-  tasks?: TaskSelection[];
-}
-export interface ProjectQuery extends ProjectSelection {
-  features?: FeatureQuery[];
-  devs?: Array<{
-    contributor: DevInfo;
-  }>;
-  creator: DevInfo;
-}
+import { ProjectQuery } from "../[projectId]/page";
 
 export const DashboardProvider: React.FC<{
   children: React.ReactNode;

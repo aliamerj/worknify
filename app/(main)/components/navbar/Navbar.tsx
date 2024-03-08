@@ -8,19 +8,18 @@ import Link from "next/link";
 import { Button, Tooltip } from "@nextui-org/react";
 import { MdLibraryAdd } from "react-icons/md";
 import { AppRouter } from "@/utils/router/app_router";
-import { databaseDrizzle } from "@/db/database";
-import { eq } from "drizzle-orm";
+
+import getTableCount from "@/utils/api_handler/get_table_count";
 
 export const NavBar = async () => {
   const session = await getServerSession(authOptions);
-  var notifications = [];
+  var notifications = 0;
   if (session?.user.id)
-    notifications = await databaseDrizzle.query.notification.findMany({
-      where: (n) => eq(n.receiverId, session?.user.id!),
-      columns: {
-        id: true,
-      },
-    });
+    notifications = await getTableCount(
+      "notification",
+      "receiver_id",
+      `'${session.user.id}'`,
+    );
 
   return (
     <Navbar className={styles.container}>
@@ -60,7 +59,7 @@ export const NavBar = async () => {
             email={session.user.email!}
             userImage={session.user.image!}
             userId={session.user.id!}
-            notificationsCount={notifications.length}
+            notificationsCount={notifications}
           />
         ) : (
           <Link className={styles.getStartedBtn} href="/api/auth/signin">

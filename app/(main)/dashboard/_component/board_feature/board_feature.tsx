@@ -9,17 +9,23 @@ import {
   AiOutlineFileText,
 } from "react-icons/ai";
 import { DroppableArea } from "../droppable_area/droppable_area";
-import { KanbanTask } from "../kanban_task/kanban_task";
-import { Button, useDisclosure } from "@nextui-org/react";
-import { AddTaskModal } from "../add_task_modal/add_task_modal";
-import { useSetTasksToUpdate } from "../../context/hooks";
-import { FeatureSelection } from "@/db/schemes/featureSchema";
 
+import { Button, Spinner, useDisclosure } from "@nextui-org/react";
+import { AddTaskModal } from "../add_task_modal/add_task_modal";
+import { useCurrentProject, useSetTasksToUpdate } from "../../context/hooks";
+import { FeatureSelection } from "@/db/schemes/featureSchema";
+import dynamic from "next/dynamic";
+const KanbanTask = dynamic(() => import("../kanban_task/kanban_task"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-60 w-full items-center justify-center ">
+      <Spinner color="primary" size="lg" />
+    </div>
+  ),
+});
 export const BoardFeature = ({
   provided,
   isDraggingOver,
-  isDev,
-  isOwner,
   feature,
 }: {
   provided: DroppableProvided;
@@ -29,6 +35,7 @@ export const BoardFeature = ({
   feature: FeatureSelection;
 }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOwner, isDev } = useCurrentProject();
   const setSelectedTaskToUpdate = useSetTasksToUpdate();
 
   return (
@@ -53,7 +60,7 @@ export const BoardFeature = ({
         <div className="mt-2 flex items-center gap-2">
           {feature.tags?.split(";").map((tag, index) => (
             <span
-              key={index}
+              key={tag + index}
               className="flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
             >
               <AiFillTag className="text-blue-700" />
@@ -71,22 +78,21 @@ export const BoardFeature = ({
             {feature.endDate ? formatDate(feature.endDate) : "N/A"}
           </span>
         </div>
-        {isDev ||
-          (isOwner && (
-            <div className="mt-5">
-              <Button
-                color="primary"
-                variant="shadow"
-                size="lg"
-                onPress={(_) => {
-                  setSelectedTaskToUpdate(undefined);
-                  onOpen();
-                }}
-              >
-                Create New Task
-              </Button>
-            </div>
-          ))}
+        {(isDev || isOwner) && (
+          <div className="mt-5">
+            <Button
+              color="primary"
+              variant="shadow"
+              size="lg"
+              onPress={(_) => {
+                setSelectedTaskToUpdate(undefined);
+                onOpen();
+              }}
+            >
+              Create New Task
+            </Button>
+          </div>
+        )}
       </div>
       <KanbanTask featureId={feature.id} onOpen={onOpen} />
       <AddTaskModal

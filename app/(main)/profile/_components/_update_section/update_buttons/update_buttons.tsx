@@ -29,7 +29,6 @@ export const UpdateButtons = () => {
     try {
       setIsLoading(true);
       const differences = findDifferences({ ...data, edit, userId, profileId });
-      console.log({ differences });
       if (profileId && Object.keys(differences).length !== 0) {
         const res = await axios.patch(ApiRouter.profile, {
           ...differences,

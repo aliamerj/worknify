@@ -8,7 +8,6 @@ import {
 import React, {
   createContext,
   useCallback,
-  useEffect,
   useMemo,
   useReducer,
   useRef,
@@ -34,6 +33,7 @@ type OptionalProfileData = {
 
 export type AllProfileData = {
   profile: (ProfileSelection & ExtendedProfileSelection) | null;
+  profileId: number | null;
 };
 type ExtendedProfileSelection = ProfileSelection & {
   experiences?: ExperienceSelection[];
@@ -79,12 +79,16 @@ export const ProfileDataProvider = ({
       email,
       userId,
     );
+
     if (typeof window !== "undefined" && !serializedData.edit) {
       const savedData = localStorage?.getItem("formData");
-      return savedData ? JSON.parse(savedData) : serializedData;
+      return savedData
+        ? { ...serializedData, ...JSON.parse(savedData) }
+        : serializedData;
     }
     return serializedData;
-  }, [allProfileData, name, email, userId]);
+  }, []);
+
   const [profileData, dispatch] = useReducer(
     profileDataReducer,
     defaultProfileData,
@@ -101,10 +105,6 @@ export const ProfileDataProvider = ({
   const setIsLoading = useCallback((state: boolean) => {
     setLoading(state);
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem("formData", JSON.stringify(profileData));
-  }, [profileData]);
 
   const findDifferences = (newData: ProfileData): OptionalProfileData => {
     const source = serializeProfile(allProfileData, name, email, userId);
@@ -141,7 +141,7 @@ const serializeProfile = (
   email: string,
   userId: string,
 ): ProfileData => {
-  if (allProfileData?.profile) {
+  if (allProfileData?.profileId && allProfileData.profile) {
     const {
       id,
       jobTitle,

@@ -5,7 +5,7 @@ import { parseInt } from "lodash";
 export default async function getTableCount(
   tableName: string,
   condition?: string,
-  valueCondition?: number,
+  valueCondition?: number | string,
 ): Promise<number> {
   const statement = sql.raw(`SELECT COUNT(*) AS tableCount FROM ${tableName}`);
   const statementWithCondition = sql.raw(

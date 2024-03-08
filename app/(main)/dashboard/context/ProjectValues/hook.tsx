@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { ProjectQuery } from "../dashboard_context";
 import { FeatureSelection } from "@/db/schemes/featureSchema";
 import { TaskSelection } from "@/db/schemes/taskSchema";
+import { ProjectQuery } from "../../[projectId]/page";
 
 interface InitialValues {
   project: Omit<ProjectQuery, "features" | "devs">;

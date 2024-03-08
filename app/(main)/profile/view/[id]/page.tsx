@@ -83,7 +83,11 @@ async function ViewProfile({ params }: Props) {
     return <Noprofile isCurrentUser={session?.user.id === params.id} />;
   }
   const { profile, projects } = user;
-  const starCount = await getTableCount("profile_star");
+  const starCount = await getTableCount(
+    "profile_star",
+    "profile_id",
+    profile.id,
+  );
   const isStared = user.profile?.stars ? user.profile.stars[0]?.userId : null;
 
   return (

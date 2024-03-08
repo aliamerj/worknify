@@ -40,12 +40,12 @@ export const featureSchema = z.object({
     )
     .max(5, "No more than 5 tags are allowed")
     .optional(),
-
   description: z
     .string()
     .trim()
     .max(500, "Description must be under 500 characters")
     .optional(),
+  includeFeature: z.boolean().default(false),
   order: z.number().min(0),
   timePeriod: TimePeriod.nullable(),
 });
@@ -85,6 +85,7 @@ export const editFeatureSchema = z.object({
     .trim()
     .max(500, "Description must be under 500 characters")
     .optional(),
+  includeFeature: z.boolean().default(false),
   order: z.number().min(0).optional(),
   timePeriod: TimePeriod.optional(),
 });

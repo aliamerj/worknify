@@ -21,6 +21,7 @@ import {
   Button,
   Input,
   Textarea,
+  Checkbox,
 } from "@nextui-org/react";
 import {
   Controller,
@@ -117,6 +118,7 @@ export const AddFeatureModal = ({
           tags: data.tag?.join(";") ?? "",
           startDate: data.timePeriod?.startDate ?? null,
           endDate: data.timePeriod?.endDate ?? null,
+          includeFeature: true,
         };
         pushFeature(newFeature);
       }
@@ -256,6 +258,29 @@ export const AddFeatureModal = ({
                                 className="block w-full rounded-lg border-gray-300 py-2 pl-4 pr-10 text-base hover:cursor-pointer focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
                               />
                             </div>
+                          </>
+                        )}
+                      />
+                    </div>
+                    <div>
+                      <Controller
+                        control={control}
+                        name="includeFeature"
+                        render={({ field, fieldState: { error } }) => (
+                          <>
+                            {error && (
+                              <p className="mb-1 text-xs italic text-red-500">
+                                {error.message}
+                              </p>
+                            )}
+                            <Checkbox
+                              radius="md"
+                              isSelected={field.value}
+                              onValueChange={(v) => field.onChange(v)}
+                              color="primary"
+                            >
+                              Include this feature in project page
+                            </Checkbox>
                           </>
                         )}
                       />

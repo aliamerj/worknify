@@ -30,7 +30,9 @@ export default async function ProfileLayout({
     if (session) {
       allProfileData = await databaseDrizzle.query.users.findFirst({
         where: (u, o) => o.eq(u.id, session.user.id!),
-        columns: {},
+        columns: {
+          profileId: true,
+        },
         with: {
           profile: {
             with: {
@@ -46,9 +48,9 @@ export default async function ProfileLayout({
 
   return (
     <ProfileDataProvider
-      userId={session?.user.id ?? ""}
-      name={session?.user?.name ?? ""}
-      email={session?.user?.email ?? ""}
+      userId={session?.user.id}
+      name={session?.user?.name}
+      email={session?.user?.email}
       allProfileData={allProfileData}
     >
       {children}

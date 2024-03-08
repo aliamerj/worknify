@@ -98,9 +98,10 @@ export async function PATCH(request: NextRequest) {
   const { id, name, description, timePeriod, assignedTo } = validated.data;
   try {
     const targetProject = await databaseDrizzle
-      .select()
+      .select({ id: project.id, owner: project.owner })
       .from(project)
-      .where((p) => and(eq(p.owner, session.user.id!)));
+      .where((p) => and(eq(p.owner, session.user.id!)))
+      .then((res) => res[0]);
     if (!targetProject) {
       const isDev = await databaseDrizzle
         .select()
@@ -116,7 +117,7 @@ export async function PATCH(request: NextRequest) {
         );
     }
     if (name || description || timePeriod || assignedTo) {
-      const newFeature = await databaseDrizzle
+      const newTask = await databaseDrizzle
         .update(tasks)
         .set({
           name,
@@ -125,7 +126,7 @@ export async function PATCH(request: NextRequest) {
           startDate: timePeriod?.startDate,
           endDate: timePeriod?.endDate,
         })
-        .where(and(eq(tasks.id, id), eq(tasks.creatorId, session.user.id)))
+        .where(eq(tasks.id, id))
         .returning()
         .then((fea) => fea[0]);
 
@@ -133,7 +134,7 @@ export async function PATCH(request: NextRequest) {
         {
           state: true,
           message: "Task Updated successfully",
-          data: newFeature,
+          data: newTask,
         },
         { status: 200 },
       );

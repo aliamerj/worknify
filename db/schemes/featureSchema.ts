@@ -5,6 +5,7 @@ import {
   varchar,
   date,
   integer,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { project } from "./projectSchema";
 import { relations } from "drizzle-orm";
@@ -18,7 +19,7 @@ export const feature = pgTable("feature", {
   featureName: varchar("feature_name", { length: 255 }).notNull(),
   order: integer("order").notNull(),
   description: varchar("description", { length: 500 }),
-
+  includeFeature: boolean("include_feature").default(false).notNull(),
   tags: text("tags"),
   startDate: date("start_date"),
   endDate: date("end_date"),

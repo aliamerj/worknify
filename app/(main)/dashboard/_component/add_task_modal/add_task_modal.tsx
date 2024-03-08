@@ -61,8 +61,6 @@ export const AddTaskModal = ({
           task.featureId === featureId ? Math.max(max, task.order) : max,
         0,
       );
-  console.log({ selectedTaskToUpdate });
-
   const { control, handleSubmit, reset } = useForm<TaskSchema>({
     defaultValues: {
       status: "New",

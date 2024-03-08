@@ -4,9 +4,13 @@ import { formatDate } from "@/utils/helper_function";
 import DOMPurify from "isomorphic-dompurify";
 import { MdWork } from "react-icons/md";
 
-export const Experience = async ({ experiences }: { experiences: ExperienceSelection[]}) => {
+export const Experience = async ({
+  experiences,
+}: {
+  experiences: ExperienceSelection[];
+}) => {
+  if (experiences.length === 0) return <div />;
 
-  
   return (
     <section className="mx-12 mt-32">
       <Slide delay={0.16}>

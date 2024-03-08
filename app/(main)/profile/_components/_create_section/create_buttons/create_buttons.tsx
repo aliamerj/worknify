@@ -43,7 +43,7 @@ export const CreateButtons = () => {
     }
   };
   return (
-    <div className="fixed inset-x-0 bottom-0 mb-4 flex justify-center">
+    <div className="fixed inset-x-0 bottom-0 z-50 mb-4 flex justify-center">
       <div className="mx-auto flex gap-4 rounded-md bg-content4 px-5 py-4">
         {/* Save Button */}
         <Button

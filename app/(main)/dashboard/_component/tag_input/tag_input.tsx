@@ -31,7 +31,9 @@ export const TagsInput = ({
     <div className="flex flex-col">
       {error &&
         error.map((err: any) => (
-          <p className="mb-2 ml-2 text-xs text-red-500">{err.message}</p>
+          <p key={err.message} className="mb-2 ml-2 text-xs text-red-500">
+            {err.message}
+          </p>
         ))}
       <input
         type="text"
@@ -42,21 +44,25 @@ export const TagsInput = ({
         className={`mb-2 w-full rounded-xl ${!!error ? "border-medium border-red-400" : "border border-gray-300"}  p-2 shadow`}
       />
       <div className="flex flex-wrap gap-2">
-        {tags.map((tag, index) => (
-          <div
-            key={index}
-            className="flex items-center space-x-1 rounded bg-blue-100 px-2 py-1 text-sm text-blue-800"
-          >
-            <span>{tag}</span>
-            <button
-              type="button"
-              className="text-blue-800 hover:text-blue-600"
-              onClick={() => removeTag(index)}
+        {tags.map((tag, index) =>
+          tag.length !== 0 ? (
+            <div
+              key={index}
+              className="flex items-center space-x-1 rounded bg-blue-100 px-2 py-1 text-sm text-blue-800"
             >
-              <RiCloseCircleLine />
-            </button>
-          </div>
-        ))}
+              <span>{tag.trim()}</span>
+              <button
+                type="button"
+                className="text-blue-800 hover:text-blue-600"
+                onClick={() => removeTag(index)}
+              >
+                <RiCloseCircleLine />
+              </button>
+            </div>
+          ) : (
+            <div />
+          ),
+        )}
       </div>
     </div>
   );

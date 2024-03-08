@@ -2,7 +2,15 @@ import { AppRouter } from "@/utils/router/app_router";
 import Link from "next/link";
 import { AiOutlineLock } from "react-icons/ai";
 
-const NotAllowedPage = () => {
+const NotAllowedPage = ({
+  message,
+  textBtn,
+  linkBtn,
+}: {
+  message?: string;
+  textBtn?: string;
+  linkBtn?: string;
+}) => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4">
       <div className="w-full max-w-md rounded-xl bg-white p-6 text-center shadow-xl">
@@ -11,14 +19,14 @@ const NotAllowedPage = () => {
           Access Restricted
         </h1>
         <p className="mb-6 text-gray-600">
-          This project is private. If you have the necessary permissions, please
-          log in to view it.
+          {message ??
+            "This project is private. If you have the necessary permissions, please log in to view it."}
         </p>
         <Link
-          href={AppRouter.signup}
+          href={linkBtn ?? AppRouter.signup}
           className="inline-block w-full rounded-lg bg-primary px-6 py-3 text-lg text-white transition duration-300 hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50"
         >
-          Login
+          {textBtn ?? "Login"}
         </Link>
         <Link
           href="/"

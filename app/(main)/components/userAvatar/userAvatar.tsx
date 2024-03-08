@@ -80,7 +80,7 @@ export const UserAvatar = ({
             <div className="flex justify-between">
               <p>Notifications</p>
               {notifications && (
-                <p className="rounded-full bg-red-600 px-2 font-bold text-white">
+                <p className="rounded-full bg-red-600 px-2 py-1 text-xs font-bold text-white">
                   {notificationsCount}
                 </p>
               )}

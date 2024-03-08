@@ -1,8 +1,5 @@
-import { databaseDrizzle } from "@/db/database";
 import { EducationSelection } from "@/db/schemes/profileSchema";
 import { formatDate } from "@/utils/helper_function";
-import { eq } from "drizzle-orm";
-import { notFound } from "next/navigation";
 import { IoSchoolSharp } from "react-icons/io5";
 /**
  * Retrieves education data from a database and displays it in a formatted way on a webpage.
@@ -15,6 +12,7 @@ export const Education = ({
 }: {
   educations: EducationSelection[];
 }) => {
+  if (educations.length === 0) return <div />;
   return (
     <section className="mt-32 px-4 md:px-12">
       <h2 className="mb-8 text-center text-4xl font-bold text-gray-800 dark:text-white">

@@ -20,6 +20,7 @@ export default async function ProjectViewPage({ params }: Props) {
     where: (p, o) => o.eq(p.id, projectId),
     with: {
       features: {
+        where: (f, o) => o.eq(f.includeFeature, true),
         columns: {
           id: true,
           featureName: true,
@@ -66,19 +67,22 @@ export default async function ProjectViewPage({ params }: Props) {
     },
   });
   if (!project) return notFound();
-  if(project.type === 'private' && project.owner === session?.user || project.devs.find(d=> d.devId=== session?.user.id)) return <NotAllowedPage/>
-  const starCount = await getTableCount("star_project");
-  const devCount = await getTableCount("dev");
-  const isDev = project?.devs ? project.devs[0]?.devId : null;
-  const isStared = project?.stars ? project.stars[0]?.userId : null;
-  const completion = calcCompletionUnified(project.features);
-
+  const isDev = project?.devs
+    ? project.devs.find((d) => d.devId === session?.user.id)?.devId
+    : null;
   if (project.type === "private") {
-    if (!session || !session.user.id) return notFound();
-    if (project.owner !== session.user.id && !isDev) {
+    if (project.owner !== session?.user.id && !isDev) {
       return <NotAllowedPage />;
     }
   }
+  const starCount = await getTableCount(
+    "star_project",
+    "project_id",
+    projectId,
+  );
+  const devCount = await getTableCount("dev", "project_id", projectId);
+  const isStared = project?.stars ? project.stars[0]?.userId : null;
+  const completion = calcCompletionUnified(project.features);
   let isWaiting: { id: number } | undefined = project?.notifications
     ? project?.notifications[0]
     : undefined;

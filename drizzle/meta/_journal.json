@@ -8,6 +8,13 @@
       "when": 1709461868961,
       "tag": "0000_wet_cerebro",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1709872344066,
+      "tag": "0001_bitter_norrin_radd",
+      "breakpoints": true
     }
   ]
 }

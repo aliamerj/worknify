@@ -15,6 +15,7 @@ import RequestPendingBox from "../../request_pending_box/request_pending_box";
 import { LiaLaptopCodeSolid } from "react-icons/lia";
 import { NotificationSchema } from "@/utils/validations/notificationsValidation";
 import Link from "next/link";
+import { ToastContainer, toast } from "react-toastify";
 // it should be splitting the code into starGiving and Join
 // TODO
 interface Props {
@@ -50,7 +51,7 @@ const ProjectHeader = ({
   isAuth,
 }: Props) => {
   const [iswaiting, setIsWaiting] = useState(isWaiting);
-  const [error, setError] = useState(null);
+
   const [loading, setLoading] = useState<Loading>({
     isLoading: false,
     on: "STAR",
@@ -96,8 +97,7 @@ const ProjectHeader = ({
       }
       setIsJoin((current) => !current);
     } catch (error: any) {
-      setError(error.response.data.message);
-      setTimeout(() => setError(null), 3000);
+      toast.error(error.response.data.message);
     }
     setLoading({ isLoading: false, on: "JOIN" });
   };
@@ -115,8 +115,7 @@ const ProjectHeader = ({
       }
       setStar((current) => !current);
     } catch (error: any) {
-      setError(error.message);
-      setTimeout(() => setError(null), 3000);
+      toast.error(error.response.data.message);
     }
     setLoading({ isLoading: false, on: "STAR" });
   };
@@ -187,15 +186,7 @@ const ProjectHeader = ({
             Dashboard
           </Button>
         </div>
-        {error && (
-          <div
-            className="fixed bottom-0 left-0 mb-5 ml-5 flex items-center gap-2 rounded-md bg-red-500 px-4 py-2 text-sm text-white shadow-lg"
-            style={{ animation: "floatError 1.5s ease-in-out" }}
-          >
-            <GoAlertFill className="text-lg" />
-            {error}
-          </div>
-        )}{" "}
+        <ToastContainer position="bottom-left" className="z-50" />
       </div>
     </div>
   );

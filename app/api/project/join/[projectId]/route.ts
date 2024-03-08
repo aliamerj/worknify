@@ -6,6 +6,7 @@ import { and, eq } from "drizzle-orm";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { notificationSchema } from "@/utils/validations/notificationsValidation";
 import { notification } from "@/db/schemes/notificationSchema";
+import { users } from "@/db/schemes/userSchema";
 
 export async function POST(
   request: NextRequest,
@@ -27,7 +28,27 @@ export async function POST(
         { state: false, message: "invalid request" },
         { status: 400 },
       );
+    if (validate.data.projectType === "private") {
+      // todo: allow the project owner to send invitation to join
+      return NextResponse.json(
+        { state: false, message: "Not authorized" },
+        { status: 401 },
+      );
+    }
     if (validate.data.notificationType === "JOIN_REQUEST") {
+      const profileId = await databaseDrizzle
+        .select({ profileId: users.profileId, id: users.id })
+        .from(users)
+        .where((u) => eq(u.id, session.user.id!))
+        .then((res) => res[0].profileId);
+      if (!profileId)
+        return NextResponse.json(
+          {
+            state: false,
+            message: "Please,Create profile first",
+          },
+          { status: 401 },
+        );
       if (validate.data.projectType === "public") {
         await databaseDrizzle.insert(dev).values({
           devId: session.user.id,
@@ -143,6 +164,16 @@ export async function DELETE(
   const body = await req.json();
 
   try {
+    const targetProject = await databaseDrizzle
+      .select({ owner: project.owner, id: project.id })
+      .from(project)
+      .where((p) => and(eq(p.owner, session.user.id!), eq(p.id, projectId)))
+      .then((res) => res[0].owner);
+    if (!targetProject)
+      return NextResponse.json(
+        { state: false, message: "Not authorized" },
+        { status: 401 },
+      );
     if (!body.devId) {
       await databaseDrizzle
         .delete(dev)

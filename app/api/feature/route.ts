@@ -26,8 +26,15 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   }
-  const { featureName, order, description, tag, timePeriod, projectId } =
-    validation.data;
+  const {
+    featureName,
+    order,
+    description,
+    tag,
+    timePeriod,
+    projectId,
+    includeFeature,
+  } = validation.data;
   const targetProject = await databaseDrizzle
     .select()
     .from(project)
@@ -50,6 +57,7 @@ export async function POST(request: NextRequest) {
     tags: tag?.join(";"),
     startDate: timePeriod?.startDate,
     endDate: timePeriod?.endDate,
+    includeFeature: includeFeature,
   };
   try {
     const featureRes = await databaseDrizzle
@@ -89,8 +97,15 @@ export async function PATCH(request: NextRequest) {
       { status: 400 },
     );
   }
-  const { id, projectId, featureName, description, timePeriod, tag } =
-    validated.data;
+  const {
+    id,
+    projectId,
+    featureName,
+    description,
+    timePeriod,
+    tag,
+    includeFeature,
+  } = validated.data;
   try {
     const targetProject = await databaseDrizzle
       .select()
@@ -106,7 +121,13 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    if (featureName || description || timePeriod || tag) {
+    if (
+      featureName ||
+      description ||
+      timePeriod ||
+      tag ||
+      includeFeature !== undefined
+    ) {
       const newFeature = await databaseDrizzle
         .update(feature)
         .set({
@@ -115,6 +136,7 @@ export async function PATCH(request: NextRequest) {
           tags: tag?.join(";"),
           startDate: timePeriod?.startDate,
           endDate: timePeriod?.endDate,
+          includeFeature: includeFeature,
         })
         .where(and(eq(feature.projectId, projectId), eq(feature.id, id)))
         .returning()

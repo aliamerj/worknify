@@ -13,7 +13,6 @@ export const ProjectSearch = () => {
         placeholder="Search for projects..."
         onChange={(e) => {
           e.preventDefault();
-          console.log(e.target.value);
           if (e.target.value === "") {
             router.replace("?", { scroll: false });
             return;

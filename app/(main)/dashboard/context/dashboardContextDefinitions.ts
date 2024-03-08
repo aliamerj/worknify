@@ -3,9 +3,10 @@ import { FeatureSelection } from "@/db/schemes/featureSchema";
 import { ColumnId, TaskSelection } from "@/db/schemes/taskSchema";
 import { ProjectSelection } from "@/db/schemes/projectSchema";
 import { ColumnsTask } from "./tasks/reducer";
-import { DevInfo } from "./dashboard_context";
+
 import { FeatureSchema } from "@/utils/validations/featureValidation";
 import { TaskSchema } from "@/utils/validations/taskValidation";
+import { DevInfo } from "../[projectId]/page";
 
 export interface IProjectInfoProvider {
   project: ProjectSelection;

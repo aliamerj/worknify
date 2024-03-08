@@ -54,7 +54,7 @@ const columnStyles: ColumnStyles = {
     textColor: "text-green-800",
   },
 };
-export const KanbanTask = ({
+const KanbanTask = ({
   featureId,
   onOpen,
 }: {
@@ -213,3 +213,4 @@ export const KanbanTask = ({
     </DragDropContext>
   );
 };
+export default KanbanTask;
