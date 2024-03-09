@@ -62,8 +62,8 @@ export const authOptions: NextAuthOptions = {
       },
     }),
     GithubProvider({
-      clientId: env.GITHUB_ID!,
-      clientSecret: env.GITHUB_SECRET!,
+      clientId: env.AUTH_GITHUB_ID!,
+      clientSecret: env.AUTH_GITHUB_SECRET!,
       profile(profile: GithubProfile) {
          console.log({profile})
         return {
