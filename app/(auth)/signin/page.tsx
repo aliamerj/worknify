@@ -21,8 +21,11 @@ export default async function SignInPage() {
         <Image
           src="/worknify_main_logo.svg"
           alt="logo"
-          width={300}
-          height={100}
+          width="0"
+          height="0"
+          sizes="100vw"
+          style={{ width: "100%", height: "auto" }}
+          priority
         />
 
         <h2>Join Worknify – Where Projects and People Come Together</h2>

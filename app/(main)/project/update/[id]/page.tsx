@@ -8,6 +8,7 @@ import React from "react";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Spinner } from "@nextui-org/react";
+import { Metadata } from "next";
 
 const ProjectForm = dynamic(
   () => import("@/app/(main)/project/_components/project_form/project_form"),
@@ -24,6 +25,32 @@ const ProjectForm = dynamic(
 interface Props {
   params: { id: string };
 }
+
+const notFoundMetadata: Metadata = {
+  title: "Project Not Found - Worknify",
+  description:
+    "The project you are looking for does not exist or is no longer available on Worknify. Discover other projects or explore our platform to connect with professionals, manage your tasks, or create your own project.",
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  // read route params
+  const projectId = parseInt(params.id);
+  if (!projectId) return notFoundMetadata;
+
+  const project = await databaseDrizzle.query.project.findFirst({
+    where: (p, o) => o.eq(p.id, projectId),
+    columns: {
+      name: true,
+    },
+  });
+  if (!project) return notFoundMetadata;
+
+  return {
+    title: `Update Your Project: ${project.name} - Worknify`,
+    description: `Revise and optimize your project, ${project.name}, on Worknify. Update your project's goals, timeline, team roles, and more to keep your project aligned with your objectives. Ensure your project stays relevant and on track for success.`,
+  };
+}
+
 const EditProjectPage = async ({ params }: Props) => {
   const session = await getServerSession(authOptions);
   const projectId = parseInt(params.id);

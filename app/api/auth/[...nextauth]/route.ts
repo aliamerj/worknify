@@ -65,6 +65,7 @@ export const authOptions: NextAuthOptions = {
       clientId: env.GITHUB_ID!,
       clientSecret: env.GITHUB_SECRET!,
       profile(profile: GithubProfile) {
+         console.log({profile})
         return {
           id: profile.id.toString(),
           name: profile.name,
@@ -88,6 +89,7 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: "/signin",
+    error:"/signin"
   },
 
   session: {

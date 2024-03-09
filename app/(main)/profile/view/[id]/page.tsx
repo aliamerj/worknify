@@ -17,6 +17,7 @@ import { EditProfileBtn } from "../../_components/_view_section/edit_Profile_btn
 import Header from "../../_components/_view_section/header/header";
 import getTableCount from "@/utils/api_handler/get_table_count";
 import { ButtonHeader } from "../../_components/_view_section/buttonsHeader/button_header";
+import { Metadata, ResolvingMetadata } from "next";
 
 const Skills = dynamic(
   () => import("@/app/(main)/profile/_components/_view_section/skills/skills"),
@@ -33,11 +34,48 @@ const Skills = dynamic(
 interface Props {
   params: { id: string };
 }
-/**
- * Retrieves and displays a user's profile information.
- * param params - An object containing the parameters passed to the function, including the user's ID.
- * returns The rendered profile information, including the header, summary, experience, skills, projects, education, and sections.
- */
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
+  // read route params
+  const id = params.id;
+
+  // fetch data
+  const user = await databaseDrizzle.query.users.findFirst({
+    where: (u, o) => o.eq(u.id, id),
+    columns: {
+      image: true,
+    },
+    with: {
+      profile: {
+        columns: {
+          fullName: true,
+          background: true,
+          skills: true,
+        },
+      },
+    },
+  });
+
+  if (!user?.profile)
+    return {
+      title: "User Not Found - Worknify",
+      description:
+        "The profile you are trying to view does not exist or is no longer available on Worknify. Explore our platform to connect with other professionals, manage projects, or enhance your own professional profile.",
+    };
+
+  // optionally access and extend (rather than replace) parent metadata
+  const previousImages = (await parent).openGraph?.images || [];
+
+  return {
+    title: `${user.profile.fullName}'s Professional Profile - Worknify`,
+    description: `${user.profile.fullName} is a ${user.profile.background} with notable experience and education. Discover their professional journey, including key roles and educational achievements, on Worknify.`,
+    openGraph: {
+      images: [user?.image ?? "", ...previousImages],
+    },
+  };
+}
 async function ViewProfile({ params }: Props) {
   const session = await getServerSession(authOptions);
 

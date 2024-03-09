@@ -9,11 +9,37 @@ import NotAllowedPage from "../../project/_components/not_allowed/not_allowed";
 import { FeatureSelection } from "@/db/schemes/featureSchema";
 import { TaskSelection } from "@/db/schemes/taskSchema";
 import { ProjectSelection } from "@/db/schemes/projectSchema";
+import { Metadata, ResolvingMetadata } from "next";
 
 interface Props {
   params: { projectId: string };
   searchParams: { feature?: string };
 }
+const generalDashboardMetadata: Metadata = {
+  title: "Dashboard - Worknify: Manage Your Projects Efficiently",
+  description:
+    "Access your Worknify dashboard to seamlessly create, update, and delete project features, manage tasks, and streamline your project management processes. Our user-friendly dashboard empowers you to take control of your projects and enhance productivity.",
+};
+
+export async function generateMetadata({
+  searchParams,
+}: Props): Promise<Metadata> {
+  // read route params
+  const id = parseInt(searchParams.feature ?? "");
+  if (!id) return generalDashboardMetadata;
+
+  const feature = await databaseDrizzle.query.feature.findFirst({
+    where: (f, o) => o.eq(f.id, id),
+  });
+
+  if (!feature) return generalDashboardMetadata;
+
+  return {
+    title: feature.featureName,
+    description: feature.description,
+  };
+}
+
 export interface DevInfo {
   id: string;
   image: string | null;

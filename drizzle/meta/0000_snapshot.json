@@ -1,5 +1,5 @@
 {
-  "id": "ea92825d-ff23-441d-9948-bae649add04c",
+  "id": "16425793-c9d5-4241-a28a-85c7e324a695",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -37,6 +37,13 @@
           "type": "varchar(500)",
           "primaryKey": false,
           "notNull": false
+        },
+        "include_feature": {
+          "name": "include_feature",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         },
         "tags": {
           "name": "tags",

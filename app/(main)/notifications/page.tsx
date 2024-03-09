@@ -2,6 +2,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { databaseDrizzle } from "@/db/database";
 import { getServerSession } from "next-auth";
 import { NotificationItem } from "../components/notification_item/notification_item";
+import { Metadata } from "next";
 export type NotificationQuery = {
   project: {
     name: string;
@@ -13,6 +14,11 @@ export type NotificationQuery = {
   id: number;
   senderId: string;
   projectId: number;
+};
+export const metadata: Metadata = {
+  title: "Notifications - Worknify: Stay Updated on Your Projects",
+  description:
+    "Never miss an update with Worknify's notification page. Receive real-time alerts for project join requests, task updates, and more. Stay connected and responsive to your team's needs, ensuring seamless collaboration and project management.",
 };
 const NotificationsPage = async () => {
   const sesstion = await getServerSession(authOptions);

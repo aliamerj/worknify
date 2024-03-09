@@ -4,7 +4,13 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { databaseDrizzle } from "@/db/database";
 import NotAllowedPage from "../_components/not_allowed/not_allowed";
 import { AppRouter } from "@/utils/router/app_router";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Create New Project - Worknify: Transform Your Ideas into Reality",
+  description:
+    "Kickstart your next venture on Worknify by creating a new project. Define your goals, outline your plan, select your team, and set the stage for success. Our intuitive platform simplifies project creation, making it easy to bring your innovative ideas to life and collaborate effectively.",
+};
 const CreateProject = async () => {
   const sesstion = await getServerSession(authOptions);
   if (!sesstion?.user.id) return <NotAllowedPage />;

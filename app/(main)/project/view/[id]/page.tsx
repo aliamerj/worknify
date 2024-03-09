@@ -9,9 +9,42 @@ import { ProjectBody } from "../../_components/_view_section/project_body/projec
 import { ProjectSchema } from "@/utils/validations/projectValidation";
 import getTableCount from "@/utils/api_handler/get_table_count";
 import { calcCompletionUnified } from "@/utils/helper_function";
+import { Metadata, ResolvingMetadata } from "next";
 
 interface Props {
   params: { id: string };
+}
+
+const notFoundMetadata: Metadata = {
+  title: "Project Not Found - Worknify",
+  description:
+    "The project you are looking for does not exist or is no longer available on Worknify. Discover other projects or explore our platform to connect with professionals, manage your tasks, or create your own project.",
+};
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
+  const projectId = parseInt(params.id);
+  if (!projectId) return notFoundMetadata;
+
+  const project = await databaseDrizzle.query.project.findFirst({
+    where: (p, o) => o.eq(p.id, projectId),
+    columns: {
+      name: true,
+      projectGoal: true,
+      logo: true,
+    },
+  });
+  if (!project) return notFoundMetadata;
+  const previousImages = (await parent).openGraph?.images || [];
+  return {
+    title: `Project: ${project.name} - Worknify`,
+    description: project.projectGoal,
+    openGraph: {
+      images: [project.logo ?? "", ...previousImages],
+    },
+  };
 }
 export default async function ProjectViewPage({ params }: Props) {
   const projectId = parseInt(params.id);

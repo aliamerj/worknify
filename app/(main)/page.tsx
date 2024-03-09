@@ -8,7 +8,7 @@ import CallToActionSection from "./components/call_to_actionSection/CallToAction
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 
-interface props {
+interface Props {
   searchParams: {
     visibility: string;
     page: string;
@@ -16,7 +16,7 @@ interface props {
   };
 }
 
-export default async function Home({ searchParams }: props) {
+export default async function Home({ searchParams }: Props) {
   const auth = await getServerSession(authOptions);
   return (
     <main>

@@ -13,6 +13,9 @@
   justify-content: center;
   border-bottom-left-radius: 75% 45px;
 }
+.loginSection h2 {
+  text-align: center;
+}
 
 .brandingSection {
   flex: 1.5;
@@ -31,6 +34,7 @@
   margin-bottom: 1.7rem;
 }
 .loginPage h2 {
+  margin-top: 1rem;
   margin-bottom: 1.5rem;
 }
 .loginSection h2 {

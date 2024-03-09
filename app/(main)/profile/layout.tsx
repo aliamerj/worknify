@@ -7,6 +7,14 @@ import {
 import { headers } from "next/headers";
 import { AppRouter } from "@/utils/router/app_router";
 import { databaseDrizzle } from "@/db/database";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Your Professional Hub - Worknify Profile",
+  description:
+    "Welcome to your Worknify Profile - the heart of your professional online presence. Here, you can manage your personal information, showcase your projects, track your progress, and connect with other professionals. Empower your career with Worknify by maintaining an up-to-date and engaging profile.",
+};
+
 /**
  * The `ProfileLayout` function is an asynchronous function that serves as a layout component for the profile page.
  * It retrieves the user's session and profile data, and provides it to the `ProfileDataProvider` component.
@@ -14,6 +22,7 @@ import { databaseDrizzle } from "@/db/database";
  * param children - The child components to be rendered within the `ProfileLayout` component.
  * returns The `ProfileDataProvider` component, which wraps the child components and provides the user's session and profile data to them.
  */
+
 export default async function ProfileLayout({
   children,
 }: {

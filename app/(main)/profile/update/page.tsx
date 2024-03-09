@@ -1,13 +1,15 @@
-import React from 'react';
+import React from "react";
 import { ProfileDisplay } from "../_components/_create_section/_displayer/profile_display";
 import { ProfileForm } from "../_components/_create_section/_form/profile_form";
 import { UpdateButtons } from "../_components/_update_section/update_buttons/update_buttons";
 import EditProfileGate from "./edit_profile_gate";
+import { Metadata } from "next";
 
-/**
- * Renders a page for editing a user's profile.
- * returns The rendered page for editing a user's profile.
- */
+export const metadata: Metadata = {
+  title: "Update Your Profile - Worknify: Keep Your Professional Details Fresh",
+  description:
+    "Easily update or change your profile data on Worknify to ensure your professional information stays current and accurate. Our straightforward editing tools allow you to quickly modify your CV details, reflecting your latest achievements and skills. Stay relevant and showcase the best version of your professional self with Worknify.",
+};
 export default function Page() {
   return (
     <EditProfileGate>

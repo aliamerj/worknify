@@ -1,13 +1,16 @@
-import React from 'react';
+import React from "react";
 import { ProfileDisplay } from "../_components/_create_section/_displayer/profile_display";
 import { ProfileForm } from "../_components/_create_section/_form/profile_form";
 import { CreateButtons } from "../_components/_create_section/create_buttons/create_buttons";
 import CreateProfileGate from "./create_profile_gate";
+import { Metadata } from "next";
 
-/**
- * Renders a form to create a user profile.
- * returns The rendered JSX elements for the CreateProfile component.
- */
+export const metadata: Metadata = {
+  title:
+    "Create Your Professional Profile - Worknify: Visualize Your CV in Real-Time",
+  description:
+    "Build your professional identity on Worknify with our intuitive profile creation form. Watch your CV come to life as you input your details, providing a real-time preview of your professional persona. Craft a compelling CV on a visually appealing page and kickstart your journey to career success with Worknify.",
+};
 export default function CreateProfile() {
   return (
     <CreateProfileGate>
