@@ -4,6 +4,10 @@ import Image from "next/image";
 import { SigninButtons } from "./signinButton/signinButton";
 import { AppRouter } from "@/utils/router/app_router";
 
+export const metadata: Metadata = {
+  title: 'Login - Access Your Worknify Account',
+  description: 'Sign in to your Worknify account to connect, collaborate, and continue your professional journey. Access your personalized dashboard, manage projects, and engage with the Worknify community. Secure and user-friendly, Worknify keeps you connected with your professional world.',
+};
 export default async function SignInPage() {
   return (
     <div className={styles.loginPage}>
