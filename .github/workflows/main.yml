@@ -32,5 +32,5 @@ jobs:
         with:
           context: .
           push: true
-          target: dev
+          target: prod
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
