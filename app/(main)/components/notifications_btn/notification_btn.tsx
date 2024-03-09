@@ -4,18 +4,18 @@ import { Button, Spinner } from "@nextui-org/react";
 import axios from "axios";
 import { useState } from "react";
 import { FaTimesCircle } from "react-icons/fa";
-import { AllNotification } from "../notification_item/notification_item";
 import { ToastContainer, toast } from "react-toastify";
+import { NotificationQuery } from "../../notifications/page";
 
 export const NotificationBtn = ({
   notific,
   handleNotific,
 }: {
-  notific: AllNotification;
+  notific: NotificationQuery;
   handleNotific: (notifId: number) => void;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
- 
+
   const handleRequest = ({ isAccept }: { isAccept: boolean }) => {
     setIsLoading(true);
     try {
@@ -25,7 +25,7 @@ export const NotificationBtn = ({
       };
       axios.post(ApiRouter.projectJoin + notific.projectId, notification);
     } catch (err: any) {
-      toast.error(err.response.data.message)
+      toast.error(err.response.data.message);
     }
     handleNotific(notific.id);
     setIsLoading(false);
@@ -35,7 +35,7 @@ export const NotificationBtn = ({
     try {
       axios.delete(ApiRouter.notifications + notific.id);
     } catch (err: any) {
-      toast.error(err.response.data.message)
+      toast.error(err.response.data.message);
     }
     handleNotific(notific.id);
     setIsLoading(false);
@@ -72,7 +72,7 @@ export const NotificationBtn = ({
           <FaTimesCircle className="text-lg" />
         </button>
       )}
-    <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 };

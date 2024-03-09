@@ -147,7 +147,7 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-export async function DELETE(request: NextResponse) {
+export async function DELETE(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user.id)
     return NextResponse.json(

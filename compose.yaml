@@ -4,7 +4,7 @@ services:
   server:
     build:
       context: .
-      target: prod
+      target: dev
     env_file:
       - .env
     ports:

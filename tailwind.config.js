@@ -31,6 +31,7 @@ const config = {
   darkMode: "class",
   plugins: [
     require("@tailwindcss/typography"),
+    require('autoprefixer'),
     nextui({
       themes: {
         light: {
