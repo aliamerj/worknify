@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
+import sharp from 'sharp'
 import {
   projectSchema,
   updateProjectSchema,
@@ -19,6 +20,7 @@ import {
 } from "@/db/schemes/projectSchema";
 import { and, eq } from "drizzle-orm";
 import { users } from "@/db/schemes/userSchema";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -63,7 +65,7 @@ export async function POST(request: NextRequest) {
 
   try {
     var imageUrl;
-    if (logo && logo instanceof File) {
+    if (logo && logo instanceof File) { 
       imageUrl = await setImageInBucket(
         session.user.id!,
         `${session.user.id!}-${name}`,
@@ -255,19 +257,25 @@ function serializeProjectData(project: FormData) {
 }
 
 async function setImageInBucket(userId: string, logoKey: string, logo: File) {
-  const signedUrl = await getSignedUrl(
-    s3,
-    uploadProjectLogo(logoKey, logo.type, logo.size, userId),
+  const img = Buffer.from(await logo.arrayBuffer())
+  const resizedImageBuffer = await sharp(img).resize(400,500).toBuffer()
+const command = new PutObjectCommand({
+       Bucket: process.env.S3_NAME!,
+    Key:logoKey,
+    Body:resizedImageBuffer,
+        ContentType: logo.type,
+    ContentLength: logo.size,
+      Metadata: {
+      userId: userId,
+    },
+  })
+
+   await s3.send(command)
+
+  const signedUrl = await getSignedUrl(s3,command,
     {
       expiresIn: 60,
     },
-  );
-  fetch(signedUrl, {
-    method: "PUT",
-    body: logo,
-    headers: {
-      "content-type": logo.type,
-    },
-  });
+  ); 
   return signedUrl;
 }
