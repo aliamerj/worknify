@@ -20,7 +20,6 @@ import {
 } from "@/db/schemes/projectSchema";
 import { and, eq } from "drizzle-orm";
 import { users } from "@/db/schemes/userSchema";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -259,23 +258,20 @@ function serializeProjectData(project: FormData) {
 async function setImageInBucket(userId: string, logoKey: string, logo: File) {
   const img = Buffer.from(await logo.arrayBuffer())
   const resizedImageBuffer = await sharp(img).resize(400,500).toBuffer()
-const command = new PutObjectCommand({
-       Bucket: process.env.S3_NAME!,
-    Key:logoKey,
-    Body:resizedImageBuffer,
-        ContentType: logo.type,
-    ContentLength: logo.size,
-      Metadata: {
-      userId: userId,
-    },
-  })
-
-   await s3.send(command)
-
-  const signedUrl = await getSignedUrl(s3,command,
+  const signedUrl = await getSignedUrl(
+    s3,
+    uploadProjectLogo(logoKey, logo.type, logo.size, userId),
     {
       expiresIn: 60,
     },
-  ); 
+  );
+
+  fetch(signedUrl, {
+    method: "PUT",
+    body: resizedImageBuffer,
+    headers: {
+      "content-type": logo.type,
+    },
+  });
   return signedUrl;
 }
