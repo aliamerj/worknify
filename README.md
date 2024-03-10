@@ -1,37 +1,53 @@
+<p align="center">
+  <img src="https://www.worknify.com/_next/image?url=%2Fworknify_main_logo.svg&w=256&q=75" alt="Worknify Logo" style="background: white; padding: 10px;">
+</p>
+
+# Worknify: Open-Source Collaboration and Project Management
+
+## Introduction
+
+**Worknify** is a cutting-edge, open-source platform engineered to transform project management and professional growth. By integrating essential tools for portfolio creation, project execution, and task management within one user-friendly environment, Worknify stands out as an essential service for professionals and teams. Developed with a robust tech stack including Next.js 13, PostgreSQL, AWS, and Docker, Worknify is committed to delivering top-tier performance and scalability.
+
+## Features
+
+### Personalized Portfolio Creation
+
+- **Custom Design**: Utilize an array of design templates and customization options to reflect your unique professional identity.
+- **Content Rich**: Embed multimedia content to showcase your projects, papers, certificates, and more.
+
+### Advanced Project Management
+
+- **Comprehensive Control**: Manage your project's lifecycle with detailed tools for planning, tracking, and analyzing progress.
+- **Collaboration**: Share your projects, receive feedback, and collaborate with peers or stakeholders in real-time.
+
+### Efficient Task Management
+
+- **Kanban Boards**: Organize your tasks with customizable Kanban boards that adapt to your workflow.
+- **Progress Tracking**: Monitor task completion, pending actions, and timelines effortlessly.
+
+## Built With
+
+- **[Next.js 13](https://nextjs.org/)**: A React framework for production, providing excellent features like hybrid static & server rendering, TypeScript support, smart bundling, and more.
+- **[PostgreSQL](https://www.postgresql.org/)**: A powerful, open-source object-relational database system with over 30 years of active development.
+- **[AWS](https://aws.amazon.com/)**: Offering reliable, scalable, and inexpensive cloud computing services.
+- **[Docker](https://www.docker.com/)**: A platform for developing, shipping, and running applications in containers.
 
 ## Getting Started
 
-First, run the development server:
+Follow these steps to get a local copy up and running.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Prerequisites
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Node.js
+- PostgreSQL
+- Docker
+- AWS CLI
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Installation
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+1. **Clone the repository:**
 
-## Learn More
+   ```bash
+   git clone https://github.com/aliamerj/worknify.git
+   cd worknify
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-
-# worknify
