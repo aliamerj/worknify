@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
-import sharp from 'sharp'
 import {
   projectSchema,
   updateProjectSchema,
@@ -63,19 +62,19 @@ export async function POST(request: NextRequest) {
   } = validation.data;
 
   try {
-    var imageUrl;
-    if (logo && logo instanceof File) { 
-      imageUrl = await setImageInBucket(
-        session.user.id!,
-        `${session.user.id!}-${name}`,
-        logo,
-      );
-    }
+    // let imageUrl = "x";
+    // if (logo && logo instanceof File) { 
+    //   imageUrl = await setImageInBucket(
+    //     session.user.id!,
+    //     `${session.user.id!}-${name}`,
+    //     logo,
+    //   );
+    // }
 
     const newProject: ProjectInsertion = {
       owner: session.user.id!,
       name: name,
-      logo: imageUrl && imageUrl.split("?")[0],
+      logo: "x", // imageUrl && imageUrl.split("?")[0],
       type: type as ProjectSelection["type"],
       link: link,
       projectGoal: projectGoal,
@@ -256,8 +255,6 @@ function serializeProjectData(project: FormData) {
 }
 
 async function setImageInBucket(userId: string, logoKey: string, logo: File) {
-  const img = Buffer.from(await logo.arrayBuffer())
-  const resizedImageBuffer = await sharp(img).resize(400,500).toBuffer()
   const signedUrl = await getSignedUrl(
     s3,
     uploadProjectLogo(logoKey, logo.type, logo.size, userId),
@@ -268,7 +265,7 @@ async function setImageInBucket(userId: string, logoKey: string, logo: File) {
 
   fetch(signedUrl, {
     method: "PUT",
-    body: resizedImageBuffer,
+    body: logo,
     headers: {
       "content-type": logo.type,
     },
