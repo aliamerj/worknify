@@ -95,8 +95,9 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (err) {
+const errorDetails = JSON.stringify(err, Object.getOwnPropertyNames(err));
     return NextResponse.json(
-      { state: false, message: "Failed to Upload Image",err},
+      { state: false, message: "Failed to Upload Image",err: errorDetails},
       { status: 500 },
     );
   }
