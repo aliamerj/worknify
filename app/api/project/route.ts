@@ -60,21 +60,21 @@ export async function POST(request: NextRequest) {
     link,
     techUsed,
   } = validation.data;
-
+   let imageUrl;
   try {
-    // let imageUrl = "x";
-    // if (logo && logo instanceof File) { 
-    //   imageUrl = await setImageInBucket(
-    //     session.user.id!,
-    //     `${session.user.id!}-${name}`,
-    //     logo,
-    //   );
-    // }
+ 
+    if (logo && logo instanceof File) { 
+      imageUrl = await setImageInBucket(
+        session.user.id!,
+        `${session.user.id!}-${name}`,
+        logo,
+      );
+    }
 
     const newProject: ProjectInsertion = {
       owner: session.user.id!,
       name: name,
-      logo: "x", // imageUrl && imageUrl.split("?")[0],
+      logo: imageUrl && imageUrl.split("?")[0],
       type: type as ProjectSelection["type"],
       link: link,
       projectGoal: projectGoal,
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
 const errorDetails = JSON.stringify(err, Object.getOwnPropertyNames(err));
     return NextResponse.json(
-      { state: false, message: "Failed to Upload Image",err: errorDetails},
+      { state: false, message: "Failed to Upload Image",err: errorDetails, imageUrl},
       { status: 500 },
     );
   }
