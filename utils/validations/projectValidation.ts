@@ -49,7 +49,7 @@ export const projectSchema = z.object({
     .string()
     .trim()
     .min(10, "Description must be at least 10 characters")
-    .max(1000, "Description must be under 1000 characters"),
+    .max(5000, "Description must be under 5000 characters"),
   compilation: z.number().default(0),
   projectGoal: z
     .string()

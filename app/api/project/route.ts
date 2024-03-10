@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
   } = validation.data;
 
   try {
-    var imageUrl;
+    let imageUrl;
     if (logo && logo instanceof File) { 
       imageUrl = await setImageInBucket(
         session.user.id!,

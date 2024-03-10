@@ -62,9 +62,15 @@ export const NavBar = async () => {
             notificationsCount={notifications}
           />
         ) : (
-          <Link className={styles.getStartedBtn} href="/api/auth/signin">
+          <Button
+            as={Link}
+            color="primary"
+            size="lg"
+            variant="shadow"
+            href="/api/auth/signin"
+          >
             Get Started
-          </Link>
+          </Button>
         )}
       </NavbarContent>
     </Navbar>

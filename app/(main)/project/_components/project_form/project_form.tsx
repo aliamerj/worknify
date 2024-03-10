@@ -172,9 +172,8 @@ const ProjectForm = ({ project }: { project?: ProjectSelection }) => {
                   variant="underlined"
                   isInvalid={!!error}
                   errorMessage={error?.message}
-                  type="text"
-                  maxLength={100}
-                  label="Problem Solving"
+                  type="text" 
+                  label="Problem Solving in 100 letters"
                   className="w-full"
                   {...field}
                 />
