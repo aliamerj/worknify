@@ -19,8 +19,7 @@ export const Education = ({
         Education
       </h2>
       <div className="flex flex-wrap justify-center gap-4">
-        {Array(8)
-          .fill(educations[0])
+        {educations
           .map((edu) => (
             <div
               key={edu.id}

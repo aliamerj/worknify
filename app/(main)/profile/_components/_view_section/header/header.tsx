@@ -74,41 +74,41 @@ const Header: React.FC<IHeader> = ({
     return null;
   };
 
-  return (
-    <div
-      className={`${styles.bgPattern} flex h-screen justify-center p-5 pt-[calc(4rem+1rem)] text-white shadow-md`}
-    >
-      <div className="flex flex-col-reverse items-center justify-center pb-14 md:w-4/5 md:flex-row md:items-center md:justify-evenly md:gap-3">
-        <section className="mx-5 flex flex-col items-center justify-center px-5 pt-16 md:items-start md:justify-start">
-          <h1 className="text-4xl font-bold md:text-5xl">{fullName}</h1>
-          <h2 className="text-xs text-gray-300">@{username}</h2>
-          <p className="my-4 text-center text-lg md:w-96 md:text-start md:text-xl">
-            {background}
-          </p>
-          {children}
-        </section>
-        <section className="mb-3 flex h-40 w-40 flex-col items-center justify-center gap-5 rounded-full md:h-64 md:w-64">
-          <Image
-            src={image ?? "/user_image.png"}
-            alt="user Image"
-            priority
-            width={200}
-            height={200}
-            style={{ objectFit: "cover" }}
-            className="rounded-full bg-foreground p-2"
-          />
+  return (<div
+  className={`${styles.bgPattern} flex min-h-screen flex-col justify-center p-5 text-white shadow-md md:pt-[4rem]`}
+>
 
-          <h1 className="flex text-center text-2xl font-bold italic tracking-wide text-white shadow-xl transition duration-300 ease-in-out md:text-3xl">
-            {jobTitle}
-          </h1>
-        </section>
-      </div>
-      <div className="flex flex-col items-end gap-5">
-        {renderLinkedInLink()}
-        {renderGithubLink()}
-      </div>
-    </div>
-  );
+ <div className="flex flex-col items-end gap-5">
+    {renderLinkedInLink()}
+    {renderGithubLink()}
+  </div>
+  <div className="flex flex-col-reverse items-center justify-center pb-14 pt-12 md:flex-row md:items-center md:justify-evenly md:gap-3">
+    <section className="mx-5 flex flex-col items-center justify-center px-5 pt-16 md:items-start md:justify-start">
+      <h1 className="text-4xl font-bold md:text-5xl">{fullName}</h1>
+      <h2 className="text-xs text-gray-300">@{username}</h2>
+      <p className="my-4 text-center text-lg md:w-96 md:text-start md:text-xl">
+        {background}
+      </p>
+      {children}
+    </section>
+    <section className="flex w-full flex-col items-center justify-center gap-5 rounded-full md:h-64 md:w-64">
+      <Image
+        src={image ?? "/user_image.png"}
+        alt="user Image"
+        priority
+        width={200}
+        height={200}
+        style={{ objectFit: "cover" }}
+        className="rounded-full bg-foreground p-2"
+      />
+
+      <h1 className="text-center text-2xl font-bold italic tracking-wide text-white shadow-xl transition duration-300 ease-in-out md:text-3xl">
+        {jobTitle}
+      </h1>
+    </section>
+  </div>
+
+</div>  );
 };
 
 export default Header;
