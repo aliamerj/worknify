@@ -8,8 +8,9 @@ const rubik = Rubik({
 });
 
 export const metadata: Metadata = {
-  title: "Open-Source Collaboration and Project Management | Worknify",
-  description: "Worknify redefines the way professionals manage projects and showcase their achievements. As a personal project developed with passion and commitment, Worknify offers a comprehensive suite of tools designed to enhance productivity, collaboration, and personal branding in one open-source platform.",
+  title: "Open-Source Collaboration and Project Management",
+  description:
+    "Worknify redefines the way professionals manage projects and showcase their achievements. As a personal project developed with passion and commitment, Worknify offers a comprehensive suite of tools designed to enhance productivity, collaboration, and personal branding in one open-source platform.",
 };
 
 export default function MainLayout({
