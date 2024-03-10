@@ -17,14 +17,12 @@ export const uploadProjectLogo = (
   fileType: string,
   size: number,
   userId: string,
-  img:File
 
 ) =>
   new PutObjectCommand({
     Bucket: process.env.S3_NAME!,
     ContentType: fileType,
     ContentLength: size,
-    Body:img,
     Key: logoName,
     Metadata: {
       userId: userId,

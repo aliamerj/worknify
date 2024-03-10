@@ -60,9 +60,9 @@ export async function POST(request: NextRequest) {
     link,
     techUsed,
   } = validation.data;
-   let imageUrl;
+
   try {
- 
+    var imageUrl;
     if (logo && logo instanceof File) { 
       imageUrl = await setImageInBucket(
         session.user.id!,
@@ -95,9 +95,8 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (err) {
-const errorDetails = JSON.stringify(err, Object.getOwnPropertyNames(err));
     return NextResponse.json(
-      { state: false, message: "Failed to Upload Image",err: errorDetails, imageUrl},
+      { state: false, message: "Failed to Upload Image"},
       { status: 500 },
     );
   }
@@ -257,14 +256,18 @@ function serializeProjectData(project: FormData) {
 async function setImageInBucket(userId: string, logoKey: string, logo: File) {
   const signedUrl = await getSignedUrl(
     s3,
-    uploadProjectLogo(logoKey, logo.type, logo.size, userId,logo),
+    uploadProjectLogo(logoKey, logo.type, logo.size, userId),
     {
       expiresIn: 60,
     },
   );
 
   fetch(signedUrl, {
-    method: "GET",
+    method: "PUT",
+    body: logo,
+    headers: {
+      "content-type": logo.type,
+    },
   });
   return signedUrl;
 }
