@@ -257,18 +257,14 @@ function serializeProjectData(project: FormData) {
 async function setImageInBucket(userId: string, logoKey: string, logo: File) {
   const signedUrl = await getSignedUrl(
     s3,
-    uploadProjectLogo(logoKey, logo.type, logo.size, userId),
+    uploadProjectLogo(logoKey, logo.type, logo.size, userId,logo),
     {
       expiresIn: 60,
     },
   );
 
   fetch(signedUrl, {
-    method: "PUT",
-    body: logo,
-    headers: {
-      "content-type": logo.type,
-    },
+    method: "GET",
   });
   return signedUrl;
 }
