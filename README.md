@@ -32,6 +32,8 @@
 - **[AWS](https://aws.amazon.com/)**: Offering reliable, scalable, and inexpensive cloud computing services.
 - **[Docker](https://www.docker.com/)**: A platform for developing, shipping, and running applications in containers.
 
+## More info in [project page on worknify](https://www.worknify.com/project/view/2)
+
 ## Getting Started
 
 Follow these steps to get a local copy up and running.
