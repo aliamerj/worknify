@@ -36,6 +36,8 @@
 
 Follow these steps to get a local copy up and running.
 
+All tasks and plans for this project listed in this [project page on worknify](https://www.worknify.com/dashboard/2)
+
 ### Prerequisites
 
 - Node.js
@@ -44,10 +46,35 @@ Follow these steps to get a local copy up and running.
 - AWS CLI
 
 ### Installation
+1. Install docker
 
-1. **Clone the repository:**
+2. **Clone the repository:**
 
    ```bash
    git clone https://github.com/aliamerj/worknify.git
    cd worknify
-
+3. set up .env
+   ```bash
+   NEXTAUTH_URL= http://localhost:3000
+   NEXTAUTH_SECRET= ...
+   # google
+   GOOGLE_CLIENT_ID= ...
+   GOOGLE_CLIENT_SECRET= ...
+   # FACEBOOK
+   FACEBOOK_CLIENT_ID=...
+   FACEBOOK_CLIENT_SECRET=...
+   # gitub need to change
+   AUTH_GITHUB_ID=...
+   AUTH_GITHUB_SECRET=...
+   # DATABASE
+   DATABASE_URL=...
+   PGPASSWORD=...
+   S3_NAME=...
+   S3_REGIN=...
+   IAM_KEY=...
+   IAM_SECRET=...
+   ```
+5. run the app locally with :
+   ```bash
+   docker compose up
+   ```
