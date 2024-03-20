@@ -54,9 +54,9 @@ export const ProjectBody = ({
         {(item) => (
           <Tab key={item.id} title={item.label}>
             {item.id === "overview" ? (
-              <div className="mx-2 mt-6 rounded-lg bg-white p-6 shadow-sm md:mx-20">
+              <div className="mx-2 mt-6 rounded-lg bg-white p-4 shadow-sm sm:p-6 md:mx-20 lg:mx-auto lg:max-w-4xl">
                 <div className="container mx-auto space-y-4">
-                  <article className="prose">
+                  <article className="prose lg:prose-lg">
                     <ReactMarkdown>{project.description}</ReactMarkdown>
                   </article>
                 </div>

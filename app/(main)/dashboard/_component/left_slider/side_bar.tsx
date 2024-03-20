@@ -16,6 +16,7 @@ import { AddFeatureModal } from "../add_feature_modal/add_feature_modal";
 import { DroppableIds } from "../task_mangement_page/task_mangement_page";
 import { useCurrentProject, useSetFeatureToUpdate } from "../../context/hooks";
 import { FeatureSelection } from "@/db/schemes/featureSchema";
+import { createPortal } from "react-dom";
 
 export const Sidebar = ({
   isSidebarOpen,
@@ -108,20 +109,28 @@ export const Sidebar = ({
                             draggableId={feature.id.toString()}
                             index={index}
                           >
-                            {(provided) => (
-                              <li
-                                draggable="true"
-                                className="py-2"
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <FeaturesCard
-                                  onOpen={onOpen}
-                                  feature={feature}
-                                />
-                              </li>
-                            )}
+                            {(provided, snapshot) => {
+                              const child = (
+                                <li
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  className="py-2"
+                                  style={provided.draggableProps.style}
+                                >
+                                  <FeaturesCard
+                                    onOpen={onOpen}
+                                    feature={feature}
+                                  />
+                                </li>
+                              );
+
+                              if (snapshot.isDragging) {
+                                return createPortal(child, document.body);
+                              }
+
+                              return child;
+                            }}
                           </Draggable>
                         ))}
                       {provided.placeholder}

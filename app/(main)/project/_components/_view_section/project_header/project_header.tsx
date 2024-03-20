@@ -157,7 +157,7 @@ const ProjectHeader = ({
             <p className="text-sm text-gray-600">{projectGoal}</p>
           </div>
         </div>
-        <div className="flex gap-3 pt-3 sm:flex-col ">
+        <div className="flex sm:flex-col responsive-view-project-btns gap-3 pt-3">
           {!iswaiting || isCreater ? (
             <Button
               size="md"
